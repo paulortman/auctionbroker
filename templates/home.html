@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block main %}
+    <h1>HOME!</h1>
+    <ul>
+        <li><a href="{% url 'auctionitem_list' %}" >Auction Items</a></li>
+        <li><a href="{% url 'bidder_list' %}" >Bidders</a></li>
+    </ul>
+{% endblock %}
