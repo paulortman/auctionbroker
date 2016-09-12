@@ -8,3 +8,10 @@ class BidderFactory(factory.django.DjangoModelFactory):
         model = Bidder
 
     name = factory.Faker('name')
+
+
+class AuctionItemFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = AuctionItem
+
+    name = factory.Faker('name')
