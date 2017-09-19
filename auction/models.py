@@ -13,7 +13,7 @@ class AuctionItem(models.Model):
     long_desc = models.TextField(blank=True)
     winning_bid_time = models.DateTimeField(blank=True, null=True)
     auction_time = models.DateTimeField(blank=True, null=True)
-    charge = models.ForeignKey('Charge', blank=True, null=True)
+    charge = models.OneToOneField('Charge', blank=True, null=True)
 
     def __str__(self):
         return "({}) {}{}".format(self.id, self.name, "*" if self.charge else "")

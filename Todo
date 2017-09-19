@@ -1,0 +1,23 @@
+outline views to do:
+
+   1) Charge Item
+        enter bidder number,
+        enter amount,
+        "Save Charge"
+        list last five charges
+        return home
+
+   2) Auction Clerk
+        After selecting item...
+        enter winning bidder number
+        enter charge
+        "Save Winning Bid"
+        Add New Item
+
+   3) New Auction Item
+        Add name
+        Add auction time (button for now)
+
+   4) Cashier
+        Search for bidder number, name, etc.
+

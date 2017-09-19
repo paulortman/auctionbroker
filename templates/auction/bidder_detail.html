@@ -1,8 +1,39 @@
 {% extends 'base.html' %}
 {% block main %}
     <h1>Bidder: {{ bidder.name }} | <a href="{% url 'bidder_update' pk=bidder.pk %}" >Edit</a></h1>
-    <uL>
-        <li>ID: {{ bidder.bidder_num }}</li>
-        <li>Amount Owed: ${{ bidder.outstanding_charges_total }}</li>
-    </uL>
+    <h2>ID: {{ bidder.bidder_num }}</h2>
+    <h2>Charges</h2>
+    {% if bidder.charges.all %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Paid</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for charge in bidder.charges.all %}
+        <tr>
+            <td>
+            {% if charge.auctionitem %}
+                {{ charge.auctionitem.name }}
+            {% endif %}
+            </td>
+            <td>${{ charge.amount }}</td>
+            <td>{{ charge.state }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th>Total</th>
+            <th>{{ bidder.outstanding_charges_total }}</th>
+            <th></th>
+        </tr>
+        </tfoot>
+    </table>
+    {% else %}
+        <p>No charges</p>
+    {% endif %}
 {% endblock %}
