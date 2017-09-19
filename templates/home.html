@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block main %}
-    <h1>HOME!</h1>
+    <h1>Auction</h1>
     <ul>
         <li><a href="{% url 'auctionitem_list' %}" >Auction Items</a></li>
         <li><a href="{% url 'bidder_list' %}" >Bidders</a></li>
@@ -14,9 +14,9 @@
 socket = new WebSocket("ws://" + window.location.host + "/");
 socket.onmessage = function(e) {
     alert(e.data);
-}
+};
 socket.onopen = function() {
     socket.send("hello world");
-}
+};
 </script>
 {% endblock %}

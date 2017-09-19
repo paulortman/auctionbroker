@@ -2,6 +2,7 @@
 {% block main %}
     <h1>Bidder: {{ bidder.name }} | <a href="{% url 'bidder_update' pk=bidder.pk %}" >Edit</a></h1>
     <uL>
-        <li>{{ bidder.bidder_num }}</li>
+        <li>ID: {{ bidder.bidder_num }}</li>
+        <li>Amount Owed: ${{ bidder.outstanding_charges_total }}</li>
     </uL>
 {% endblock %}

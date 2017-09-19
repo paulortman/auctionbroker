@@ -1,6 +1,7 @@
-from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
+from django.views import View
+from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView
 
-from .models import AuctionItem, Bidder
+from .models import AuctionItem, Bidder, Charge
 from .forms import AuctionItemForm, BidderForm
 
 class AuctionItemList(ListView):
@@ -45,3 +46,16 @@ class BidderUpdate(UpdateView):
 
 class BidderDelete(DeleteView):
     model = Bidder
+
+
+class RandomSale(TemplateView):
+    template_name = 'sale.html'
+    def get(self, request, *args, **kwargs):
+        from auction.modelfactory import AuctionItemFactory, BidderFactory
+        b = BidderFactory.create()
+        ai = AuctionItemFactory.create()
+        c = Charge.objects.create(bidder=b, amount='1')
+        ai.charge = c
+        ai.save()
+        return super().get(request, args, kwargs)
+

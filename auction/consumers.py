@@ -6,6 +6,7 @@ def websocket_receive(message):
         message.reply_channel.send('ohi my')
 
 def ws_add(message):
+    message.reply_channel.send({"accept": True})
     Group("sales_events").add(message.reply_channel)
 
 def ws_disconnect(message):

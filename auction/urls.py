@@ -29,4 +29,6 @@ urlpatterns = [
     url(r'^bidder/(?P<pk>\d+)/$', views.BidderDetail.as_view(), name="bidder_detail"),
     url(r'^bidder/(?P<pk>\d+)/edit/$', views.BidderUpdate.as_view(), name="bidder_update"),
     url(r'^bidder/(?P<pk>\d+)/delete/$', views.BidderDelete.as_view(), name="bidder_delete"),
+
+    url(r'^sale/$', views.RandomSale.as_view(), name="test_sale"),
 ]
