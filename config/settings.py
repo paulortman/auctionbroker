@@ -124,6 +124,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Channels
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "ROUTING": "auction.routing.channel_routing",
+    },
+}
 
 
 # Django Debug Toolbar
