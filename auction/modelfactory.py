@@ -1,17 +1,25 @@
-from .models import Bidder
-from .models import AuctionItem
+from .models import Buyer, Booth
+from .models import Item
 import factory
 
 
-class BidderFactory(factory.django.DjangoModelFactory):
+class BuyerFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = Bidder
+        model = Buyer
 
     name = factory.Faker('name')
 
 
-class AuctionItemFactory(factory.django.DjangoModelFactory):
+class BoothFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = AuctionItem
+        model = Booth
 
-    name = factory.Faker('name')
+    name = factory.Sequence(lambda n: 'booth %d' % n)
+
+
+class ItemFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Item
+
+    name = factory.Sequence(lambda n: 'item %d' % n)
+    booth = factory.SubFactory(BoothFactory)

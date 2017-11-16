@@ -1,61 +1,66 @@
 from django.views import View
-from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView
+from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
 
-from .models import AuctionItem, Bidder, Charge
-from .forms import AuctionItemForm, BidderForm
+from .models import Item, Buyer, Purchase
+from .forms import ItemForm, BuyerForm
 
-class AuctionItemList(ListView):
-    model = AuctionItem
-
-
-class AuctionItemDetail(DetailView):
-    model = AuctionItem
+class ItemList(ListView):
+    model = Item
 
 
-class AuctionItemCreate(CreateView):
-    model = AuctionItem
-    form_class = AuctionItemForm
+class ItemDetail(DetailView):
+    model = Item
 
 
-class AuctionItemUpdate(UpdateView):
-    model = AuctionItem
-    form_class = AuctionItemForm
+class ItemCreate(CreateView):
+    model = Item
+    form_class = ItemForm
 
 
-class AuctionItemDelete(DeleteView):
-    model = AuctionItem
+class ItemUpdate(UpdateView):
+    model = Item
+    form_class = ItemForm
 
 
-class BidderList(ListView):
-    model = Bidder
+class ItemDelete(DeleteView):
+    model = Item
 
 
-class BidderDetail(DetailView):
-    model = Bidder
+class BuyerList(ListView):
+    model = Buyer
 
 
-class BidderCreate(CreateView):
-    model = Bidder
-    form_class = BidderForm
+class BuyerDetail(DetailView):
+    model = Buyer
 
 
-class BidderUpdate(UpdateView):
-    model = Bidder
-    form_class = BidderForm
+class BuyerCreate(CreateView):
+    model = Buyer
+    form_class = BuyerForm
 
 
-class BidderDelete(DeleteView):
-    model = Bidder
+class BuyerUpdate(UpdateView):
+    model = Buyer
+    form_class = BuyerForm
+
+
+class BuyerDelete(DeleteView):
+    model = Buyer
 
 
 class RandomSale(TemplateView):
     template_name = 'sale.html'
     def get(self, request, *args, **kwargs):
-        from auction.modelfactory import AuctionItemFactory, BidderFactory
-        b = BidderFactory.create()
-        ai = AuctionItemFactory.create()
-        c = Charge.objects.create(bidder=b, amount='1')
+        from auction.modelfactory import ItemFactory, BuyerFactory
+        b = BuyerFactory.create()
+        ai = ItemFactory.create()
+        c = Purchase.objects.create(bidder=b, amount='1')
         ai.charge = c
         ai.save()
         return super().get(request, args, kwargs)
+
+
+class AddCharge(FormView):
+    template_name = 'auction/add_charge.html'
+
 

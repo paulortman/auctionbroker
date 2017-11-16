@@ -1,9 +1,9 @@
 outline views to do:
 
-   1) Charge Item
+   1) Purchase Item
         enter bidder number,
         enter amount,
-        "Save Charge"
+        "Save Purchase"
         list last five charges
         return home
 

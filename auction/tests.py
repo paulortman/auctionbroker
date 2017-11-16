@@ -1,48 +1,60 @@
 from decimal import Decimal
 from django.test import TestCase
 
-from .models import Charge
-from .modelfactory import AuctionItemFactory, BidderFactory
+from .models import Purchase
+from .modelfactory import ItemFactory, BuyerFactory, BoothFactory
 
 
 class AuctionBidEntry(TestCase):
 
     def test_winning_bid_time_set(self):
-        b = BidderFactory()
-        c = Charge.objects.create(bidder=b, amount='10')
-        ai = AuctionItemFactory(charge=c)
-        ai.save()
-        assert ai.winning_bid_time is not None
+        b = BuyerFactory()
+        p = Purchase.objects.create(buyer=b, amount='10')
+        i = ItemFactory(purchase=p)
+        i.save()
+        assert i.purchase.transaction_time is not None
 
     def test_winning_bid_time_not_set(self):
-        ai = AuctionItemFactory()
-        ai.save()
-        assert ai.winning_bid_time is None
+        i = ItemFactory()
+        i.save()
+        assert i.purchase is None
 
 
-class ChargesTestCase(TestCase):
+class PurchaseTestCase(TestCase):
 
-    def test_no_charges(self):
-        b = BidderFactory()
-        assert b.outstanding_charges_total == 0
+    def test_no_purchases(self):
+        b = BuyerFactory()
+        assert b.outstanding_purchases_total == 0
 
-    def test_one_charge(self):
-        b = BidderFactory()
-        Charge.objects.create(bidder=b, amount='10.00')
-        assert b.outstanding_charges_total == Decimal('10.00')
+    def test_one_purchase(self):
+        b = BuyerFactory()
+        Purchase.objects.create(buyer=b, amount=Decimal('10.00'))
+        assert b.outstanding_purchases_total == Decimal('10.00')
 
-    def test_multiple_charges(self):
-        b = BidderFactory()
-        Charge.objects.create(bidder=b, amount='10.00')
-        Charge.objects.create(bidder=b, amount='10.00')
-        Charge.objects.create(bidder=b, amount='10.00')
-        Charge.objects.create(bidder=b, amount='10.00')
-        assert b.outstanding_charges_total == Decimal('40.00')
+    def test_multiple_purchases(self):
+        b = BuyerFactory()
+        Purchase.objects.create(buyer=b, amount=Decimal('10.00'))
+        Purchase.objects.create(buyer=b, amount=Decimal('10.00'))
+        Purchase.objects.create(buyer=b, amount=Decimal('10.00'))
+        Purchase.objects.create(buyer=b, amount=Decimal('10.00'))
+        assert b.outstanding_purchases_total == Decimal('40.00')
 
     def test_some_paid(self):
-        b = BidderFactory()
-        Charge.objects.create(bidder=b, amount='10.00')
-        Charge.objects.create(bidder=b, amount='10.00')
-        Charge.objects.create(bidder=b, amount='10.00', state=Charge.PAID)
-        Charge.objects.create(bidder=b, amount='10.00', state=Charge.PAID)
-        assert b.outstanding_charges_total == Decimal('20.00')
+        b = BuyerFactory()
+        Purchase.objects.create(buyer=b, amount=Decimal('10.00'))
+        Purchase.objects.create(buyer=b, amount=Decimal('10.00'))
+        Purchase.objects.create(buyer=b, amount=Decimal('10.00'), state=Purchase.PAID)
+        Purchase.objects.create(buyer=b, amount=Decimal('10.00'), state=Purchase.PAID)
+        assert b.outstanding_purchases_total == Decimal('20.00')
+
+    def test_new_donation(self):
+        b = BuyerFactory()
+        booth = BoothFactory()
+        p = Purchase.build_donation(buyer=b, amount=Decimal('10.00'), booth=booth)
+        assert p.donation_amount == Decimal('10.00')
+
+    def test_new_priced_item(self):
+        b = BuyerFactory()
+        booth = BoothFactory()
+        p = Purchase.build_priced_item(buyer=b, amount=Decimal('10.00'), booth=booth)
+        assert p.donation_amount == Decimal('0.00')

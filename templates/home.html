@@ -1,22 +1,15 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block main %}
     <h1>Auction</h1>
     <ul>
         <li><a href="{% url 'auctionitem_list' %}" >Auction Items</a></li>
         <li><a href="{% url 'bidder_list' %}" >Bidders</a></li>
     </ul>
+    <div id="reacter">DEADBEEF</div>
 {% endblock %}
 
 {% block endscript %}
-<script>
-// Note that the path doesn't matter right now; any WebSocket
-// connection gets bumped over to WebSocket consumers
-socket = new WebSocket("ws://" + window.location.host + "/");
-socket.onmessage = function(e) {
-    alert(e.data);
-};
-socket.onopen = function() {
-    socket.send("hello world");
-};
+<script src="{% static 'js/Bundle.js' %}">
 </script>
 {% endblock %}

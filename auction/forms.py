@@ -1,16 +1,16 @@
 from django import forms
 
-from .models import AuctionItem
-from .models import Bidder
+from .models import Item
+from .models import Buyer
 
 
-class AuctionItemForm(forms.ModelForm):
+class ItemForm(forms.ModelForm):
     class Meta:
-        model = AuctionItem
+        model = Item
         exclude = []
 
 
-class BidderForm(forms.ModelForm):
+class BuyerForm(forms.ModelForm):
     class Meta:
-        model = Bidder
+        model = Buyer
         exclude = []

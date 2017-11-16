@@ -18,17 +18,18 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^items/$', views.AuctionItemList.as_view(), name="auctionitem_list"),
-    url(r'^item/create/$', views.AuctionItemCreate.as_view(), name="auctionitem_create"),
-    url(r'^item/(?P<pk>\d+)/$', views.AuctionItemDetail.as_view(), name="auctionitem_detail"),
-    url(r'^item/(?P<pk>\d+)/edit/$', views.AuctionItemUpdate.as_view(), name="auctionitem_update"),
-    url(r'^item/(?P<pk>\d+)/delete/$', views.AuctionItemDelete.as_view(), name="auctionitem_delete"),
+    url(r'^items/$', views.ItemList.as_view(), name="item_list"),
+    url(r'^item/create/$', views.ItemCreate.as_view(), name="item_create"),
+    url(r'^item/(?P<pk>\d+)/$', views.ItemDetail.as_view(), name="item_detail"),
+    url(r'^item/(?P<pk>\d+)/edit/$', views.ItemUpdate.as_view(), name="item_update"),
+    url(r'^item/(?P<pk>\d+)/delete/$', views.ItemDelete.as_view(), name="item_delete"),
 
-    url(r'^bidders/$', views.BidderList.as_view(), name="bidder_list"),
-    url(r'^bidder/create/$', views.BidderCreate.as_view(), name="bidder_create"),
-    url(r'^bidder/(?P<pk>\d+)/$', views.BidderDetail.as_view(), name="bidder_detail"),
-    url(r'^bidder/(?P<pk>\d+)/edit/$', views.BidderUpdate.as_view(), name="bidder_update"),
-    url(r'^bidder/(?P<pk>\d+)/delete/$', views.BidderDelete.as_view(), name="bidder_delete"),
+    url(r'^buyers/$', views.BuyerList.as_view(), name="buyer_list"),
+    url(r'^buyer/create/$', views.BuyerCreate.as_view(), name="buyer_create"),
+    url(r'^buyer/(?P<pk>\d+)/$', views.BuyerDetail.as_view(), name="buyer_detail"),
+    url(r'^buyer/(?P<pk>\d+)/edit/$', views.BuyerUpdate.as_view(), name="buyer_update"),
+    url(r'^buyer/(?P<pk>\d+)/delete/$', views.BuyerDelete.as_view(), name="buyer_delete"),
 
     url(r'^sale/$', views.RandomSale.as_view(), name="test_sale"),
+    url(r'^add_charge/$', views.AddCharge.as_view(), name="add_charge"),
 ]
