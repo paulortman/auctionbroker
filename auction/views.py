@@ -60,7 +60,7 @@ class RandomSale(TemplateView):
         return super().get(request, args, kwargs)
 
 
-class AddCharge(FormView):
+class AddCharge(TemplateView):
     template_name = 'auction/add_charge.html'
 
 

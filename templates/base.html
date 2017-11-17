@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,8 +28,8 @@
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li class="active"><a href="{% url 'home' %}">Home</a></li>
-                <li><a class="nav-link" href="{% url 'auctionitem_list' %}">Items</a></li>
-                <li><a class="nav-link" href="{% url 'bidder_list' %}">Bidders</a></li>
+                <li><a class="nav-link" href="{% url 'item_list' %}">Items</a></li>
+                <li><a class="nav-link" href="{% url 'buyer_list' %}">Buyers</a></li>
                 </li>
             </ul>
         </div><!--/.nav-collapse -->
@@ -40,8 +41,6 @@
             <h1>DEADBEEF</h1>
         {% endblock %}
     {% endblock %}
-    {% block endscript %}
-    {% endblock %}
 </div>
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -51,5 +50,15 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
         integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>
+
+<!-- React components as per https://www.codementor.io/gbozee/getting-started-in-react-the-easy-way-bd17gjmah -->
+<script src="https://unpkg.com/react@15.6.0/dist/react.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@15.6.0/dist/react-dom.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/create-react-class@15.6.0/create-react-class.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/babel-standalone@6.24.2/babel.min.js"></script>
+
+{% block extra_footer_script %}
+{% endblock %}
+
 </body>
 </html>

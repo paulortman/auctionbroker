@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block main %}
 
-    <h1>Item: {{ auctionitem.name }} | <a href="{% url 'auctionitem_update' pk=auctionitem.pk %}" >Edit</a></h1>
+    <h1>Item: {{ item.name }} | <a href="{% url 'item_update' pk=item.pk %}" >Edit</a></h1>
 
     <ul>
-        <li>Desc: {{ auctionitem.long_desc }}</li>
-        <li>Winner: {{ auctionitem.charge.bidder.name }}</li>
-        <li>Auction Time: {{ auctionitem.auction_time }}</li>
+        <li>Desc: {{ item.long_desc }}</li>
+        <li>Winner: {{ item.charge.bidder.name }}</li>
+        <li>Auction Time: {{ item.auction_time }}</li>
     </ul>
 {% endblock %}

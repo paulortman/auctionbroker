@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block main %}
-    <h1>Bidders</h1>
+    <h1>Buyers</h1>
     <ul>
-    {% for bidder in bidder_list %}
-        <li><a href="{% url 'bidder_detail' pk=bidder.pk %}" >{{ bidder.name }}</a> - ({{ bidder.id }})</li>
+    {% for buyer in buyer_list %}
+        <li><a href="{% url 'buyer_detail' pk=buyer.pk %}" >{{ buyer.name }}</a> - ({{ buyer.id }})</li>
     {% endfor %}
     </ul>
 {% endblock %}

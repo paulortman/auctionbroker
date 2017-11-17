@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block main %}
-    <h1>Bidder: {{ bidder.name }} | <a href="{% url 'bidder_update' pk=bidder.pk %}" >Edit</a></h1>
-    <h2>ID: {{ bidder.bidder_num }}</h2>
+    <h1>Bidder: {{ buyer.name }} | <a href="{% url 'buyer_update' pk=buyer.pk %}" >Edit</a></h1>
+    <h2>ID: {{ buyer.buyer_num }}</h2>
     <h2>Charges</h2>
-    {% if bidder.charges.all %}
+    {% if buyer.charges.all %}
     <table class="table table-striped">
         <thead>
         <tr>
@@ -13,11 +13,11 @@
         </tr>
         </thead>
         <tbody>
-        {% for charge in bidder.charges.all %}
+        {% for charge in buyer.charges.all %}
         <tr>
             <td>
-            {% if charge.auctionitem %}
-                {{ charge.auctionitem.name }}
+            {% if charge.item %}
+                {{ charge.item.name }}
             {% endif %}
             </td>
             <td>${{ charge.amount }}</td>
@@ -28,7 +28,7 @@
         <tfoot>
         <tr>
             <th>Total</th>
-            <th>{{ bidder.outstanding_charges_total }}</th>
+            <th>{{ buyer.outstanding_charges_total }}</th>
             <th></th>
         </tr>
         </tfoot>
