@@ -1,10 +1,14 @@
+from django.core.exceptions import ValidationError
 from django.forms import formset_factory
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
+from extra_views import FormSetView
 
 from .models import Item, Buyer, Purchase
-from .forms import ItemForm, BuyerForm, PricedItemPurchaseForm
+from .forms import ItemForm, BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm
+
 
 class ItemList(ListView):
     model = Item
@@ -76,13 +80,32 @@ def priced_item_checkout(request):
     })
 
 
-class CheckoutBidder(FormView):
-    template_name =
+class CheckoutBuyer(FormView):
+    template_name = 'auction/checkout_buyer.html'
+    form_class = CheckoutBuyerForm
+
+    def form_valid(self, form):
+        buyer_num = form.cleaned_data['buyer_num']
+        try:
+            buyer = Buyer.objects.get(buyer_num=buyer_num)
+        except Buyer.DoesNotExist:
+            form.add_error("Buyer {} unknown".format(buyer_num))
+            redirect('checkout_buyer', buyer_num=buyer_num)
+
+        return redirect('checkout_purchase', buyer_num=buyer.buyer_num)
 
 
-class CheckoutPurchase(FormView):
-    pass
+class CheckoutPurchase(FormSetView):
+    template_name = 'auction/checkout_purchase.html'
+    form_class = CheckoutPurchaseForm
 
+    def get_context_data(self, **kwargs):
+        context = super(CheckoutPurchase, self).get_context_data(**kwargs)
+        context['buyer_num'] = self.kwargs.get('buyer_num')
+        return context
+
+    def formset_valid(self, formset):
+        return redirect('checkout_complete', buyer_num=self.kwargs.get('buyer_num'))
 
 class CheckoutComplete(FormView):
     pass

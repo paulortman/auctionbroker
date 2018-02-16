@@ -33,7 +33,7 @@ urlpatterns = [
     url(r'^sale/$', views.RandomSale.as_view(), name="test_sale"),
     url(r'^add_charge/$', views.priced_item_checkout, name="add_charge"),
 
-    url(r'^checkout/', views.CheckoutBidder.as_view(), name='checkout_select_bidder'),
-    url(r'^checkout/(?P<buyer_id>)', views.CheckoutPurchase.as_view(), name='checkout_purchase'),
-    url(r'^checkout/(?P<buyer_id>)/complete/', views.CheckoutComplete.as_view(), name='checkout_complete'),
+    url(r'^checkout/$', views.CheckoutBuyer.as_view(), name='checkout_buyer'),
+    url(r'^checkout/(?P<buyer_num>\d+)/$', views.CheckoutPurchase.as_view(), name='checkout_purchase'),
+    url(r'^checkout/(?P<buyer_num>\d+)/complete/$', views.CheckoutComplete.as_view(), name='checkout_complete'),
 ]

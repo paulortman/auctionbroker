@@ -4,3 +4,5 @@ factory-boy
 git+https://github.com/jazzband/django-debug-toolbar.git#egg=django-debug-toolbar
 pytest-django
 coverage
+ipdb
+django-extra-views
