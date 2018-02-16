@@ -1,8 +1,10 @@
+from django.forms import formset_factory
+from django.shortcuts import render
 from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
 
 from .models import Item, Buyer, Purchase
-from .forms import ItemForm, BuyerForm
+from .forms import ItemForm, BuyerForm, PricedItemPurchaseForm
 
 class ItemList(ListView):
     model = Item
@@ -54,13 +56,33 @@ class RandomSale(TemplateView):
         from auction.modelfactory import ItemFactory, BuyerFactory
         b = BuyerFactory.create()
         ai = ItemFactory.create()
-        c = Purchase.objects.create(bidder=b, amount='1')
+        c = Purchase.objects.create(buyer=b, amount='1')
         ai.charge = c
         ai.save()
         return super().get(request, args, kwargs)
 
 
-class AddCharge(TemplateView):
-    template_name = 'auction/add_charge.html'
+def priced_item_checkout(request):
+    PurchasesFormSet = formset_factory(PricedItemPurchaseForm, extra=2)
+
+    if request.method == 'POST':
+        purchases_formset = PurchasesFormSet(request.POST, request.FILES)
+        if purchases_formset.is_valid():
+            pass
+    else:  # GET
+        purchases_formset = PurchasesFormSet()
+    return render(request, 'auction/add_charge.html', {
+        'purchases_formset': purchases_formset
+    })
 
 
+class CheckoutBidder(FormView):
+    template_name =
+
+
+class CheckoutPurchase(FormView):
+    pass
+
+
+class CheckoutComplete(FormView):
+    pass

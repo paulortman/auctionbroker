@@ -1,7 +1,7 @@
 outline views to do:
 
    1) Purchase Item
-        enter bidder number,
+        enter buyer number,
         enter amount,
         "Save Purchase"
         list last five charges
@@ -9,7 +9,7 @@ outline views to do:
 
    2) Auction Clerk
         After selecting item...
-        enter winning bidder number
+        enter winning buyer number
         enter charge
         "Save Winning Bid"
         Add New Item
@@ -19,5 +19,5 @@ outline views to do:
         Add auction time (button for now)
 
    4) Cashier
-        Search for bidder number, name, etc.
+        Search for buyer number, name, etc.
 

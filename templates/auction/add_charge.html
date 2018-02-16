@@ -6,6 +6,10 @@
 {% endblock %}
 
 {% block extra_footer_script %}
+    {{ purchases_formset.management_form }}
+    {% for form in purchases_formset %}
+        {{ form }}
+    {% endfor %}
     <script type="text/babel" src="{% static 'js/add.js' %}"></script>
 
 {% endblock %}

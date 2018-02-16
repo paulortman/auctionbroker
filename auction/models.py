@@ -106,6 +106,9 @@ class Purchase(models.Model):
     def create_priced_item(cls, buyer, amount, booth):
         return Purchase.build_priced_item(buyer, amount, booth).save()
 
+
 class Booth(models.Model):
 
     name = models.CharField(max_length=100)
+    uses_item_inventory = models.BooleanField(default=False)
+    can_adjust_fmv = models.BooleanField(default=False)

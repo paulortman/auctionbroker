@@ -31,5 +31,9 @@ urlpatterns = [
     url(r'^buyer/(?P<pk>\d+)/delete/$', views.BuyerDelete.as_view(), name="buyer_delete"),
 
     url(r'^sale/$', views.RandomSale.as_view(), name="test_sale"),
-    url(r'^add_charge/$', views.AddCharge.as_view(), name="add_charge"),
+    url(r'^add_charge/$', views.priced_item_checkout, name="add_charge"),
+
+    url(r'^checkout/', views.CheckoutBidder.as_view(), name='checkout_select_bidder'),
+    url(r'^checkout/(?P<buyer_id>)', views.CheckoutPurchase.as_view(), name='checkout_purchase'),
+    url(r'^checkout/(?P<buyer_id>)/complete/', views.CheckoutComplete.as_view(), name='checkout_complete'),
 ]
