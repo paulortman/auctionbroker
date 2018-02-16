@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'channels',
     'debug_toolbar',
 
+    'djmoney',
     'auction',
 ]
 
@@ -138,4 +139,3 @@ CHANNEL_LAYERS = {
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 INTERNAL_IPS = ['127.0.0.1',]
-

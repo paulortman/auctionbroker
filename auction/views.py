@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.forms import formset_factory
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
@@ -101,11 +101,13 @@ class CheckoutPurchase(FormSetView):
 
     def get_context_data(self, **kwargs):
         context = super(CheckoutPurchase, self).get_context_data(**kwargs)
-        context['buyer_num'] = self.kwargs.get('buyer_num')
+        buyer = get_object_or_404(Buyer, buyer_num=self.kwargs.get('buyer_num'))
+        context['buyer'] = buyer
         return context
 
     def formset_valid(self, formset):
         return redirect('checkout_complete', buyer_num=self.kwargs.get('buyer_num'))
 
-class CheckoutComplete(FormView):
-    pass
+
+class CheckoutComplete(TemplateView):
+    template_name = 'auction/checkout_complete.html'

@@ -1,12 +1,18 @@
 {% extends 'base.html' %}
 {% block main %}
-    <form action="{% url 'checkout_purchase' buyer_num=buyer_num %}" method="post">
+    <p>Purchasing for: {{ buyer.name }}</p>
+    <form action="{% url 'checkout_purchase' buyer_num=buyer.buyer_num %}" method="post">
         {{ formset.management_form }}
         {% csrf_token %}
         {% for form in formset %}
-        <input type="text" name="amount" />
-        <input type="text" name="quantity" />
-        <input type="submit" value="Checkout" />
+        <div>
+            <input type="text" name="amount" />
+            <input type="text" name="quantity" />
+        </div>
         {% endfor %}
+        <div>
+            <input class="btn btn-primary" type="submit" value="Checkout" />
+            <input class="btn btn-danger" type="reset" value="Cancel Checkout" />
+        </div>
     </form>
 {% endblock %}

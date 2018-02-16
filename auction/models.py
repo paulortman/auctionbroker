@@ -1,11 +1,12 @@
 import json
-from decimal import Decimal
 from django.db import models
 from django.utils import timezone
 from django.shortcuts import reverse
 from channels.channel import Group
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from djmoney.models.fields import MoneyField
+from djmoney.money import Money
 
 
 class Item(models.Model):
@@ -14,8 +15,9 @@ class Item(models.Model):
     long_desc = models.TextField(blank=True)
     scheduled_sale_time = models.DateTimeField(blank=True, null=True)
     purchase = models.OneToOneField('Purchase', blank=True, null=True)
-    fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.0'))
+    amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
     booth = models.ForeignKey('Booth', blank=True, null=True)
+    fair_market_value = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
 
     def __str__(self):
         return "({}) {}{}".format(self.id, self.name, "*" if self.purchase else "")
@@ -48,7 +50,7 @@ class Buyer(models.Model):
     @property
     def outstanding_purchases_total(self):
         s = self.purchases.filter(state=Purchase.UNPAID).aggregate(models.Sum('amount'))['amount__sum']
-        return s if s else 0
+        return Money(s, 'USD') if s else Money(0, 'USD')
 
 
 class Purchase(models.Model):
@@ -62,7 +64,7 @@ class Purchase(models.Model):
     )
 
     buyer = models.ForeignKey('Buyer', related_name='purchases')
-    amount = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.0'))
+    amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
     state = models.CharField(choices=STATES, default='UNPAID', max_length=7)
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     paid_time = models.DateTimeField(blank=True, null=True)
@@ -88,23 +90,23 @@ class Purchase(models.Model):
 
     @classmethod
     def build_donation(cls, buyer, amount, booth):
-        p = Purchase(buyer=buyer, amount=Decimal(amount))
+        p = Purchase(buyer=buyer, amount=Money(amount, 'USD'))
         Item(name='Donation', purchase=p, booth=booth)
         return p
 
     @classmethod
     def create_donation(cls, buyer, amount, booth):
-        return Purchase.build_donation(buyer, amount, booth).save()
+        return Purchase.build_donation(buyer, Money(amount, 'USD'), booth).save()
 
     @classmethod
     def build_priced_item(cls, buyer, amount, booth):
-        p = Purchase(buyer=buyer, amount=Decimal(amount))
-        Item(name='Donation', fair_market_value=Decimal(amount), purchase=p, booth=booth)
+        p = Purchase(buyer=buyer, amount=Money(amount, 'USD'))
+        Item(name='Donation', fair_market_value=Money(amount, 'USD'), purchase=p, booth=booth)
         return p
 
     @classmethod
     def create_priced_item(cls, buyer, amount, booth):
-        return Purchase.build_priced_item(buyer, amount, booth).save()
+        return Purchase.build_priced_item(buyer, Money(amount, 'USD'), booth).save()
 
 
 class Booth(models.Model):

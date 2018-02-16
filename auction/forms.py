@@ -1,6 +1,5 @@
-from decimal import Decimal
 from django import forms
-from django.forms import formset_factory
+from djmoney.forms import MoneyField
 
 from .models import Item
 from .models import Buyer
@@ -19,7 +18,7 @@ class BuyerForm(forms.ModelForm):
 
 
 class PricedItemPurchaseForm(forms.Form):
-    amount = forms.DecimalField(max_digits=15, decimal_places=2, min_value=Decimal('0.0'))
+    amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
     quantity = forms.IntegerField(min_value=0)
 
 
@@ -27,5 +26,8 @@ class CheckoutBuyerForm(forms.Form):
     buyer_num = forms.CharField(max_length=10)
 
 class CheckoutPurchaseForm(PricedItemPurchaseForm):
-    amount = forms.DecimalField(max_digits=15, decimal_places=2, min_value=Decimal('0.0'))
+    amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
     quantity = forms.IntegerField(min_value=0)
+
+    def entry_total(self):
+        return self.amount * self.quantity
