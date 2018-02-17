@@ -54,6 +54,7 @@ class Buyer(models.Model):
         return Money(s, 'USD') if s else Money(0, 'USD')
 
 
+
 class Purchase(models.Model):
     UNPAID = 'UNPAID'
     PAID = 'PAID'
@@ -107,7 +108,9 @@ class Purchase(models.Model):
 
     @classmethod
     def create_priced_item(cls, buyer, amount, booth):
-        return Purchase.build_priced_item(buyer, amount, booth).save()
+        p = Purchase.objects.create(buyer=buyer, amount=amount)
+        Item.objects.create(name='Donation', fair_market_value=amount, purchase=p, booth=booth)
+        return p
 
 
 class Booth(models.Model):

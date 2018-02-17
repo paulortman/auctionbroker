@@ -3,7 +3,7 @@
     <h1>Bidder: {{ buyer.name }} | <a href="{% url 'buyer_update' pk=buyer.pk %}" >Edit</a></h1>
     <h2>ID: {{ buyer.buyer_num }}</h2>
     <h2>Charges</h2>
-    {% if buyer.charges.all %}
+    {% if buyer.purchases.all %}
     <table class="table table-striped">
         <thead>
         <tr>
@@ -13,15 +13,13 @@
         </tr>
         </thead>
         <tbody>
-        {% for charge in buyer.charges.all %}
+        {% for purchase in buyer.purchases.all %}
         <tr>
             <td>
-            {% if charge.item %}
-                {{ charge.item.name }}
-            {% endif %}
+                {{ purchase.item.booth.name }}: {{ purchase.item.name }}
             </td>
-            <td>${{ charge.amount }}</td>
-            <td>{{ charge.state }}</td>
+            <td>{{ purchase.amount }}</td>
+            <td>{{ purchase.state }}</td>
         </tr>
         {% endfor %}
         </tbody>
