@@ -1,7 +1,7 @@
 from django import forms
 from djmoney.forms import MoneyField
 
-from .models import Item
+from .models import Item, Booth
 from .models import Buyer
 
 
@@ -9,6 +9,12 @@ class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
         exclude = []
+
+
+class BoothForm(forms.ModelForm):
+    class Meta:
+        model = Booth
+        exclude = ['slug']
 
 
 class BuyerForm(forms.ModelForm):
@@ -31,4 +37,6 @@ class CheckoutPurchaseForm(PricedItemPurchaseForm):
 
     @property
     def entry_total(self):
-        return self.cleaned_data['amount'] * self.cleaned_data['quantity']
+        if self.cleaned_data:
+            return self.cleaned_data['amount'] * self.cleaned_data['quantity']
+        return 0

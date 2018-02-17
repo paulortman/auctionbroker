@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block main %}
     <p>Purchasing for: {{ buyer.name }}</p>
-    <form action="{% url 'checkout_purchase' buyer_num=buyer.buyer_num %}" method="post">
+    <form action="{% url 'checkout_purchase' buyer_num=buyer.buyer_num booth_slug=booth.slug %}" method="post">
         {{ formset.management_form }}
         {% csrf_token %}
         {% for form in formset %}

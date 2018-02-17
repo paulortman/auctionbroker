@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block main %}
+    <h1>Booth: {{ booth.name }} | <a href="{% url 'booth_update' pk=booth.pk %}" >Edit</a></h1>
+    <p><a href="{% url 'checkout_buyer' booth_slug=booth.slug %}">Checkout</a></p>
+{% endblock %}

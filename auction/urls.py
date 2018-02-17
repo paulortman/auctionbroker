@@ -24,6 +24,12 @@ urlpatterns = [
     url(r'^item/(?P<pk>\d+)/edit/$', views.ItemUpdate.as_view(), name="item_update"),
     url(r'^item/(?P<pk>\d+)/delete/$', views.ItemDelete.as_view(), name="item_delete"),
 
+    url(r'^booths/$', views.BoothList.as_view(), name="booth_list"),
+    url(r'^booth/create/$', views.BoothCreate.as_view(), name="booth_create"),
+    url(r'^booth/(?P<pk>\d+)/$', views.BoothDetail.as_view(), name="booth_detail"),
+    url(r'^booth/(?P<pk>\d+)/edit/$', views.BoothUpdate.as_view(), name="booth_update"),
+    url(r'^booth/(?P<pk>\d+)/delete/$', views.BoothDelete.as_view(), name="booth_delete"),
+
     url(r'^buyers/$', views.BuyerList.as_view(), name="buyer_list"),
     url(r'^buyer/create/$', views.BuyerCreate.as_view(), name="buyer_create"),
     url(r'^buyer/(?P<pk>\d+)/$', views.BuyerDetail.as_view(), name="buyer_detail"),
@@ -33,7 +39,6 @@ urlpatterns = [
     url(r'^sale/$', views.RandomSale.as_view(), name="test_sale"),
     url(r'^add_charge/$', views.priced_item_checkout, name="add_charge"),
 
-    url(r'^checkout/$', views.CheckoutBuyer.as_view(), name='checkout_buyer'),
-    url(r'^checkout/(?P<buyer_num>\d+)/$', views.CheckoutPurchase.as_view(), name='checkout_purchase'),
-    url(r'^checkout/(?P<buyer_num>\d+)/complete/$', views.CheckoutComplete.as_view(), name='checkout_complete'),
+    url(r'^(?P<booth_slug>[-\w]+)/checkout/$', views.CheckoutBuyer.as_view(), name='checkout_buyer'),
+    url(r'^(?P<booth_slug>[-\w]+)/checkout/(?P<buyer_num>\d+)/$', views.CheckoutPurchase.as_view(), name='checkout_purchase'),
 ]

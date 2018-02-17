@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block main %}
+    <h1>Booths</h1>
+    <ul>
+    {% for booth in booth_list %}
+        <li><a href="{% url 'booth_detail' pk=booth.pk %}" >{{ booth.name }}</a> - ({{ booth.id }})</li>
+    {% endfor %}
+    </ul>
+{% endblock %}

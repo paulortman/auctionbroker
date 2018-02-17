@@ -5,6 +5,7 @@ from django.shortcuts import reverse
 from channels.channel import Group
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.utils.text import slugify
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 
@@ -112,5 +113,16 @@ class Purchase(models.Model):
 class Booth(models.Model):
 
     name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, blank=True, editable=False)
     uses_item_inventory = models.BooleanField(default=False)
     can_adjust_fmv = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Booth, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('booth_detail', kwargs={'pk': self.pk})
