@@ -53,6 +53,45 @@ class Buyer(models.Model):
         s = self.purchases.filter(state=Purchase.UNPAID).aggregate(models.Sum('amount'))['amount__sum']
         return Money(s, 'USD') if s else Money(0, 'USD')
 
+    @property
+    def purchases_total(self):
+        purchases = self.purchases.all().aggregate(models.Sum('amount'))['amount__sum']
+        return Money(purchases, 'USD') if purchases else Money('0', 'USD')
+
+    @property
+    def payments_total(self):
+        payments = self.payments.all().aggregate(models.Sum('amount'))['amount__sum']
+        return Money(payments, 'USD') if payments else Money('0', 'USD')
+
+    @property
+    def donations_total(self):
+        fmv = self.purchases.all().aggregate(models.Sum('item__fair_market_value'))['item__fair_market_value__sum']
+        fmv = Money(fmv, 'USD') if fmv else Money('0', 'USD')
+        return self.purchases_total - fmv
+
+    @property
+    def outstanding_balance(self):
+        return self.purchases_total - self.payments_total
+
+    @property
+    def account_is_settled(self):
+        return self.outstanding_balance == Money('0.00', 'USD')
+
+
+class Payment(models.Model):
+    CASH = 'CASH'
+    CHECK = 'CHECK'
+    CARD = 'CARD'
+    METHODS = (
+        (CASH, 'Cash'),
+        (CHECK, 'Check'),
+        (CARD, 'Card')
+    )
+    buyer = models.ForeignKey('Buyer', related_name='payments')
+    amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
+    method = models.CharField(choices=METHODS, default='CHECK', max_length=6)
+    transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
 
 
 class Purchase(models.Model):

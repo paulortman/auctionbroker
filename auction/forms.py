@@ -1,8 +1,7 @@
 from django import forms
 from djmoney.forms import MoneyField
 
-from .models import Item, Booth
-from .models import Buyer
+from .models import Item, Booth, Buyer, Payment
 
 
 class ItemForm(forms.ModelForm):
@@ -15,6 +14,12 @@ class BoothForm(forms.ModelForm):
     class Meta:
         model = Booth
         exclude = ['slug']
+
+
+class PaymentForm(forms.ModelForm):
+    class Meta:
+        model = Payment
+        exclude = []
 
 
 class BuyerForm(forms.ModelForm):

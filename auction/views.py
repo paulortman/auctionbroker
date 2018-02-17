@@ -14,8 +14,9 @@ from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
 from auction.modelfactory import BoothFactory
-from .models import Item, Buyer, Purchase, Booth
-from .forms import ItemForm, BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm
+from .models import Item, Buyer, Purchase, Booth, Payment
+from .forms import ItemForm, BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
+    PaymentForm
 
 
 class ItemList(ListView):
@@ -60,6 +61,28 @@ class BoothUpdate(UpdateView):
 
 class BoothDelete(DeleteView):
     model = Booth
+
+
+class PaymentList(ListView):
+    model = Payment
+
+
+class PaymentDetail(DetailView):
+    model = Payment
+
+
+class PaymentCreate(CreateView):
+    model = Payment
+    form_class = PaymentForm
+
+
+class PaymentUpdate(UpdateView):
+    model = Payment
+    form_class = PaymentForm
+
+
+class PaymentDelete(DeleteView):
+    model = Payment
 
 
 class BuyerList(ListView):

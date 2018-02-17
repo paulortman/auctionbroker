@@ -1,7 +1,7 @@
 from django.test import TestCase
 from moneyed import Money
 
-from .models import Purchase
+from .models import Purchase, Payment
 from .modelfactory import ItemFactory, BuyerFactory, BoothFactory
 
 
@@ -58,3 +58,41 @@ class PurchaseTestCase(TestCase):
         booth = BoothFactory()
         p = Purchase.build_priced_item(buyer=b, amount='10.00', booth=booth)
         assert p.donation_amount == Money('0.00', 'USD')
+
+
+class PaymentsTestCase(TestCase):
+
+    def setUp(self):
+        self.b = BuyerFactory()
+        self.booth = BoothFactory()
+
+    def test_full_payment(self):
+        Purchase.create_priced_item(buyer=self.b, amount='10.00', booth=self.booth)
+        assert self.b.purchases_total == Money('10.00', 'USD')
+        assert self.b.outstanding_balance == Money('10.00', 'USD')
+        Payment.objects.create(buyer=self.b, amount='10.00')
+        assert self.b.outstanding_balance == Money('0.00', 'USD')
+        assert self.b.account_is_settled
+        assert self.b.purchases_total == Money('10.00', 'USD')
+        assert self.b.donations_total == Money('0.00', 'USD')
+
+    def test_partial_payment(self):
+        Purchase.create_priced_item(buyer=self.b, amount='10.00', booth=self.booth)
+        assert self.b.purchases_total == Money('10.00', 'USD')
+        assert self.b.outstanding_balance == Money('10.00', 'USD')
+        Payment.objects.create(buyer=self.b, amount='5.00')
+        assert self.b.outstanding_balance == Money('5.00', 'USD')
+        assert not self.b.account_is_settled
+        assert self.b.purchases_total == Money('10.00', 'USD')
+        assert self.b.donations_total == Money('0.00', 'USD')
+
+    def test_over_payment(self):
+        Purchase.create_priced_item(buyer=self.b, amount='10.00', booth=self.booth)
+        assert self.b.purchases_total == Money('10.00', 'USD')
+        assert self.b.outstanding_balance == Money('10.00', 'USD')
+        Payment.objects.create(buyer=self.b, amount='15.00')
+        assert self.b.outstanding_balance == Money('-5.00', 'USD')
+        assert not self.b.account_is_settled
+        assert self.b.purchases_total == Money('10.00', 'USD')
+        assert self.b.donations_total == Money('0.00', 'USD')
+
