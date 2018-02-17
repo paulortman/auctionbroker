@@ -90,23 +90,23 @@ class Purchase(models.Model):
 
     @classmethod
     def build_donation(cls, buyer, amount, booth):
-        p = Purchase(buyer=buyer, amount=Money(amount, 'USD'))
+        p = Purchase(buyer=buyer, amount=amount)
         Item(name='Donation', purchase=p, booth=booth)
         return p
 
     @classmethod
     def create_donation(cls, buyer, amount, booth):
-        return Purchase.build_donation(buyer, Money(amount, 'USD'), booth).save()
+        return Purchase.build_donation(buyer, amount, booth).save()
 
     @classmethod
     def build_priced_item(cls, buyer, amount, booth):
-        p = Purchase(buyer=buyer, amount=Money(amount, 'USD'))
-        Item(name='Donation', fair_market_value=Money(amount, 'USD'), purchase=p, booth=booth)
+        p = Purchase(buyer=buyer, amount=amount)
+        Item(name='Donation', fair_market_value=amount, purchase=p, booth=booth)
         return p
 
     @classmethod
     def create_priced_item(cls, buyer, amount, booth):
-        return Purchase.build_priced_item(buyer, Money(amount, 'USD'), booth).save()
+        return Purchase.build_priced_item(buyer, amount, booth).save()
 
 
 class Booth(models.Model):

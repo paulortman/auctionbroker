@@ -29,5 +29,6 @@ class CheckoutPurchaseForm(PricedItemPurchaseForm):
     amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
     quantity = forms.IntegerField(min_value=0)
 
+    @property
     def entry_total(self):
-        return self.amount * self.quantity
+        return self.cleaned_data['amount'] * self.cleaned_data['quantity']

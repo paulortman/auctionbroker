@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
 {% block main %}
-    <p>Purchase Complete.</p>
+    <p>Purchase of {{ purchase_total }} Complete for {{ buyer.name }}</p>
     <p><a class="btn btn-primary" href="{% url 'checkout_buyer' %}">Start New Purchase</a></p>
 {% endblock %}

@@ -4,8 +4,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
+from djmoney.money import Money
 from extra_views import FormSetView
 
+from auction.modelfactory import BoothFactory
 from .models import Item, Buyer, Purchase
 from .forms import ItemForm, BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm
 
@@ -106,7 +108,15 @@ class CheckoutPurchase(FormSetView):
         return context
 
     def formset_valid(self, formset):
-        return redirect('checkout_complete', buyer_num=self.kwargs.get('buyer_num'))
+        context = self.get_context_data()
+        purchase_total = sum([form.entry_total for form in formset.forms])
+        buyer = get_object_or_404(Buyer, buyer_num=self.kwargs.get('buyer_num'))
+
+        # Commit the purchase
+        p = Purchase.build_priced_item(buyer=buyer, amount=purchase_total, booth=BoothFactory())
+
+        context['purchase_total'] = purchase_total
+        return render(self.request, template_name='auction/checkout_complete.html', context=context)
 
 
 class CheckoutComplete(TemplateView):

@@ -5,10 +5,9 @@
         {{ formset.management_form }}
         {% csrf_token %}
         {% for form in formset %}
-        <div>
-            <input type="text" name="amount" />
-            <input type="text" name="quantity" />
-        </div>
+            <div>
+            {{ form }}
+            </div>
         {% endfor %}
         <div>
             <input class="btn btn-primary" type="submit" value="Checkout" />
