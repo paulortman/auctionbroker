@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% block main %}
-    <h1>Bidder: {{ buyer.name }} | <a href="{% url 'buyer_update' pk=buyer.pk %}" >Edit</a></h1>
-    <h2>ID: {{ buyer.buyer_num }}</h2>
-    <h2>Charges | <a href="{% url 'buyer_receipt' pk=buyer.pk %}">Receipt</a></h2>
+    <h1>Buyer: {{ buyer.name }}</h1>
+    <h2>Charges</h2>
     {% if buyer.purchases.all %}
     <table class="table table-striped">
         <thead>

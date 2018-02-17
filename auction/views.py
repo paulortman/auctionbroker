@@ -1,11 +1,17 @@
+from io import StringIO, BytesIO
+
 from django.core.exceptions import ValidationError
 from django.forms import formset_factory
+from django.http import HttpResponse, FileResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import get_template, render_to_string
 from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
 from djmoney.money import Money
 from extra_views import FormSetView
+from weasyprint import HTML, CSS
+from weasyprint.fonts import FontConfiguration
 
 from auction.modelfactory import BoothFactory
 from .models import Item, Buyer, Purchase, Booth
@@ -76,6 +82,23 @@ class BuyerUpdate(UpdateView):
 
 class BuyerDelete(DeleteView):
     model = Buyer
+
+class BuyerReceipt(DetailView):
+    template_name = 'auction/buyer_receipt.html'
+    model = Buyer
+
+    def get(self, *args, **kwargs):
+        context={'buyer': self.get_object()}
+        font_config = FontConfiguration()
+        html = HTML(string=render_to_string(self.template_name, context=context))
+        css = CSS(string="body { background-color: blue; }")
+
+        # Create a PDF response and use Weasy to print to it
+        response = HttpResponse(content_type="application/pdf")
+        response['Content-Disposition'] = 'filename="somefilename.pdf"'
+        html.write_pdf(target=response, stylesheets=[css,], font_config=font_config)
+
+        return response
 
 
 class RandomSale(TemplateView):
