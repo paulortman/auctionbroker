@@ -8,6 +8,7 @@ from django.template.loader import get_template, render_to_string
 from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
+from django.views.generic.detail import SingleObjectMixin
 from djmoney.money import Money
 from extra_views import FormSetView
 from weasyprint import HTML, CSS
@@ -16,7 +17,7 @@ from weasyprint.fonts import FontConfiguration
 from auction.modelfactory import BoothFactory
 from .models import Item, Buyer, Purchase, Booth, Payment
 from .forms import ItemForm, BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
-    PaymentForm
+    PaymentForm, ItemBiddingForm
 
 
 class ItemList(ListView):
@@ -201,4 +202,31 @@ class CheckoutPurchase(FormSetView):
 
         context['purchase_total'] = purchase_total
         return render(self.request, template_name='auction/checkout_complete.html', context=context)
+
+
+class BiddingRecorder(FormView):
+    model = Item
+    form_class = ItemBiddingForm
+    template_name = 'auction/bidding_recorder.html'
+
+
+    def dispatch(self, request, *args, **kwargs):
+        item_pk = self.kwargs.get('item_pk')
+        self.item = get_object_or_404(Item, pk=item_pk)
+        return super(BiddingRecorder, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(BiddingRecorder, self).get_context_data(**kwargs)
+        context['item'] = self.item
+        return context
+
+    def form_valid(self, form):
+        buyer_num = form.cleaned_data['buyer_num']
+        buyer = get_object_or_404(Buyer, buyer_num=buyer_num)
+        amount = form.cleaned_data['amount']
+        purchase = Purchase.objects.create(item=self.item, amount=amount, buyer=buyer)
+        context = self.get_context_data()
+        context['last_purchase'] = purchase
+        return render(self.request, template_name='auction/bidding_complete.html', context=context)
+
 

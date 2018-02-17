@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block main %}
+
+    <p>The last purchase of {{ last_purchase.item.name }} was made by {{ last_purchase.buyer.name }}
+        ({{ last_purchase.buyer.buyer_num }}) for {{ last_purchase.amount }}.</p>
+
+{% endblock %}

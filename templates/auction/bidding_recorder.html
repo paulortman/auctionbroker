@@ -7,6 +7,11 @@
         <li>Desc: {{ item.long_desc }}</li>
         <li>Winner: {{ item.charge.buyer.name }}</li>
         <li>Auction Time: {{ item.auction_time }}</li>
-        <li><a href="{% url "bidding_recorder" pk=item.pk %}">Bid Now</a></li>
     </ul>
+    <form action="{% url "bidding_recorder" pk=item.pk %}" method="post">
+        {% csrf_token %}
+        {{ form.as_ul }}
+        <input type="submit" value="Record Wining Bid" />
+        <input type="reset" value="Cancel" />
+    </form>
 {% endblock %}
