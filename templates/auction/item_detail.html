@@ -5,8 +5,8 @@
 
     <ul>
         <li>Desc: {{ item.long_desc }}</li>
-        <li>Winner: {{ item.charge.buyer.name }}</li>
-        <li>Auction Time: {{ item.auction_time }}</li>
-        <li><a href="{% url "bidding_recorder" pk=item.pk %}">Bid Now</a></li>
+        <li>Winner: {{ item.purchase.buyer.name }}</li>
+        <li>Auction Time: {{ item.scheduled_sale_time }}</li>
+        <li><a href="{% url "bidding_recorder" item_pk=item.pk %}">Bid Now</a></li>
     </ul>
 {% endblock %}

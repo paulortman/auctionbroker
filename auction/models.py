@@ -16,15 +16,20 @@ class Item(models.Model):
     long_desc = models.TextField(blank=True)
     scheduled_sale_time = models.DateTimeField(blank=True, null=True)
     purchase = models.OneToOneField('Purchase', blank=True, null=True)
-    amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
     booth = models.ForeignKey('Booth', blank=True, null=True)
     fair_market_value = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
+    sale_time = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return "({}) {}{}".format(self.id, self.name, "*" if self.purchase else "")
 
     def get_absolute_url(self):
         return reverse('item_detail', kwargs={'pk': self.pk})
+
+    def commit_to_purchase(self, purchase):
+        self.purchase = purchase
+        self.sale_time = timezone.now()
+        self.save()
 
 
 @receiver(post_save, sender=Item)
@@ -130,27 +135,23 @@ class Purchase(models.Model):
         return self.item.fair_market_value
 
     @classmethod
-    def build_donation(cls, buyer, amount, booth):
-        p = Purchase(buyer=buyer, amount=amount)
-        Item(name='Donation', purchase=p, booth=booth)
-        return p
-
-    @classmethod
     def create_donation(cls, buyer, amount, booth):
         p = Purchase.objects.create(buyer=buyer, amount=amount)
-        Item.objects.create(name='Donation', purchase=p, booth=booth)
-        return p
-
-    @classmethod
-    def build_priced_item(cls, buyer, amount, booth):
-        p = Purchase(buyer=buyer, amount=amount)
-        Item(name='Priced Items', fair_market_value=amount, purchase=p, booth=booth)
+        i = Item.objects.create(name='Donation', purchase=p, booth=booth)
+        i.commit_to_purchase(p)
         return p
 
     @classmethod
     def create_priced_item(cls, buyer, amount, booth):
         p = Purchase.objects.create(buyer=buyer, amount=amount)
-        Item.objects.create(name='Priced Items', fair_market_value=amount, purchase=p, booth=booth)
+        i = Item.objects.create(name='Priced Items', fair_market_value=amount, purchase=p, booth=booth)
+        i.commit_to_purchase(p)
+        return p
+
+    @classmethod
+    def purchase_item(cls, buyer, amount, item):
+        p = Purchase.objects.create(buyer=buyer, amount=amount)
+        item.commit_to_purchase(p)
         return p
 
 

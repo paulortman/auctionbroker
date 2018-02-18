@@ -50,13 +50,13 @@ class PurchaseTestCase(TestCase):
     def test_new_donation(self):
         b = BuyerFactory()
         booth = BoothFactory()
-        p = Purchase.build_donation(buyer=b, amount='10.00', booth=booth)
+        p = Purchase.create_donation(buyer=b, amount='10.00', booth=booth)
         assert p.donation_amount == Money('10.00', 'USD')
 
     def test_new_priced_item(self):
         b = BuyerFactory()
         booth = BoothFactory()
-        p = Purchase.build_priced_item(buyer=b, amount='10.00', booth=booth)
+        p = Purchase.create_priced_item(buyer=b, amount='10.00', booth=booth)
         assert p.donation_amount == Money('0.00', 'USD')
 
 

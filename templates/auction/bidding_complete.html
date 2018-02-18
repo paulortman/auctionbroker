@@ -1,7 +1,18 @@
 {% extends 'base.html' %}
 {% block main %}
 
-    <p>The last purchase of {{ last_purchase.item.name }} was made by {{ last_purchase.buyer.name }}
-        ({{ last_purchase.buyer.buyer_num }}) for {{ last_purchase.amount }}.</p>
+    {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li {% if message.tags %}class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% for item in item_list %}
+        <div>
+            <a href="{% url 'bidding_recorder' item_pk=item.pk %}" >{{ item.name }}</a>
+        </div>
+    {% endfor %}
 
 {% endblock %}

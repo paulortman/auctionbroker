@@ -7,7 +7,7 @@ from .models import Item, Booth, Buyer, Payment
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        exclude = []
+        exclude = ['purchase']
 
 class ItemBiddingForm(forms.Form):
     amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')

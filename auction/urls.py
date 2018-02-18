@@ -47,6 +47,7 @@ urlpatterns = [
     url(r'^add_charge/$', views.priced_item_checkout, name="add_charge"),
 
     url(r'^bidding/(?P<item_pk>\d+)/$', views.BiddingRecorder.as_view(), name='bidding_recorder'),
+    url(r'^bidding/list/$', views.BiddingList.as_view(), name='bidding_list'),
 
     url(r'^(?P<booth_slug>[-\w]+)/checkout/$', views.CheckoutBuyer.as_view(), name='checkout_buyer'),
     url(r'^(?P<booth_slug>[-\w]+)/checkout/(?P<buyer_num>\d+)/$', views.CheckoutPurchase.as_view(), name='checkout_purchase'),

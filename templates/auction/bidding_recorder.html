@@ -5,10 +5,15 @@
 
     <ul>
         <li>Desc: {{ item.long_desc }}</li>
-        <li>Winner: {{ item.charge.buyer.name }}</li>
-        <li>Auction Time: {{ item.auction_time }}</li>
+        <li>Winner: {{ item.purchase.buyer.name }}</li>
+        <li>Amount: {{ item.purchase.amount }}</li>
+        {% if item.sale_time %}
+        <li>Sale Time: {{ item.sale_time }}</li>
+        {% else %}
+        <li>Auction Time: {{ item.scheduled_sale_time }}</li>
+        {% endif %}
     </ul>
-    <form action="{% url "bidding_recorder" pk=item.pk %}" method="post">
+    <form action="{% url "bidding_recorder" item_pk=item.pk %}" method="post">
         {% csrf_token %}
         {{ form.as_ul }}
         <input type="submit" value="Record Wining Bid" />
