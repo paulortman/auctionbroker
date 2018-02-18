@@ -8,3 +8,4 @@ ipdb
 django-extra-views
 django-money
 WeasyPrint
+django-braces

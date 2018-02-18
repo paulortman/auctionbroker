@@ -1,3 +1,4 @@
+from braces.views import GroupRequiredMixin
 from django.contrib import messages
 from django.forms import formset_factory
 from django.http import HttpResponse
@@ -35,26 +36,31 @@ class ItemDelete(DeleteView):
     model = Item
 
 
-class BoothList(ListView):
+class BoothList(GroupRequiredMixin, ListView):
     model = Booth
+    group_required = u'admins'
 
 
-class BoothDetail(DetailView):
+class BoothDetail(GroupRequiredMixin, DetailView):
     model = Booth
+    group_required = u'admins'
 
 
-class BoothCreate(CreateView):
-    model = Booth
-    form_class = BoothForm
-
-
-class BoothUpdate(UpdateView):
+class BoothCreate(GroupRequiredMixin, CreateView):
     model = Booth
     form_class = BoothForm
+    group_required = u'admins'
 
 
-class BoothDelete(DeleteView):
+class BoothUpdate(GroupRequiredMixin, UpdateView):
     model = Booth
+    form_class = BoothForm
+    group_required = u'admins'
+
+
+class BoothDelete(GroupRequiredMixin, DeleteView):
+    model = Booth
+    group_required = u'admins'
 
 
 class PaymentList(ListView):
