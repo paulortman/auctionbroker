@@ -1,8 +1,18 @@
-{% extends 'base.html' %}
-{% block main %}
-    <form action="{% url 'checkout_buyer' booth_slug=booth.slug %}" method="post">
+{% extends 'action_page.html' %}
+{% load bootstrap4 %}
+
+{% block page-heading %}
+    {{ booth.name }} Checkout
+{% endblock %}
+
+{% block action-page-content %}
+
+    <form action="{% url 'checkout_buyer' booth_slug=booth.slug %}" method="post" class="form">
         {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="Select" />
+        {% bootstrap_form form layout='inline' %}
+        {% buttons %}
+            <button class="btn btn-primary" type="submit" >Select Bidder</button>
+            <button class="btn btn-secondary" type="reset" >Clear</button>
+        {% endbuttons %}
     </form>
 {% endblock %}

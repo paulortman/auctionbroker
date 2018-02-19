@@ -1,4 +1,6 @@
 import json
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.shortcuts import reverse
@@ -81,6 +83,20 @@ class Buyer(models.Model):
     @property
     def account_is_settled(self):
         return self.outstanding_balance == Money('0.00', 'USD')
+
+
+def buyer_number_validator(value):
+    try:
+        buyer_num = int(value)
+    except ValueError:
+        raise ValidationError("'%(value)s' is not a valid Buyer Number", params={'value': value})
+
+    try:
+        buyer = Buyer.objects.get(buyer_num=buyer_num)
+    except Buyer.DoesNotExist:
+        raise ValidationError("No buyer exists for buyer number '%(value)s'", params={'value': value})
+
+
 
 
 class Payment(models.Model):

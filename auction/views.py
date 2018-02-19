@@ -5,13 +5,14 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
+from djmoney.money import Money
 from extra_views import FormSetView
 from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
 from .models import Item, Buyer, Purchase, Booth, Payment
 from .forms import ItemForm, BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
-    PaymentForm, ItemBiddingForm
+    PaymentForm, ItemBiddingForm, CheckoutConfirmForm
 
 
 class ItemList(ListView):
@@ -194,13 +195,51 @@ class CheckoutPurchase(FormSetView):
 
     def formset_valid(self, formset):
         context = self.get_context_data()
+        values = [{'price': money_serialize(form.cleaned_data['price']), 'quantity': form.cleaned_data['quantity'] } for form in formset.forms]
+        self.request.session['purchase_forms'] = values
         purchase_total = sum([form.entry_total for form in formset.forms])
+        self.request.session['purchase_total'] = money_serialize(purchase_total)
+
+        return redirect('checkout_confirm', buyer_num=self.buyer.buyer_num, booth_slug=self.booth.slug)
+
+
+def money_serialize(money):
+    return {'price': str(money.amount),
+            'currency': str(money.currency)}
+
+def money_deserialize(d):
+    return Money(d['price'], d['currency'])
+
+
+class CheckoutConfirm(FormView):
+    form_class = CheckoutConfirmForm
+    template_name = 'auction/checkout_confirm.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        booth_slug = self.kwargs.get('booth_slug')
+        buyer_num = self.kwargs.get('buyer_num')
+        self.booth = get_object_or_404(Booth, slug=booth_slug)
+        self.buyer = get_object_or_404(Buyer, buyer_num=buyer_num)
+        return super(CheckoutConfirm, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(CheckoutConfirm, self).get_context_data(**kwargs)
+        context['buyer'] = self.buyer
+        context['booth'] = self.booth
+        context['purchase_total'] = money_deserialize(self.request.session['purchase_total'])
+        return context
+
+    def form_valid(self, form):
+        purchase_total = money_deserialize(self.request.session['purchase_total'])
 
         # Save the purchase for the buyer
         p = Purchase.create_priced_item(buyer=self.buyer, amount=purchase_total, booth=self.booth)
 
-        context['purchase_total'] = purchase_total
-        return render(self.request, template_name='auction/checkout_complete.html', context=context)
+        # Clear the session state
+        del(self.request.session['purchase_total'])
+        del(self.request.session['purchase_forms'])
+
+        return redirect('checkout_buyer', booth_slug=self.booth.slug)
 
 
 class BiddingRecorder(FormView):

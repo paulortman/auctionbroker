@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-primary {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <h1 class="page-header">{% block page-heading%}Page Heading{% endblock %}</h1>
+
+    {% block action-page-content %}
+        <p>DEADBEEF</p>
+    {% endblock %}
+
+{% endblock %}

@@ -9,3 +9,4 @@ django-extra-views
 django-money
 WeasyPrint
 django-braces
+django-bootstrap4

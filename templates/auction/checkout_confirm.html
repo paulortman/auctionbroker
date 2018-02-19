@@ -1,0 +1,18 @@
+{% extends 'action_page.html' %}
+{% load bootstrap4 %}
+
+{% block page-heading %}
+    {{ booth }} Checkout
+{% endblock %}
+
+{% block action-page-content %}
+    <h2>Purchasing for: {{ buyer.name }} (#{{ buyer.buyer_num }})</h2>
+
+    <p>The total purchase price is {{ purchase_total }}. Is this correct?</p>
+    <form action="{% url 'checkout_confirm' buyer_num=buyer.buyer_num booth_slug=booth.slug %}" method="post" class="form">
+        {% csrf_token %}
+        {% buttons submit="Yes" %}
+
+        {% endbuttons %}
+    </form>
+{% endblock %}
