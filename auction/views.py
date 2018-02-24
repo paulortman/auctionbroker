@@ -18,6 +18,12 @@ from .forms import ItemForm, BuyerForm, PricedItemPurchaseForm, CheckoutBuyerFor
 class ItemList(ListView):
     model = Item
 
+class ItemManagement(ListView):
+    model = Item
+    template_name = 'auction/item_management.html'
+
+    def get_queryset(self):
+        return Item.objects.filter(booth=Booth.objects.get(name='Auction')).order_by('sale_time','scheduled_sale_time')
 
 class ItemDetail(DetailView):
     model = Item

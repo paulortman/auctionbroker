@@ -1,0 +1,36 @@
+{% extends 'action_page.html' %}
+
+{% block title %}Auction Management{% endblock %}
+
+{% block main %}
+    <h1 class="page-header" >Auction Item Management</h1>
+    <div class="tools">
+
+    </div>
+    <table class="table table-bordered table-striped table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Scheduled Time</th>
+            <th>Sold?</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for item in item_list %}
+        <tr>
+            <td scope="row"><a class="pk" href="{% url 'item_detail' pk=item.pk %}" >{{ item.pk }}</a></td>
+            <td><a href="{% url 'item_detail' pk=item.pk %}" >{{ item.name }}</a></td>
+            <td>{{ item.long_desc|truncatewords:10 }}</td>
+            <td>{{ item.scheduled_sale_time|date:"P" }}</td>
+            {% if item.purchase_id %}
+            <td>(<a href="{% url 'buyer_detail' pk=item.purchase.buyer_id %}" >{{ item.purchase.buyer.buyer_num}}</a>) {{ item.purchase.amount }}</td>
+            {% else %}
+                <td><a href="{% url 'bidding_recorder' item_pk=item.pk %}">Record Bid</a></td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+{% endblock %}

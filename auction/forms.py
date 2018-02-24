@@ -44,14 +44,14 @@ class CheckoutBuyerForm(forms.Form):
                                 help_text="Enter the Buyer's Purchase number to start the checkout.")
 
 
-class CheckoutPurchaseForm(PricedItemPurchaseForm):
-    amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
-    quantity = forms.IntegerField(min_value=0)
+class CheckoutPurchaseForm(forms.Form):
+    price = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
+    quantity = forms.IntegerField(min_value=0, )
 
     @property
     def entry_total(self):
         if self.cleaned_data:
-            return self.cleaned_data['amount'] * self.cleaned_data['quantity']
+            return self.cleaned_data['price'] * self.cleaned_data['quantity']
         return 0
 
 class CheckoutConfirmForm(forms.Form):
