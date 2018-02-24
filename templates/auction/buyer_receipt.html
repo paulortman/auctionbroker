@@ -1,36 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'paper.html' %}
 {% block main %}
     <h1>Buyer: {{ buyer.name }}</h1>
-    <h2>Charges</h2>
-    {% if buyer.purchases.all %}
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Description</th>
-            <th>Amount</th>
-            <th>Paid</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for purchase in buyer.purchases.all %}
-        <tr>
-            <td>
-                {{ purchase.item.booth.name }}: {{ purchase.item.name }}
-            </td>
-            <td>{{ purchase.amount }}</td>
-            <td>{{ purchase.state }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-        <tfoot>
-        <tr>
-            <th>Total</th>
-            <th>{{ buyer.outstanding_purchases_total }}</th>
-            <th></th>
-        </tr>
-        </tfoot>
-    </table>
-    {% else %}
-        <p>No charges</p>
-    {% endif %}
+
+    {% include 'auction/buyer_charges_payment_table.html' %}
 {% endblock %}

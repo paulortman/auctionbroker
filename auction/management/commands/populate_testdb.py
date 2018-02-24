@@ -58,3 +58,4 @@ class Command(BaseCommand):
             AuctionItemFactory.create(booth=auction, name=i)
             print('i', end='')
 
+        print("\nPopulation Done")

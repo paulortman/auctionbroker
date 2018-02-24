@@ -1,0 +1,15 @@
+{% extends 'action_page.html' %}
+{% load bootstrap4 %}
+
+{% block title %}{{ buyer.name }} Payment{% endblock %}
+
+{% block main %}
+
+    <h1 class="page-header">Make a Payment for {{ buyer.name }}</h1>
+    <p>{{ buyer.name }} has an outstanding balance of {{ buyer.outstanding_balance }}.</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form layout='horizontal' %}
+        {% buttons submit="Make Payment" reset="Cancel" %}{% endbuttons %}
+    </form>
+{% endblock %}

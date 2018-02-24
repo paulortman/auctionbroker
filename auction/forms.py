@@ -56,3 +56,9 @@ class CheckoutPurchaseForm(forms.Form):
 
 class CheckoutConfirmForm(forms.Form):
     pass
+
+
+class BuyerPaymentForm(forms.ModelForm):
+    class Meta:
+        model = Payment
+        exclude = ['buyer', 'transaction_time']

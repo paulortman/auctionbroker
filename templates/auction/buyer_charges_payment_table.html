@@ -1,0 +1,78 @@
+<h2>Charges</h2>
+{% if buyer.purchases.all %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Charge Description</th>
+            <th>Donation</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for purchase in buyer.purchases.all %}
+        <tr>
+            <td>
+                <em>{{ purchase.item.booth.name }}</em>: {{ purchase.item.name }}
+            </td>
+            <td> {% if purchase.donation_amount %} {{ purchase.donation_amount }} {% else %} - {% endif %} </td>
+            <td>{{ purchase.amount }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    <tfoot>
+    <tr>
+        <th class="text-right" >Totals</th>
+        <th>{{ buyer.donations_total }}</th>
+        <th>{{ buyer.outstanding_purchases_total }}</th>
+    </tr>
+    </tfoot>
+</table>
+{% else %}
+    <h2>No charges</h2>
+{% endif %}
+
+{% if buyer.payments.all %}
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Payments </th>
+        <th>Amount</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for payment in buyer.payments.all %}
+        <tr>
+            <td>
+                {{ payment.transaction_time|date:"SHORT_DATETIME_FORMAT" }}: {{ payment.get_method_display }}
+            </td>
+            <td>{{ payment.amount }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    <tfoot>
+    <tr>
+        <th class="text-right" >Total Charges</th>
+        <th>{{ buyer.payments_total }}</th>
+    </tr>
+    </tfoot>
+</table>
+{% else %}
+    <h2>No payments</h2>
+{% endif %}
+<p class="hidden-print"><a href="{% url 'buyer_pay' pk=buyer.pk %}" class="btn btn-primary" >Add Payment</a></p>
+
+{% if buyer.donations_total %}
+    <h2>Donation Amount: {{ buyer.donations_total }}</h2>
+
+    <p>The donation amount is the price difference from what the buyer paid over and above the <q>Fair Market Value</q>
+    (<acronym>FMV</acronym>).  Items that were purchased with a specific price are deemed to have a price equal to the
+    <acronym>FMV</acronym>.  Items sold at auction or with a negotiated price are assigned a <acronym>FMV</acronym>
+    before the sale.</p>
+
+{% endif %}
+{% if not buyer.account_is_settled %}
+    <h2>Balance Due: {{ buyer.outstanding_balance }}</h2>
+{% else %}
+    <h2>Account is Settled</h2>
+    <p>No payments are necessary, payments are equal to charges</p>
+{% endif %}

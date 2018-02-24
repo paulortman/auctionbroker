@@ -24,6 +24,7 @@ class Item(models.Model):
     booth = models.ForeignKey('Booth', blank=True, null=True)
     sale_time = models.DateTimeField(blank=True, null=True)
     fair_market_value = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
+    is_purchased = models.BooleanField(default=False)
 
     def __str__(self):
         return "({}) {}{}".format(self.id, self.name, "*" if self.purchase else "")
@@ -31,6 +32,7 @@ class Item(models.Model):
     def commit_to_purchase(self, purchase):
         self.purchase = purchase
         self.sale_time = timezone.now()
+        self.is_purchased = True
         self.save()
 
 
@@ -139,7 +141,6 @@ class Payment(models.Model):
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
 
-
 class Purchase(models.Model):
     UNPAID = 'UNPAID'
     PAID = 'PAID'
@@ -169,11 +170,12 @@ class Purchase(models.Model):
 
     @property
     def item(self):
-        if self.priceditem:
+        if hasattr(self, 'priceditem'):
             return self.priceditem
-        if self.auctionitem:
+        if hasattr(self, 'auctionitem'):
             return self.auctionitem
-        raise AttributeError('Purchase object has no valie \'item\' attribute')
+
+        raise AttributeError('Purchase object has no valid \'item\' attribute')
 
     @property
     def donation_amount(self):

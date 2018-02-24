@@ -1,5 +1,6 @@
 from braces.views import GroupRequiredMixin
 from django.contrib import messages
+from django.contrib.staticfiles import finders
 from django.forms import formset_factory
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -12,7 +13,7 @@ from weasyprint.fonts import FontConfiguration
 
 from .models import Item, Buyer, Purchase, Booth, Payment, AuctionItem
 from .forms import BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
-    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, AuctionItemForm
+    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, AuctionItemForm, BuyerPaymentForm
 
 
 class AuctionItemMixin:
@@ -99,36 +100,48 @@ class PaymentDelete(DeleteView):
     model = Payment
 
 
-class BuyerList(ListView):
+class BuyerMixin:
     model = Buyer
+    def get_object(self):
+        pk = self.kwargs.get('pk', None)
+        if not pk:
+            raise Exception("pk not specified")
+        return self.model.objects.get(pk=pk)
+
+class BuyerList(BuyerMixin, ListView):
+    pass
 
 
-class BuyerDetail(DetailView):
-    model = Buyer
+class BuyerDetail(BuyerMixin, DetailView):
+    pass
 
 
-class BuyerCreate(CreateView):
-    model = Buyer
+class BuyerCreate(BuyerMixin, CreateView):
     form_class = BuyerForm
 
 
-class BuyerUpdate(UpdateView):
-    model = Buyer
+class BuyerUpdate(BuyerMixin, UpdateView):
     form_class = BuyerForm
 
 
-class BuyerDelete(DeleteView):
-    model = Buyer
+class BuyerDelete(BuyerMixin, DeleteView):
+    pass
 
-class BuyerReceipt(DetailView):
+
+class BuyerReceipt(BuyerMixin, DetailView):
     template_name = 'auction/buyer_receipt.html'
-    model = Buyer
 
     def get(self, *args, **kwargs):
         context={'buyer': self.get_object()}
         font_config = FontConfiguration()
         html = HTML(string=render_to_string(self.template_name, context=context))
-        css = CSS(string="body { background-color: blue; }")
+        css_files = ['css/bootstrap.min.css', 'css/print.css']
+        css_files = ['css/print.css',]
+        css_str = ""
+        for f in css_files:
+            with open(finders.find(f), 'r') as fh:
+                css_str += fh.read()
+        css = CSS(string=css_str)
 
         # Create a PDF response and use Weasy to print to it
         response = HttpResponse(content_type="application/pdf")
@@ -136,6 +149,21 @@ class BuyerReceipt(DetailView):
         html.write_pdf(target=response, stylesheets=[css,], font_config=font_config)
 
         return response
+
+
+class BuyerPay(BuyerMixin, FormView):
+    form_class = BuyerPaymentForm
+    template_name = 'auction/buyer_payment.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['buyer'] = self.get_object()
+        return context
+
+    def form_valid(self, form):
+        buyer=self.get_object()
+        Payment.objects.create(buyer=buyer, amount=form.cleaned_data['amount'], method=form.cleaned_data['method'])
+        return redirect('buyer_detail', pk=buyer.pk)
 
 
 class RandomSale(TemplateView):

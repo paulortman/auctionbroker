@@ -1,0 +1,25 @@
+@page {
+    size: Letter portrait;
+    margin: 2cm;
+
+	/*see http://diethardsteiner.github.io/reporting/2015/02/17/CSS-for-print.html*/
+    @bottom-center {
+		width: 100%;
+		content: "Reporting Powered by Open Source Software";
+		vertical-align: middle;
+		font-family: sans-serif;
+		font-weight: bold;
+		font-size: 0.3cm;
+	}
+}
+
+body {
+    font-family: "Bitstream Vera Sans", Verdana, Arial, sans-serif;
+    font-size: 11pt;
+}
+.hidden-print {
+    display: none;
+}
+.table {
+    width: 100%;
+}
