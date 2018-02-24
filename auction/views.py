@@ -270,19 +270,5 @@ class BiddingRecorder(FormView):
         purchase = Purchase.purchase_item(buyer=buyer, amount=amount, item=self.item)
         msg = f"{buyer.buyer_num} ({buyer.name}) purchased {self.item.name} ({self.item.id}) in the amount of {amount}"
         messages.add_message(self.request, messages.INFO, msg)
-        return redirect('bidding_list')
-
-class BiddingList(ListView):
-    model = Item
-    template_name = 'auction/bidding_complete.html'
-
-    # def get_context_data(self, **kwargs):
-    #     context = super(BiddingList, self).get_context_data(**kwargs)
-    #     last_purchase = self.kwargs.get('last_purchase', None)
-    #     if last_purchase:
-    #         context['last_purchase'] = last_purchase
-    #     return context
-    #
-    #
-    #
+        return redirect('item_management')
 
