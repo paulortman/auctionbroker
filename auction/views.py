@@ -34,6 +34,10 @@ class AuctionItemManagement(AuctionItemMixin, ListView):
     model = AuctionItem
     template_name = 'auction/auctionitem_management.html'
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.select_related('purchase', 'purchase__buyer')
+
 class AuctionItemDetail(AuctionItemMixin, DetailView):
     model = AuctionItem
 
