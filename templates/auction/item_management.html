@@ -27,7 +27,7 @@
             {% if item.purchase_id %}
             <td>(<a href="{% url 'buyer_detail' pk=item.purchase.buyer_id %}" >{{ item.purchase.buyer.buyer_num}}</a>) {{ item.purchase.amount }}</td>
             {% else %}
-                <td><a href="{% url 'bidding_recorder' item_pk=item.pk %}">Record Bid</a></td>
+                <td><a class="btn btn-primary btn-sm" href="{% url 'bidding_recorder' item_pk=item.pk %}">Record Bid</a></td>
             {% endif %}
         </tr>
     {% endfor %}
