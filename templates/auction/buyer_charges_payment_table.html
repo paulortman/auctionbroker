@@ -1,78 +1,100 @@
+{% load static %}
+
 <h2>Charges</h2>
 {% if buyer.purchases.all %}
-<table class="table table-striped">
+<table class="table table-hover">
     <thead>
         <tr>
-            <th>Charge Description</th>
-            <th>Donation</th>
-            <th>Amount</th>
+            <th class="col-action">Action</th>
+            <th scope="col">Charge Description</th>
+            <th scope="col" class="col-price">Donation</th>
+            <th scope="col" class="col-price">Amount</th>
         </tr>
     </thead>
     <tbody>
     {% for purchase in buyer.purchases.all %}
         <tr>
+            <td class="col-action">
+                <a class="btn btn-sm btn-outline-secondary " href="{% url 'purchase_update' pk=purchase.pk %}" title="Edit">
+                    <img src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
+                <a class="btn btn-sm btn-outline-danger" href="{% url 'purchase_delete' pk=purchase.pk %}" title="Delete">
+                    <img src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
             <td>
                 <em>{{ purchase.item.booth.name }}</em>: {{ purchase.item.name }}
             </td>
-            <td> {% if purchase.donation_amount %} {{ purchase.donation_amount }} {% else %} - {% endif %} </td>
-            <td>{{ purchase.amount }}</td>
+            <td class="col-price"> {% if purchase.donation_amount %} {{ purchase.donation_amount }} {% else %} - {% endif %} </td>
+            <td class="col-price">{{ purchase.amount }}</td>
         </tr>
     {% endfor %}
     </tbody>
     <tfoot>
     <tr>
+        <th class="col-action"></th>
         <th class="text-right" >Totals</th>
-        <th>{{ buyer.donations_total }}</th>
-        <th>{{ buyer.outstanding_purchases_total }}</th>
+        <th class="col-price">{{ buyer.donations_total }}</th>
+        <th class="col-price">{{ buyer.outstanding_purchases_total }}</th>
     </tr>
     </tfoot>
 </table>
 {% else %}
     <h2>No charges</h2>
 {% endif %}
+<p class="hidden-print"><a href="#" class="btn btn-secondary btn-sm" >Add Charge</a>
+    <a href="#" class="btn btn-secondary btn-sm" >Add Donation</a></p>
 
+<h2>Payments</h2>
 {% if buyer.payments.all %}
-<table class="table table-striped">
+
+<table class="table table-hover">
     <thead>
     <tr>
+        <th class="col-action">Action</th>
         <th>Payments </th>
-        <th>Amount</th>
+        <th class="col-price">Amount</th>
     </tr>
     </thead>
     <tbody>
     {% for payment in buyer.payments.all %}
         <tr>
-            <td>
-                {{ payment.transaction_time|date:"SHORT_DATETIME_FORMAT" }}: {{ payment.get_method_display }}
+            <td class="col-action">
+                <a class="btn btn-sm btn-outline-secondary " href="{% url 'payment_update' pk=payment.pk %}" title="Edit">
+                    <img src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
+                <a class="btn btn-sm btn-outline-danger" href="{% url 'payment_delete' pk=payment.pk %}" title="Delete">
+                    <img src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
             </td>
-            <td>{{ payment.amount }}</td>
+            <td>
+                {{ payment.transaction_time|date:"SHORT_DATETIME_FORMAT" }} {{ payment.get_method_display }} {{ payment.notes }}
+            </td>
+            <td class="col-price">{{ payment.amount }}</td>
         </tr>
     {% endfor %}
     </tbody>
     <tfoot>
     <tr>
+        <th class="col-action"></th>
         <th class="text-right" >Total Charges</th>
-        <th>{{ buyer.payments_total }}</th>
+        <th class="col-price">{{ buyer.payments_total }}</th>
     </tr>
     </tfoot>
 </table>
 {% else %}
     <h2>No payments</h2>
 {% endif %}
-<p class="hidden-print"><a href="{% url 'buyer_pay' pk=buyer.pk %}" class="btn btn-primary" >Add Payment</a></p>
+<p class="hidden-print"><a href="{% url 'buyer_pay' pk=buyer.pk %}" class="btn btn-primary btn-sm" >Add Payment</a></p>
+
+{% if not buyer.account_is_settled %}
+    <h2>Balance Due: {{ buyer.outstanding_balance }}</h2>
+{% else %}
+    <h2>Account is Settled</h2>
+    <p>No payments are necessary, payments are equal to charges.</p>
+{% endif %}
 
 {% if buyer.donations_total %}
     <h2>Donation Amount: {{ buyer.donations_total }}</h2>
 
     <p>The donation amount is the price difference from what the buyer paid over and above the <q>Fair Market Value</q>
-    (<acronym>FMV</acronym>).  Items that were purchased with a specific price are deemed to have a price equal to the
-    <acronym>FMV</acronym>.  Items sold at auction or with a negotiated price are assigned a <acronym>FMV</acronym>
-    before the sale.</p>
+        (<acronym>FMV</acronym>).  Items that were purchased with a specific price are deemed to have a price equal to the
+        <acronym>FMV</acronym>.  Items sold at auction or with a negotiated price are assigned a <acronym>FMV</acronym>
+        before the sale.</p>
 
-{% endif %}
-{% if not buyer.account_is_settled %}
-    <h2>Balance Due: {{ buyer.outstanding_balance }}</h2>
-{% else %}
-    <h2>Account is Settled</h2>
-    <p>No payments are necessary, payments are equal to charges</p>
 {% endif %}

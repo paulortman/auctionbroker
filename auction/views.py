@@ -5,6 +5,7 @@ from django.forms import formset_factory
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
 from djmoney.money import Money
 from extra_views import FormSetView
@@ -13,7 +14,7 @@ from weasyprint.fonts import FontConfiguration
 
 from .models import Item, Buyer, Purchase, Booth, Payment, AuctionItem
 from .forms import BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
-    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, AuctionItemForm, BuyerPaymentForm
+    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, AuctionItemForm, BuyerPaymentForm, PurchaseForm
 
 
 class AuctionItemMixin:
@@ -78,6 +79,32 @@ class BoothDelete(GroupRequiredMixin, DeleteView):
     group_required = u'admins'
 
 
+class PurchaseList(ListView):
+    model = Purchase
+
+
+class PurchaseDetail(DetailView):
+    model = Purchase
+
+
+class PurchaseCreate(CreateView):
+    model = Purchase
+    form_class = PurchaseForm
+
+
+class PurchaseUpdate(UpdateView):
+    model = Purchase
+    form_class = PurchaseForm
+
+
+class PurchaseDelete(DeleteView):
+    model = Purchase
+
+    def get_success_url(self):
+        buyer = self.get_object().buyer
+        return reverse('buyer_detail', kwargs={'pk': buyer.pk})
+
+
 class PaymentList(ListView):
     model = Payment
 
@@ -98,6 +125,10 @@ class PaymentUpdate(UpdateView):
 
 class PaymentDelete(DeleteView):
     model = Payment
+
+    def get_success_url(self):
+        buyer = self.get_object().buyer
+        return reverse('buyer_detail', kwargs={'pk': buyer.pk})
 
 
 class BuyerMixin:

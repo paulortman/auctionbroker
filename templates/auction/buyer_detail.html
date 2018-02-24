@@ -1,6 +1,6 @@
 {% extends 'action_page.html' %}
 {% block main %}
-    <h1>Buyer: {{ buyer.name }} | <a href="{% url 'buyer_update' pk=buyer.pk %}" >Edit</a></h1>
+    <h1>Buyer: {{ buyer.name }} | <a href="{% url 'buyer_update' pk=buyer.pk %}" >Edit</a> | <a href="{% url 'buyer_receipt' pk=buyer.pk %}" >Receipt</a></h1>
     <p>Buyer Number: {{ buyer.buyer_num }}</p>
 
     {% include 'auction/buyer_charges_payment_table.html' %}

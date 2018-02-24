@@ -137,8 +137,10 @@ class Payment(models.Model):
     )
     buyer = models.ForeignKey('Buyer', related_name='payments')
     amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
-    method = models.CharField(choices=METHODS, default='CHECK', max_length=6)
+    method = models.CharField(choices=METHODS, default='CHECK', max_length=6,
+                              help_text="The method or type of payment made.")
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    note = models.TextField(blank=True, help_text="Record any notes about the payment.")
 
 
 class Purchase(models.Model):

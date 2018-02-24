@@ -43,6 +43,12 @@ urlpatterns = [
     url(r'^payment/(?P<pk>\d+)/edit/$', views.PaymentUpdate.as_view(), name="payment_update"),
     url(r'^payment/(?P<pk>\d+)/delete/$', views.PaymentDelete.as_view(), name="payment_delete"),
 
+    url(r'^purchase/$', views.PurchaseList.as_view(), name="purchase_list"),
+    url(r'^purchase/create/$', views.PurchaseCreate.as_view(), name="purchase_create"),
+    url(r'^purchase/(?P<pk>\d+)/$', views.PurchaseDetail.as_view(), name="purchase_detail"),
+    url(r'^purchase/(?P<pk>\d+)/edit/$', views.PurchaseUpdate.as_view(), name="purchase_update"),
+    url(r'^purchase/(?P<pk>\d+)/delete/$', views.PurchaseDelete.as_view(), name="purchase_delete"),
+
     url(r'^sale/$', views.RandomSale.as_view(), name="test_sale"),
     url(r'^add_charge/$', views.priced_item_checkout, name="add_charge"),
 

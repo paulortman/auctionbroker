@@ -10,6 +10,8 @@
     <form action="" method="post">
         {% csrf_token %}
         {% bootstrap_form form layout='horizontal' %}
-        {% buttons submit="Make Payment" reset="Cancel" %}{% endbuttons %}
+        {% buttons submit="Make Payment" %}
+            <a class="btn btn-secondary" href="{% url 'buyer_detail' pk=buyer.pk %}">Cancel</a>
+        {% endbuttons %}
     </form>
 {% endblock %}

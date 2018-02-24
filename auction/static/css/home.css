@@ -9,3 +9,11 @@ body {
 .page-header {
   padding-top: 10px;
 }
+
+.table .col-price {
+  width: 7em;
+}
+.table .col-action {
+  width: 10em;
+
+}

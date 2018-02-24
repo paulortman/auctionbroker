@@ -17,9 +17,23 @@ body {
     font-family: "Bitstream Vera Sans", Verdana, Arial, sans-serif;
     font-size: 11pt;
 }
-.hidden-print {
+.hidden-print, .col-action {
     display: none;
 }
 .table {
+    table-layout: fixed;
     width: 100%;
+}
+
+.table .col-price {
+    width: 7em;
+}
+.table thead th {
+    border-bottom: 1px solid gray;
+}
+.table tbody td {
+    border-bottom: 1px dotted gray;
+}
+.table tfoot th {
+    border-top: 1px solid gray;
 }
