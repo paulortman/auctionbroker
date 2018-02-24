@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block main %}
+    <h1>Items</h1>
+    <ul>
+    {% for item in object_list %}
+        <li><a href="{% url 'item_detail' item_number=item.item_number %}" >{{ item.name }}</a>- ({{ item.item_number }})</li>
+    {% endfor %}
+    </ul>
+{% endblock %}

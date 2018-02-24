@@ -2,6 +2,8 @@ import json
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Max
+from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import reverse
 from channels.channel import Group
@@ -13,26 +15,47 @@ from djmoney.money import Money
 
 
 class Item(models.Model):
+    class Meta:
+        abstract = True
 
     name = models.CharField(max_length=50, blank=False)
     long_desc = models.TextField(blank=True)
-    scheduled_sale_time = models.DateTimeField(blank=True, null=True)
     purchase = models.OneToOneField('Purchase', blank=True, null=True)
     booth = models.ForeignKey('Booth', blank=True, null=True)
-    fair_market_value = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
     sale_time = models.DateTimeField(blank=True, null=True)
+    fair_market_value = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
 
     def __str__(self):
         return "({}) {}{}".format(self.id, self.name, "*" if self.purchase else "")
-
-    def get_absolute_url(self):
-        return reverse('item_detail', kwargs={'pk': self.pk})
 
     def commit_to_purchase(self, purchase):
         self.purchase = purchase
         self.sale_time = timezone.now()
         self.save()
 
+
+class PricedItem(Item):
+    pass
+
+
+def item_number_generator():
+    try:
+        value = AuctionItem.objects.all().aggregate(Max('item_number'))['item_number__max']
+    except AuctionItem.DoesNotExist:
+        value = 0
+    value = 0 if value is None else value
+    return max([value, settings.BASE_AUCTION_NUMBER]) + 1
+
+
+class AuctionItem(Item):
+    class Meta:
+        pass
+
+    item_number = models.PositiveIntegerField(unique=True, db_index=True, default=item_number_generator)
+    scheduled_sale_time = models.DateTimeField(blank=True, null=True)
+
+    def get_absolute_url(self):
+        return reverse('item_detail', kwargs={'item_number': self.item_number})
 
 @receiver(post_save, sender=Item)
 def send_sale_event(sender, instance, **kwargs):
@@ -72,9 +95,11 @@ class Buyer(models.Model):
 
     @property
     def donations_total(self):
-        fmv = self.purchases.all().aggregate(models.Sum('item__fair_market_value'))['item__fair_market_value__sum']
-        fmv = Money(fmv, 'USD') if fmv else Money('0', 'USD')
-        return self.purchases_total - fmv
+        fmv_priced = self.purchases.all().aggregate(models.Sum('priceditem__fair_market_value'))['priceditem__fair_market_value__sum']
+        fmv_auction = self.purchases.all().aggregate(models.Sum('auctionitem__fair_market_value'))['auctionitem__fair_market_value__sum']
+        fmv_priced = Money(fmv_priced, 'USD') if fmv_priced else Money('0', 'USD')
+        fmv_auction = Money(fmv_auction, 'USD') if fmv_auction else Money('0', 'USD')
+        return self.purchases_total - (fmv_priced + fmv_auction)
 
     @property
     def outstanding_balance(self):
@@ -143,7 +168,16 @@ class Purchase(models.Model):
         super().save(*args, **kwargs)
 
     @property
+    def item(self):
+        if self.priceditem:
+            return self.priceditem
+        if self.auctionitem:
+            return self.auctionitem
+        raise AttributeError('Purchase object has no valie \'item\' attribute')
+
+    @property
     def donation_amount(self):
+
         return self.amount - self.item.fair_market_value
 
     @property
@@ -153,14 +187,15 @@ class Purchase(models.Model):
     @classmethod
     def create_donation(cls, buyer, amount, booth):
         p = Purchase.objects.create(buyer=buyer, amount=amount)
-        i = Item.objects.create(name='Donation', purchase=p, booth=booth)
+        i = PricedItem.objects.create(name='Donation', purchase=p, booth=booth)
         i.commit_to_purchase(p)
         return p
 
     @classmethod
     def create_priced_item(cls, buyer, amount, booth):
         p = Purchase.objects.create(buyer=buyer, amount=amount)
-        i = Item.objects.create(name='Priced Items', fair_market_value=amount, purchase=p, booth=booth)
+        i = PricedItem.objects.create(name='{} Item'.format(booth.name),
+                                      fair_market_value=amount, purchase=p, booth=booth)
         i.commit_to_purchase(p)
         return p
 

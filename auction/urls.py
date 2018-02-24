@@ -17,11 +17,11 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^items/$', views.ItemList.as_view(), name="item_list"),
-    url(r'^item/create/$', views.ItemCreate.as_view(), name="item_create"),
-    url(r'^item/(?P<pk>\d+)/$', views.ItemDetail.as_view(), name="item_detail"),
-    url(r'^item/(?P<pk>\d+)/edit/$', views.ItemUpdate.as_view(), name="item_update"),
-    url(r'^item/(?P<pk>\d+)/delete/$', views.ItemDelete.as_view(), name="item_delete"),
+    url(r'^items/$', views.AuctionItemList.as_view(), name="item_list"),
+    url(r'^item/create/$', views.AuctionItemCreate.as_view(), name="item_create"),
+    url(r'^item/(?P<item_number>\d+)/$', views.AuctionItemDetail.as_view(), name="item_detail"),
+    url(r'^item/(?P<item_number>\d+)/edit/$', views.AuctionItemUpdate.as_view(), name="item_update"),
+    url(r'^item/(?P<item_number>\d+)/delete/$', views.AuctionItemDelete.as_view(), name="item_delete"),
 
     url(r'^booths/$', views.BoothList.as_view(), name="booth_list"),
     url(r'^booth/create/$', views.BoothCreate.as_view(), name="booth_create"),
@@ -45,8 +45,8 @@ urlpatterns = [
     url(r'^sale/$', views.RandomSale.as_view(), name="test_sale"),
     url(r'^add_charge/$', views.priced_item_checkout, name="add_charge"),
 
-    url(r'^bidding/(?P<item_pk>\d+)/$', views.BiddingRecorder.as_view(), name='bidding_recorder'),
-    url(r'^management/$', views.ItemManagement.as_view(), name='item_management'),
+    url(r'^bidding/(?P<item_number>\d+)/$', views.BiddingRecorder.as_view(), name='bidding_recorder'),
+    url(r'^management/$', views.AuctionItemManagement.as_view(), name='item_management'),
 
     url(r'^(?P<booth_slug>[-\w]+)/checkout/$', views.CheckoutBuyer.as_view(), name='checkout_buyer'),
     url(r'^(?P<booth_slug>[-\w]+)/checkout/(?P<buyer_num>\d+)/$', views.CheckoutPurchase.as_view(), name='checkout_purchase'),

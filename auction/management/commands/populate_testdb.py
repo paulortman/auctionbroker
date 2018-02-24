@@ -2,7 +2,7 @@ import random
 
 from django.core.management.base import BaseCommand, CommandError
 
-from auction.modelfactory import BoothFactory, BuyerFactory, ItemFactory
+from auction.modelfactory import BoothFactory, BuyerFactory, AuctionItemFactory
 
 items = [
     "1945 Massey Harris",
@@ -51,7 +51,10 @@ class Command(BaseCommand):
 
         for i in range(200):
             BuyerFactory.create()
+            print('b', end='')
 
-        for i in random.shuffle(items):
-            ItemFactory.create(booth=auction, name=i)
+        random.shuffle(items)
+        for i in items:
+            AuctionItemFactory.create(booth=auction, name=i)
+            print('i', end='')
 

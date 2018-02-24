@@ -1,12 +1,12 @@
 from django import forms
 from djmoney.forms import MoneyField
 
-from .models import Item, Booth, Buyer, Payment, buyer_number_validator
+from .models import Item, Booth, Buyer, Payment, buyer_number_validator, AuctionItem
 
 
-class ItemForm(forms.ModelForm):
+class AuctionItemForm(forms.ModelForm):
     class Meta:
-        model = Item
+        model = AuctionItem
         exclude = ['purchase']
 
 class ItemBiddingForm(forms.Form):

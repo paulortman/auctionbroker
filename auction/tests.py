@@ -2,7 +2,7 @@ from django.test import TestCase
 from moneyed import Money
 
 from .models import Purchase, Payment
-from .modelfactory import ItemFactory, BuyerFactory, BoothFactory
+from .modelfactory import AuctionItemFactory, BuyerFactory, BoothFactory
 
 
 class AuctionBidEntry(TestCase):
@@ -10,12 +10,12 @@ class AuctionBidEntry(TestCase):
     def test_winning_bid_time_set(self):
         b = BuyerFactory()
         p = Purchase.objects.create(buyer=b, amount='10')
-        i = ItemFactory(purchase=p)
+        i = AuctionItemFactory(purchase=p)
         i.save()
         assert i.purchase.transaction_time is not None
 
     def test_winning_bid_time_not_set(self):
-        i = ItemFactory()
+        i = AuctionItemFactory()
         i.save()
         assert i.purchase is None
 

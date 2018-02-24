@@ -4,8 +4,7 @@ from django.utils import timezone
 from djmoney.money import Money
 from django.conf import settings
 
-from .models import Buyer, Booth
-from .models import Item
+from .models import Buyer, Booth, AuctionItem
 import factory
 
 
@@ -24,9 +23,9 @@ class BoothFactory(factory.django.DjangoModelFactory):
     name = factory.Sequence(lambda n: 'booth %d' % n)
 
 
-class ItemFactory(factory.django.DjangoModelFactory):
+class AuctionItemFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = Item
+        model = AuctionItem
 
     name = factory.Sequence(lambda n: 'item %d' % n)
     booth = factory.SubFactory(BoothFactory)

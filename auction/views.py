@@ -10,37 +10,44 @@ from extra_views import FormSetView
 from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
-from .models import Item, Buyer, Purchase, Booth, Payment
-from .forms import ItemForm, BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
-    PaymentForm, ItemBiddingForm, CheckoutConfirmForm
+from .models import Item, Buyer, Purchase, Booth, Payment, AuctionItem
+from .forms import BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
+    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, AuctionItemForm
 
 
-class ItemList(ListView):
-    model = Item
-
-class ItemManagement(ListView):
-    model = Item
-    template_name = 'auction/item_management.html'
-
+class AuctionItemMixin:
     def get_queryset(self):
-        return Item.objects.filter(booth=Booth.objects.get(name='Auction')).order_by('sale_time','scheduled_sale_time')
+        return self.model.objects.all().order_by('sale_time','scheduled_sale_time')
 
-class ItemDetail(DetailView):
-    model = Item
+    def get_object(self):
+        item_number = self.kwargs.get('item_number', None)
+        if not item_number:
+            raise Exception("item_number not specified")
+        return self.model.objects.get(item_number=item_number)
+
+class AuctionItemList(AuctionItemMixin, ListView):
+    model = AuctionItem
+
+class AuctionItemManagement(AuctionItemMixin, ListView):
+    model = AuctionItem
+    template_name = 'auction/auctionitem_management.html'
+
+class AuctionItemDetail(AuctionItemMixin, DetailView):
+    model = AuctionItem
 
 
-class ItemCreate(CreateView):
-    model = Item
-    form_class = ItemForm
+class AuctionItemCreate(AuctionItemMixin, CreateView):
+    model = AuctionItem
+    form_class = AuctionItemForm
 
 
-class ItemUpdate(UpdateView):
-    model = Item
-    form_class = ItemForm
+class AuctionItemUpdate(AuctionItemMixin, UpdateView):
+    model = AuctionItem
+    form_class = AuctionItemForm
 
 
-class ItemDelete(DeleteView):
-    model = Item
+class AuctionItemDelete(AuctionItemMixin, DeleteView):
+    model = AuctionItem
 
 
 class BoothList(GroupRequiredMixin, ListView):
