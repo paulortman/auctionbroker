@@ -77,6 +77,9 @@ class Buyer(models.Model):
     buyer_num = models.CharField(max_length=8)
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return "Buyer {name} ({number})".format(name=self.name, number=self.buyer_num)
+
     def get_absolute_url(self):
         return reverse('buyer_detail', kwargs={'pk': self.pk})
 
@@ -142,6 +145,10 @@ class Payment(models.Model):
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     note = models.TextField(blank=True, help_text="Record any notes about the payment.")
 
+    def __str__(self):
+        return "{amount} payment by {buyer}".format(amount=self.amount, buyer=self.buyer.name)
+
+
 
 class Purchase(models.Model):
     UNPAID = 'UNPAID'
@@ -158,6 +165,9 @@ class Purchase(models.Model):
     state = models.CharField(choices=STATES, default='UNPAID', max_length=7)
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     paid_time = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return "{amount} purchase by {buyer}".format(amount=self.amount, buyer=self.buyer.name)
 
     def get_absolute_url(self):
         return reverse('purchase_detail', kwargs={'pk': self.pk})

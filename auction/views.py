@@ -53,6 +53,7 @@ class AuctionItemUpdate(AuctionItemMixin, UpdateView):
 
 
 class AuctionItemDelete(AuctionItemMixin, DeleteView):
+    template_name = 'auction/generic_confirm_delete.html'
     model = AuctionItem
 
 
@@ -79,6 +80,7 @@ class BoothUpdate(GroupRequiredMixin, UpdateView):
 
 
 class BoothDelete(GroupRequiredMixin, DeleteView):
+    template_name = 'auction/generic_confirm_delete.html'
     model = Booth
     group_required = u'admins'
 
@@ -102,6 +104,7 @@ class PurchaseUpdate(UpdateView):
 
 
 class PurchaseDelete(DeleteView):
+    template_name = 'auction/generic_confirm_delete.html'
     model = Purchase
 
     def get_success_url(self):
@@ -128,6 +131,7 @@ class PaymentUpdate(UpdateView):
 
 
 class PaymentDelete(DeleteView):
+    template_name = 'auction/generic_confirm_delete.html'
     model = Payment
 
     def get_success_url(self):
@@ -144,7 +148,11 @@ class BuyerMixin:
         return self.model.objects.get(pk=pk)
 
 class BuyerList(BuyerMixin, ListView):
-    pass
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # return qs.select_related('payments', 'purchases')
+        return qs.prefetch_related('payments', 'purchases')
 
 
 class BuyerDetail(BuyerMixin, DetailView):
@@ -160,7 +168,7 @@ class BuyerUpdate(BuyerMixin, UpdateView):
 
 
 class BuyerDelete(BuyerMixin, DeleteView):
-    pass
+    template_name = 'auction/generic_confirm_delete.html'
 
 
 class BuyerReceipt(BuyerMixin, DetailView):

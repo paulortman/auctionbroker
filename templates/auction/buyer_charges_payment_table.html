@@ -1,9 +1,9 @@
 {% load static %}
 
-<h2>Charges</h2>
+<h2>Purchases</h2>
 {% if buyer.purchases.all %}
-<table class="table table-hover">
-    <thead>
+<table class="table table-bordered table-hover">
+    <thead class="thead-dark">
         <tr>
             <th class="col-action">Action</th>
             <th scope="col">Charge Description</th>
@@ -37,16 +37,16 @@
     </tfoot>
 </table>
 {% else %}
-    <h2>No charges</h2>
+    <h2>No purchases</h2>
 {% endif %}
-<p class="hidden-print"><a href="#" class="btn btn-secondary btn-sm" >Add Charge</a>
+<p class="hidden-print"><a href="#" class="btn btn-secondary btn-sm" >Add Purchase</a>
     <a href="#" class="btn btn-secondary btn-sm" >Add Donation</a></p>
 
 <h2>Payments</h2>
 {% if buyer.payments.all %}
 
-<table class="table table-hover">
-    <thead>
+<table class="table table-bordered table-hover">
+    <thead class="thead-dark">
     <tr>
         <th class="col-action">Action</th>
         <th>Payments </th>

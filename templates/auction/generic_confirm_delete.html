@@ -1,0 +1,12 @@
+{% extends 'action_page.html' %}
+{% load bootstrap4 %}
+{% block main %}
+    <h1 class="page-header">Confirm Delete</h1>
+    <form action="" method="post">
+    {% csrf_token %}
+    <p>Are you sure you want to delete <q>{{ object }}</q>?</p>
+    {% buttons %}
+        <button class="btn btn-danger" type="submit" >Delete</button>
+    {% endbuttons %}
+</form>
+{% endblock %}
