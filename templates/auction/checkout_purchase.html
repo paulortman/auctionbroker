@@ -9,6 +9,7 @@
 {% block content %}
     <div class="row container-fluid">
         <div class="col col-md-6">
+            <h2>Total: <span id="total"></span></h2>
             <form action="{% url 'checkout_purchase' buyer_num=buyer.buyer_num booth_slug=booth.slug %}" method="post" class="form">
                 {% csrf_token %}
                 <input type="hidden" name="form-TOTAL_FORMS" value="0" id="id_form-TOTAL_FORMS">
@@ -26,7 +27,7 @@
                     </thead>
                     <tbody id="entries">
                     </tbody>
-                    <tfoot>
+                    <tfoot class="">
                         <tr>
                             <th id="total">$0.00</th>
                             <th>Total</th>
@@ -42,7 +43,12 @@
         </div>
         <div class="col col-md-6">
             <form id="entry">
-                <input id="newEntry" autofocus placeholder="How Much?">
+                <div class="input-group input-group-lg">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Add Item</span>
+                    </div>
+                    <input class="form-control" id="newEntry" autofocus placeholder="$0.00t">
+                </div>
             </form>
             <div class="softkeys" data-target="input[id=newEntry]"></div>
         </div>
@@ -91,30 +97,6 @@
             border-top: 1px solid black;
         }
 
-        #entry {
-            background: #333;
-            padding: 12px;
-            border-radius: 10px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, .25);
-        }
-
-        #entry input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid black;
-            text-align: right;
-            font-family: sans-serif;
-            font-size: 20px;
-            box-shadow: inset 0 0 3px rgba(0, 0, 0, .5);
-            -webkit-box-sizing: border-box;
-            -moz-box-sizing: border-box;
-            box-sizing: border-box;
-        }
-
-        #entry input:focus {
-            outline: none;
-            border-color: rgba(255, 255, 255, .75);
-        }
     </style>
 {% endblock %}
 
@@ -145,7 +127,7 @@
             currency = currencyFormat(entry);
             var cnt = next_form_number();
             document.getElementById('entries').innerHTML +=
-                '<tr><td>' + next_amount(cnt, currencyPad(entry)) + '</td>' +
+                '<tr><td class="input-group"><div class="input-group-prepend"><span class="input-group-text">$</span></div>' + next_amount(cnt, currencyPad(entry)) + '</td>' +
                 '<td>' + next_quantity(cnt) + '</td></tr>';
             total += entry;
             document.getElementById('total').innerHTML = currencyFormat(total);
