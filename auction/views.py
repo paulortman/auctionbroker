@@ -7,7 +7,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
-from djmoney.money import Money
 from extra_views import FormSetView
 from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
@@ -287,14 +286,6 @@ class CheckoutPurchase(FormSetView):
         return redirect('checkout_confirm', buyer_num=self.buyer.buyer_num, booth_slug=self.booth.slug)
 
 
-def money_serialize(money):
-    return {'price': str(money.amount),
-            'currency': str(money.currency)}
-
-def money_deserialize(d):
-    return Money(d['price'], d['currency'])
-
-
 class CheckoutConfirm(FormView):
     form_class = CheckoutConfirmForm
     template_name = 'auction/checkout_confirm.html'
@@ -310,11 +301,11 @@ class CheckoutConfirm(FormView):
         context = super(CheckoutConfirm, self).get_context_data(**kwargs)
         context['buyer'] = self.buyer
         context['booth'] = self.booth
-        context['purchase_total'] = money_deserialize(self.request.session['purchase_total'])
+        context['purchase_total'] = self.request.session['purchase_total']
         return context
 
     def form_valid(self, form):
-        purchase_total = money_deserialize(self.request.session['purchase_total'])
+        purchase_total = self.request.session['purchase_total']
 
         # Save the purchase for the buyer
         p = Purchase.create_priced_item(buyer=self.buyer, amount=purchase_total, booth=self.booth)

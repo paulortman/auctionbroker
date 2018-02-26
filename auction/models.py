@@ -1,5 +1,6 @@
 import json
 
+import decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Max
@@ -10,8 +11,15 @@ from channels.channel import Group
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.utils.text import slugify
-from djmoney.models.fields import MoneyField
-from djmoney.money import Money
+
+
+def D(val):
+    if val is None:
+        return decimal.Decimal(0)
+    return decimal.Decimal(val)
+
+def USD(d):
+    return "${}".format(d.quantize(decimal.Decimal('.01'), decimal.ROUND_HALF_UP))
 
 
 class Item(models.Model):
@@ -23,7 +31,7 @@ class Item(models.Model):
     purchase = models.OneToOneField('Purchase', blank=True, null=True)
     booth = models.ForeignKey('Booth', blank=True, null=True)
     sale_time = models.DateTimeField(blank=True, null=True)
-    fair_market_value = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
+    fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=D(0))
     is_purchased = models.BooleanField(default=False)
 
     def __str__(self):
@@ -86,24 +94,24 @@ class Buyer(models.Model):
     @property
     def outstanding_purchases_total(self):
         s = self.purchases.filter(state=Purchase.UNPAID).aggregate(models.Sum('amount'))['amount__sum']
-        return Money(s, 'USD') if s else Money(0, 'USD')
+        return D(s)
 
     @property
     def purchases_total(self):
         purchases = self.purchases.all().aggregate(models.Sum('amount'))['amount__sum']
-        return Money(purchases, 'USD') if purchases else Money('0', 'USD')
+        return D(purchases)
 
     @property
     def payments_total(self):
         payments = self.payments.all().aggregate(models.Sum('amount'))['amount__sum']
-        return Money(payments, 'USD') if payments else Money('0', 'USD')
+        return D(payments)
 
     @property
     def donations_total(self):
         fmv_priced = self.purchases.all().aggregate(models.Sum('priceditem__fair_market_value'))['priceditem__fair_market_value__sum']
         fmv_auction = self.purchases.all().aggregate(models.Sum('auctionitem__fair_market_value'))['auctionitem__fair_market_value__sum']
-        fmv_priced = Money(fmv_priced, 'USD') if fmv_priced else Money('0', 'USD')
-        fmv_auction = Money(fmv_auction, 'USD') if fmv_auction else Money('0', 'USD')
+        fmv_priced = D(fmv_priced)
+        fmv_auction = D(fmv_auction)
         return self.purchases_total - (fmv_priced + fmv_auction)
 
     @property
@@ -112,7 +120,7 @@ class Buyer(models.Model):
 
     @property
     def account_is_settled(self):
-        return self.outstanding_balance == Money('0.00', 'USD')
+        return self.outstanding_balance == D(0)
 
 
 def buyer_number_validator(value):
@@ -139,14 +147,14 @@ class Payment(models.Model):
         (CARD, 'Card')
     )
     buyer = models.ForeignKey('Buyer', related_name='payments')
-    amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
     method = models.CharField(choices=METHODS, default='CHECK', max_length=6,
                               help_text="The method or type of payment made.")
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     note = models.TextField(blank=True, help_text="Record any notes about the payment.")
 
     def __str__(self):
-        return "{amount} payment by {buyer}".format(amount=self.amount, buyer=self.buyer.name)
+        return "{amount} payment by {buyer}".format(amount=USD(self.amount), buyer=self.buyer.name)
 
 
 
@@ -161,13 +169,13 @@ class Purchase(models.Model):
     )
 
     buyer = models.ForeignKey('Buyer', related_name='purchases')
-    amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
     state = models.CharField(choices=STATES, default='UNPAID', max_length=7)
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     paid_time = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return "{amount} purchase by {buyer}".format(amount=self.amount, buyer=self.buyer.name)
+        return "{amount} purchase by {buyer}".format(amount=USD(self.amount), buyer=self.buyer.name)
 
     def get_absolute_url(self):
         return reverse('purchase_detail', kwargs={'pk': self.pk})
@@ -191,7 +199,6 @@ class Purchase(models.Model):
 
     @property
     def donation_amount(self):
-
         return self.amount - self.item.fair_market_value
 
     @property
@@ -200,22 +207,22 @@ class Purchase(models.Model):
 
     @classmethod
     def create_donation(cls, buyer, amount, booth):
-        p = Purchase.objects.create(buyer=buyer, amount=amount)
+        p = Purchase.objects.create(buyer=buyer, amount=D(amount))
         i = PricedItem.objects.create(name='Donation', purchase=p, booth=booth)
         i.commit_to_purchase(p)
         return p
 
     @classmethod
     def create_priced_item(cls, buyer, amount, booth):
-        p = Purchase.objects.create(buyer=buyer, amount=amount)
+        p = Purchase.objects.create(buyer=buyer, amount=D(amount))
         i = PricedItem.objects.create(name='{} Item'.format(booth.name),
-                                      fair_market_value=amount, purchase=p, booth=booth)
+                                      fair_market_value=D(amount), purchase=p, booth=booth)
         i.commit_to_purchase(p)
         return p
 
     @classmethod
     def purchase_item(cls, buyer, amount, item):
-        p = Purchase.objects.create(buyer=buyer, amount=amount)
+        p = Purchase.objects.create(buyer=buyer, amount=D(amount))
         item.commit_to_purchase(p)
         return p
 

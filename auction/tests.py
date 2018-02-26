@@ -1,5 +1,5 @@
+from decimal import Decimal
 from django.test import TestCase
-from moneyed import Money
 
 from .models import Purchase, Payment
 from .modelfactory import AuctionItemFactory, BuyerFactory, BoothFactory
@@ -24,12 +24,12 @@ class PurchaseTestCase(TestCase):
 
     def test_no_purchases(self):
         b = BuyerFactory()
-        assert b.outstanding_purchases_total == Money('0', 'USD')
+        assert b.outstanding_purchases_total == Decimal('0')
 
     def test_one_purchase(self):
         b = BuyerFactory()
         Purchase.objects.create(buyer=b, amount='10.00')
-        assert b.outstanding_purchases_total == Money('10.00', 'USD')
+        assert b.outstanding_purchases_total == Decimal('10.00')
 
     def test_multiple_purchases(self):
         b = BuyerFactory()
@@ -37,7 +37,7 @@ class PurchaseTestCase(TestCase):
         Purchase.objects.create(buyer=b, amount='10.00')
         Purchase.objects.create(buyer=b, amount='10.00')
         Purchase.objects.create(buyer=b, amount='10.00')
-        assert b.outstanding_purchases_total == Money('40.00', 'USD')
+        assert b.outstanding_purchases_total == Decimal('40.00')
 
     def test_some_paid(self):
         b = BuyerFactory()
@@ -45,19 +45,19 @@ class PurchaseTestCase(TestCase):
         Purchase.objects.create(buyer=b, amount='10.00')
         Purchase.objects.create(buyer=b, amount='10.00', state=Purchase.PAID)
         Purchase.objects.create(buyer=b, amount='10.00', state=Purchase.PAID)
-        assert b.outstanding_purchases_total == Money('20.00', 'USD')
+        assert b.outstanding_purchases_total == Decimal('20.00')
 
     def test_new_donation(self):
         b = BuyerFactory()
         booth = BoothFactory()
         p = Purchase.create_donation(buyer=b, amount='10.00', booth=booth)
-        assert p.donation_amount == Money('10.00', 'USD')
+        assert p.donation_amount == Decimal('10.00')
 
     def test_new_priced_item(self):
         b = BuyerFactory()
         booth = BoothFactory()
         p = Purchase.create_priced_item(buyer=b, amount='10.00', booth=booth)
-        assert p.donation_amount == Money('0.00', 'USD')
+        assert p.donation_amount == Decimal('0.00')
 
 
 class PaymentsTestCase(TestCase):
@@ -68,31 +68,31 @@ class PaymentsTestCase(TestCase):
 
     def test_full_payment(self):
         Purchase.create_priced_item(buyer=self.b, amount='10.00', booth=self.booth)
-        assert self.b.purchases_total == Money('10.00', 'USD')
-        assert self.b.outstanding_balance == Money('10.00', 'USD')
+        assert self.b.purchases_total == Decimal('10.00')
+        assert self.b.outstanding_balance == Decimal('10.00')
         Payment.objects.create(buyer=self.b, amount='10.00')
-        assert self.b.outstanding_balance == Money('0.00', 'USD')
+        assert self.b.outstanding_balance == Decimal('0.00')
         assert self.b.account_is_settled
-        assert self.b.purchases_total == Money('10.00', 'USD')
-        assert self.b.donations_total == Money('0.00', 'USD')
+        assert self.b.purchases_total == Decimal('10.00')
+        assert self.b.donations_total == Decimal('0.00')
 
     def test_partial_payment(self):
         Purchase.create_priced_item(buyer=self.b, amount='10.00', booth=self.booth)
-        assert self.b.purchases_total == Money('10.00', 'USD')
-        assert self.b.outstanding_balance == Money('10.00', 'USD')
+        assert self.b.purchases_total == Decimal('10.00')
+        assert self.b.outstanding_balance == Decimal('10.00')
         Payment.objects.create(buyer=self.b, amount='5.00')
-        assert self.b.outstanding_balance == Money('5.00', 'USD')
+        assert self.b.outstanding_balance == Decimal('5.00')
         assert not self.b.account_is_settled
-        assert self.b.purchases_total == Money('10.00', 'USD')
-        assert self.b.donations_total == Money('0.00', 'USD')
+        assert self.b.purchases_total == Decimal('10.00')
+        assert self.b.donations_total == Decimal('0.00')
 
     def test_over_payment(self):
         Purchase.create_priced_item(buyer=self.b, amount='10.00', booth=self.booth)
-        assert self.b.purchases_total == Money('10.00', 'USD')
-        assert self.b.outstanding_balance == Money('10.00', 'USD')
+        assert self.b.purchases_total == Decimal('10.00')
+        assert self.b.outstanding_balance == Decimal('10.00')
         Payment.objects.create(buyer=self.b, amount='15.00')
-        assert self.b.outstanding_balance == Money('-5.00', 'USD')
+        assert self.b.outstanding_balance == Decimal('-5.00')
         assert not self.b.account_is_settled
-        assert self.b.purchases_total == Money('10.00', 'USD')
-        assert self.b.donations_total == Money('0.00', 'USD')
+        assert self.b.purchases_total == Decimal('10.00')
+        assert self.b.donations_total == Decimal('0.00')
 

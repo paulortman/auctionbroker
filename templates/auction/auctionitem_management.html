@@ -1,5 +1,5 @@
 {% extends 'action_page.html' %}
-{% load djmoney %}
+{% load money %}
 
 {% block title %}Auction Management{% endblock %}
 
@@ -26,7 +26,7 @@
 {#            <td>{{ item.long_desc|truncatewords:10 }}</td>#}
             <td>{{ item.scheduled_sale_time|date:"P" }}</td>
             {% if item.purchase_id %}
-            <td>(<a href="{% url 'buyer_detail' pk=item.purchase.buyer_id %}" >{{ item.purchase.buyer.buyer_num}}</a>) {{ item.purchase.amount }}</td>
+            <td>(<a href="{% url 'buyer_detail' pk=item.purchase.buyer_id %}" >{{ item.purchase.buyer.buyer_num}}</a>) {{ item.purchase.amount|money }}</td>
             {% else %}
                 <td><a class="btn btn-primary btn-sm" href="{% url 'bidding_recorder' item_number=item.item_number %}">Record Bid</a></td>
             {% endif %}

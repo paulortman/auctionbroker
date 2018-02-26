@@ -1,7 +1,7 @@
 import random
 
+from decimal import Decimal
 from django.core.management.base import BaseCommand, CommandError
-from djmoney.money import Money
 
 from auction.models import Buyer, Booth, Purchase, AuctionItem
 
@@ -22,7 +22,7 @@ class Command(BaseCommand):
             priced_purchases = random.randint(1, 5)
             for purchase in range(priced_purchases):
                 booth = random.choice(booths)
-                price = Money(random.choice(prices), 'USD')
+                price = Decimal(random.choice(prices))
                 Purchase.create_priced_item(buyer=buyer, amount=price, booth=booth)
                 print('p', end='')
 
@@ -33,7 +33,7 @@ class Command(BaseCommand):
         buyer_sample = random.sample(list(Buyer.objects.all()), int(buyer_cnt * 0.3))  # 30% sample
         for item in items:
             # amount is between 100 - 115 % of the fmv
-            amount = item.fair_market_value * (random.randint(100, 115) / 100.0)
+            amount = item.fair_market_value * Decimal(random.randint(100, 115) / 100.0)
             buyer = random.choice(buyer_sample)
             Purchase.purchase_item(buyer=buyer, amount=amount, item=item)
             print('i', end='')

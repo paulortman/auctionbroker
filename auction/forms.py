@@ -1,5 +1,4 @@
 from django import forms
-from djmoney.forms import MoneyField
 
 from .models import Item, Booth, Buyer, Payment, buyer_number_validator, AuctionItem, Purchase
 
@@ -10,7 +9,7 @@ class AuctionItemForm(forms.ModelForm):
         exclude = ['purchase']
 
 class ItemBiddingForm(forms.Form):
-    amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
+    amount = forms.DecimalField(max_digits=15, decimal_places=2)
     buyer_num = forms.CharField(max_length=10)
 
 
@@ -39,7 +38,7 @@ class BuyerForm(forms.ModelForm):
 
 
 class PricedItemPurchaseForm(forms.Form):
-    amount = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
+    amount = forms.DecimalField(max_digits=15, decimal_places=2)
     quantity = forms.IntegerField(min_value=0)
 
 
@@ -51,7 +50,7 @@ class CheckoutBuyerForm(forms.Form):
 
 
 class CheckoutPurchaseForm(forms.Form):
-    price = MoneyField(max_digits=15, decimal_places=2, default_currency='USD')
+    price = forms.DecimalField(max_digits=15, decimal_places=2)
     quantity = forms.IntegerField(min_value=0, )
 
     @property
