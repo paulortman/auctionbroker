@@ -1,10 +1,16 @@
-{% extends 'base.html' %}
-{% block main %}
+{% extends 'action_page.html' %}
+{% load bootstrap4 %}
+
+{% block title %}Record Bid for {{ item.name }}{% endblock %}
+
+{% block page-heading %}Record Bid{% endblock %}
+
+{% block content %}
 
     <h1>Item: {{ item.name }} | <a href="{% url 'item_update' item_number=item.item_number %}" >Edit</a></h1>
 
     <ul>
-        <li>Desc: {{ item.long_desc }}</li>
+        <li>Description: {{ item.long_desc }}</li>
         <li>Winner: {{ item.purchase.buyer.name }}</li>
         <li>Amount: {{ item.purchase.amount }}</li>
         {% if item.sale_time %}
@@ -15,8 +21,10 @@
     </ul>
     <form action="{% url "bidding_recorder" item_number=item.item_number %}" method="post">
         {% csrf_token %}
-        {{ form.as_ul }}
-        <input type="submit" value="Record Wining Bid" />
-        <input type="reset" value="Cancel" />
+        {% bootstrap_form form layout="horizontal" %}
+        {% buttons %}
+        <button class="btn btn-primary" type="submit" >Record Winning Bid</button>
+        <button class="btn" type="reset" >Cancel</button>
+        {% endbuttons %}
     </form>
 {% endblock %}

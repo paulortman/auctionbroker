@@ -3,9 +3,9 @@
 
 {% block title %}{{ buyer.name }} Payment{% endblock %}
 
-{% block main %}
+{% block page-heading %}Make a Payment for {{ buyer.name }}{% endblock %}
 
-    <h1 class="page-header">Make a Payment for {{ buyer.name }}</h1>
+{% block content %}
     <p>{{ buyer.name }} has an outstanding balance of {{ buyer.outstanding_balance }}.</p>
     <form action="" method="post">
         {% csrf_token %}

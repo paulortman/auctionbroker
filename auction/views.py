@@ -11,7 +11,7 @@ from extra_views import FormSetView
 from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
-from .models import Item, Buyer, Purchase, Booth, Payment, AuctionItem
+from .models import Item, Buyer, Purchase, Booth, Payment, AuctionItem, USD, D
 from .forms import BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, AuctionItemForm, BuyerPaymentForm, PurchaseForm
 
@@ -203,8 +203,11 @@ class BuyerPay(BuyerMixin, FormView):
         return context
 
     def form_valid(self, form):
-        buyer=self.get_object()
-        Payment.objects.create(buyer=buyer, amount=form.cleaned_data['amount'], method=form.cleaned_data['method'])
+        buyer = self.get_object()
+        amount = form.cleaned_data['amount']
+        Payment.objects.create(buyer=buyer, amount=amount, method=form.cleaned_data['method'])
+        msg = "Payment of {amount} made by {name}".format(amount=USD(amount), name=buyer.name)
+        messages.add_message(self.request, messages.INFO, msg)
         return redirect('buyer_detail', pk=buyer.pk)
 
 
@@ -278,10 +281,10 @@ class CheckoutPurchase(FormSetView):
 
     def formset_valid(self, formset):
         context = self.get_context_data()
-        values = [{'price': money_serialize(form.cleaned_data['price']), 'quantity': form.cleaned_data['quantity'] } for form in formset.forms]
+        values = [form.serialize() for form in formset.forms if form.has_changed()]
         self.request.session['purchase_forms'] = values
         purchase_total = sum([form.entry_total for form in formset.forms])
-        self.request.session['purchase_total'] = money_serialize(purchase_total)
+        self.request.session['purchase_total'] = str(purchase_total)
 
         return redirect('checkout_confirm', buyer_num=self.buyer.buyer_num, booth_slug=self.booth.slug)
 
@@ -301,11 +304,11 @@ class CheckoutConfirm(FormView):
         context = super(CheckoutConfirm, self).get_context_data(**kwargs)
         context['buyer'] = self.buyer
         context['booth'] = self.booth
-        context['purchase_total'] = self.request.session['purchase_total']
+        context['purchase_total'] = D(self.request.session['purchase_total'])
         return context
 
     def form_valid(self, form):
-        purchase_total = self.request.session['purchase_total']
+        purchase_total = D(self.request.session['purchase_total'])
 
         # Save the purchase for the buyer
         p = Purchase.create_priced_item(buyer=self.buyer, amount=purchase_total, booth=self.booth)
@@ -313,6 +316,10 @@ class CheckoutConfirm(FormView):
         # Clear the session state
         del(self.request.session['purchase_total'])
         del(self.request.session['purchase_forms'])
+
+        msg = "Completed Purchase of {amount} by {name} ({number})".format(
+            amount=USD(purchase_total), name=self.buyer.name, number=self.buyer.buyer_num)
+        messages.add_message(self.request, messages.INFO, msg)
 
         return redirect('checkout_buyer', booth_slug=self.booth.slug)
 
@@ -323,8 +330,8 @@ class BiddingRecorder(FormView):
     template_name = 'auction/bidding_recorder.html'
 
     def dispatch(self, request, *args, **kwargs):
-        item_pk = self.kwargs.get('item_pk')
-        self.item = get_object_or_404(Item, pk=item_pk)
+        item_number = self.kwargs.get('item_number')
+        self.item = get_object_or_404(AuctionItem, item_number=item_number)
         return super(BiddingRecorder, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -337,7 +344,9 @@ class BiddingRecorder(FormView):
         buyer = get_object_or_404(Buyer, buyer_num=buyer_num)
         amount = form.cleaned_data['amount']
         purchase = Purchase.purchase_item(buyer=buyer, amount=amount, item=self.item)
-        msg = f"{buyer.buyer_num} ({buyer.name}) purchased {self.item.name} ({self.item.id}) in the amount of {amount}"
+        msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
+            b_num=buyer.buyer_num, b_name=buyer.name, i_name=self.item.name, i_num=self.item.item_number,
+            amount=USD(amount))
         messages.add_message(self.request, messages.INFO, msg)
         return redirect('item_management')
 

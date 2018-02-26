@@ -1,11 +1,13 @@
 {% extends 'action_page.html' %}
 {% load bootstrap4 %}
 
-{% block page-heading %}
+{% block title %}
     {{ booth.name }} Checkout
 {% endblock %}
 
-{% block action-page-content %}
+{% block page-heading %}{{ booth.name }} Checkout{% endblock %}
+
+{% block content %}
 
     <form action="{% url 'checkout_buyer' booth_slug=booth.slug %}" method="post" class="form">
         {% csrf_token %}

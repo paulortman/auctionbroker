@@ -1,12 +1,11 @@
 {% extends 'action_page.html' %}
 {% load bootstrap4 %}
 
-{% block page-heading %}
-    {{ booth }} Checkout
-{% endblock %}
+{% block title %}{{ booth.name }} Checkout{% endblock %}
 
-{% block action-page-content %}
-    <h2>Purchasing for: {{ buyer.name }} (#{{ buyer.buyer_num }})</h2>
+{% block page-heading %}{{ booth.name }} Checkout: {{ buyer.name }} (#{{ buyer.buyer_num }}){% endblock %}
+
+{% block content %}
     <form action="{% url 'checkout_purchase' buyer_num=buyer.buyer_num booth_slug=booth.slug %}" method="post" class="form">
         {{ formset.management_form }}
         {% csrf_token %}
@@ -20,7 +19,7 @@
         <tbody>
         {% for form in formset %}
             <tr>
-                <td>{{ form.amount }}</td>
+                <td>{{ form.price }}</td>
                 <td>{{ form.quantity }}</td>
             </tr>
         {% endfor %}
@@ -28,7 +27,7 @@
         </table>
         {% buttons %}
             <input class="btn btn-primary" type="submit" value="Checkout" />
-            <input class="btn btn-warning" type="reset" value="Cancel Checkout" />
+            <input class="btn btn-secondary" type="reset" value="Cancel Checkout" />
         {% endbuttons %}
     </form>
 {% endblock %}

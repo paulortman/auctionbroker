@@ -1,18 +1,16 @@
 {% extends 'action_page.html' %}
 {% load bootstrap4 %}
+{% load money %}
 
-{% block page-heading %}
-    {{ booth }} Checkout
-{% endblock %}
+{% block page-heading %}{{ booth.name }} Checkout: {{ buyer.name }} (#{{ buyer.buyer_num }}){% endblock %}
 
-{% block action-page-content %}
-    <h2>Purchasing for: {{ buyer.name }} (#{{ buyer.buyer_num }})</h2>
-
-    <p>The total purchase price is {{ purchase_total }}. Is this correct?</p>
+{% block content %}
+    <p>The total purchase price is {{ purchase_total|money }}. Is this correct?</p>
     <form action="{% url 'checkout_confirm' buyer_num=buyer.buyer_num booth_slug=booth.slug %}" method="post" class="form">
         {% csrf_token %}
-        {% buttons submit="Yes" %}
-
+        {% bootstrap_form form %}
+        {% buttons %}
+            <button class="btn btn-primary" type="submit">Yes</button>
         {% endbuttons %}
     </form>
 {% endblock %}

@@ -46,7 +46,9 @@ class CheckoutBuyerForm(forms.Form):
     buyer_num = forms.CharField(max_length=10,
                                 validators=[buyer_number_validator],
                                 label="Enter Buyer Number",
-                                help_text="Enter the Buyer's Purchase number to start the checkout.")
+                                help_text="Enter the Buyer's Purchase number to start the checkout.",
+                                widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
+
 
 
 class CheckoutPurchaseForm(forms.Form):
@@ -58,6 +60,10 @@ class CheckoutPurchaseForm(forms.Form):
         if self.cleaned_data:
             return self.cleaned_data['price'] * self.cleaned_data['quantity']
         return 0
+
+    def serialize(self):
+        return {'price': str(self.cleaned_data['price']), 'quantity': self.cleaned_data['quantity']}
+
 
 class CheckoutConfirmForm(forms.Form):
     pass

@@ -16,9 +16,9 @@
         {% for purchase in buyer.purchases.all %}
             <tr>
                 <td class="col-action">
-                    <a class="btn btn-sm btn-outline-secondary " href="{% url 'purchase_update' pk=purchase.pk %}" title="Edit">
+                    <a class="btn btn-sm btn-secondary " href="{% url 'purchase_update' pk=purchase.pk %}" title="Edit">
                         <img style="width:14px; height: 14px;" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
-                    <a class="btn btn-sm btn-outline-danger" href="{% url 'purchase_delete' pk=purchase.pk %}" title="Delete">
+                    <a class="btn btn-sm btn-secondary" href="{% url 'purchase_delete' pk=purchase.pk %}" title="Delete">
                         <img style="width:14px; height: 14px;" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
                 <td>
                     <em>{{ purchase.item.booth.name }}</em>: {{ purchase.item.name }}
@@ -57,9 +57,9 @@
         {% for payment in buyer.payments.all %}
             <tr>
                 <td class="col-action">
-                    <a class="btn btn-sm btn-outline-secondary " href="{% url 'payment_update' pk=payment.pk %}" title="Edit">
+                    <a class="btn btn-sm btn-secondary " href="{% url 'payment_update' pk=payment.pk %}" title="Edit">
                         <img style="width:14px; height: 14px;" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
-                    <a class="btn btn-sm btn-outline-danger" href="{% url 'payment_delete' pk=payment.pk %}" title="Delete">
+                    <a class="btn btn-sm btn-secondary" href="{% url 'payment_delete' pk=payment.pk %}" title="Delete">
                         <img style="width:14px; height: 14px;" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
                 </td>
                 <td>

@@ -1,5 +1,10 @@
 {% extends 'action_page.html' %}
-{% block main %}
+
+{% block title %}Buyer {{ buyer.name }}{% endblock %}
+
+{% block page-heading %}Buyer {{ buyer.name }}{% endblock %}
+
+{% block content %}
     <h1>Buyer: {{ buyer.name }} | <a href="{% url 'buyer_update' pk=buyer.pk %}" >Edit</a> | <a href="{% url 'buyer_receipt' pk=buyer.pk %}" >Receipt</a></h1>
     <p>Buyer Number: {{ buyer.buyer_num }}</p>
 

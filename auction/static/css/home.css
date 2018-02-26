@@ -17,3 +17,8 @@ body {
   width: 10em;
 
 }
+
+input[type=number] {
+  -moz-appearance: textfield;
+  -webkit-appearance: textfield;
+}

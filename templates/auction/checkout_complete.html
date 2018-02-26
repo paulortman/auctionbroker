@@ -1,6 +1,10 @@
-{% extends 'base.html' %}
-{% load djmoney %}
-{% block main %}
-    <p>Purchase of {% money_localize purchase_total %} Complete for {{ buyer.name }}</p>
+{% extends 'action_page.html' %}
+{% load money %}
+
+{% block title %}Checkout Complete{% endblock %}
+
+{% block page-heading %} Purchase of {% purchase_total|money %} Complete for {{ buyer.name }}{% endblock %}
+
+{% block content %}
     <p><a class="btn btn-primary" href="{% url 'checkout_buyer' booth_slug=booth.slug %}">Start New Purchase</a></p>
 {% endblock %}

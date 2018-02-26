@@ -3,13 +3,14 @@
 
 {% block title %}Buyer List{% endblock %}
 
+{% block page-heading %}Buyer List{% endblock %}
+
 {% block main %}
-    <h1 class="page-header">Buyers</h1>
     {% if not object_list %}
         <p>No Buyers are registered.</p>
     {% else %}
-    <table class="table table-hover">
-    <thead>
+    <table class="table table-bordered table-hover">
+    <thead class="thead-dark">
         <tr>
             <th scope="col" class="col-action">Action</th>
             <th scope="col">Name</th>
@@ -20,10 +21,10 @@
         {% for buyer in object_list %}
         <tr>
             <td>
-                <a class="btn btn-sm btn-outline-secondary " href="{% url 'buyer_update' pk=buyer.pk %}" title="Edit">
-                    <img src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
-                <a class="btn btn-sm btn-outline-danger" href="{% url 'buyer_delete' pk=buyer.pk %}" title="Delete">
-                    <img src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
+                <a class="btn btn-sm btn-secondary " href="{% url 'buyer_update' pk=buyer.pk %}" title="Edit">
+                    <img style="width:14px; height: 14px;" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
+                <a class="btn btn-sm btn-secondary" href="{% url 'buyer_delete' pk=buyer.pk %}" title="Delete">
+                    <img style="width:14px; height: 14px;" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
             </td>
             <td><a href="{% url 'buyer_detail' pk=buyer.pk %}" >{{ buyer.name }}</a></td>
             <td><a href="{% url 'buyer_detail' pk=buyer.pk %}" >{{ buyer.buyer_num }}</a></td>
