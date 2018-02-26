@@ -98,7 +98,9 @@
                             break;
 
                         case 'return' :
-                            character = '\n';
+                            // character = '\n';
+                            $(settings.target).submit();
+                            targetValue = '';
                             break;
 
                         case 'tab' :

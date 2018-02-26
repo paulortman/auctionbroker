@@ -8,138 +8,192 @@
 
 {% block content %}
     <div class="row container-fluid">
-    <div class="col col-md-6">
-    <form action="{% url 'checkout_purchase' buyer_num=buyer.buyer_num booth_slug=booth.slug %}" method="post" class="form">
-        {{ formset.management_form }}
-        {% csrf_token %}
-        {% for form in formset %}
-            {% if forloop.counter <= 1 %}
-            <div class="form-row">
-                <div class="col col-md-4">
-                    {% bootstrap_field form.price %}
-                </div>
-                <div class="col col-md-2">
-                    {% bootstrap_field form.quantity %}
-                </div>
-            </div>
-            {% else %}
-            <div class="form-row">
-                <div class="col col-md-4">
-                    {% bootstrap_field form.price show_label=False%}
-                </div>
-                <div class="col col-md-2">
-                    {% bootstrap_field form.quantity show_label=False %}
-                </div>
-            </div>
-            {% endif %}
-        {% endfor %}
-        {% bootstrap_formset_errors formset %}
+        <div class="col col-md-6">
+            <form action="{% url 'checkout_purchase' buyer_num=buyer.buyer_num booth_slug=booth.slug %}" method="post" class="form">
+                {% csrf_token %}
+                <input type="hidden" name="form-TOTAL_FORMS" value="0" id="id_form-TOTAL_FORMS">
+                <input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS">
+                <input type="hidden" name="form-MIN_NUM_FORMS" value="0" id="id_form-MIN_NUM_FORMS">
+                <input type="hidden" name="form-MAX_NUM_FORMS" value="1000" id="id_form-MAX_NUM_FORMS">
+                {% bootstrap_formset_errors formset %}
 
-        {% buttons %}
-            <input class="btn btn-primary" type="submit" value="Checkout" />
-            <input class="btn btn-secondary" type="reset" value="Cancel Checkout" />
-        {% endbuttons %}
-    </form>
-    </div>
-    <div class="col col-md-6">
-        <div class="softkeys" data-target="input[name='code']"></div>
-    </div>
+                <table class="table table-sm">
+                    <thead >
+                        <tr>
+                            <th scope="col">Price</th>
+                            <th scope="col">Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entries">
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th id="total">$0.00</th>
+                            <th>Total</th>
+                        </tr>
+                    </tfoot>
+                </table>
+{#                {% bootstrap_formset formset %}#}
+                {% buttons %}
+                    <input class="btn btn-primary" type="submit" value="Checkout"/>
+                    <input class="btn btn-secondary" type="reset" value="Cancel Checkout"/>
+                {% endbuttons %}
+            </form>
+        </div>
+        <div class="col col-md-6">
+            <form id="entry">
+                <input id="newEntry" autofocus placeholder="How Much?">
+            </form>
+            <div class="softkeys" data-target="input[id=newEntry]"></div>
+        </div>
     </div>
 
 {% endblock %}
 
 {% block extra_header %}
-     <link rel="stylesheet" href="{% static 'css/softkeys-0.0.1.css' %}">
+    <link rel="stylesheet" href="{% static 'css/softkeys-0.0.1.css' %}">
+    <style>
+        #register {
+            width: 20em;
+            margin: auto;
+        }
+
+        #ticket {
+            background: white;
+            margin: 0 1em;
+            padding: 1em;
+            box-shadow: 0 0 5px rgba(0, 0, 0, .25);
+        }
+
+        #ticket h1 {
+            text-align: center;
+        }
+
+        #ticket table {
+            font-family: monospace;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #ticket td, #ticket th {
+            padding: 5px;
+        }
+
+        #ticket th {
+            text-align: left;
+        }
+
+        #ticket td, #ticket #total {
+            text-align: right;
+        }
+
+        #ticket tfoot th {
+            border-top: 1px solid black;
+        }
+
+        #entry {
+            background: #333;
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, .25);
+        }
+
+        #entry input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid black;
+            text-align: right;
+            font-family: sans-serif;
+            font-size: 20px;
+            box-shadow: inset 0 0 3px rgba(0, 0, 0, .5);
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        #entry input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, .75);
+        }
+    </style>
 {% endblock %}
 
 {% block script_footer %}
-     <script src="{% static 'js/softkeys-0.0.1.js' %}"></script>
-            <script>
-            $(document).ready(function(){
-                $('.softkeys').softkeys({
-                    target : $('.softkeys').data('target'),
-                    layout : [
-                        [
-                            'delete'
-                        ],
-                        [
-                            '7',
-                            '8',
-                            '9',
-                        ],
-                        [
-                            '4',
-                            '5',
-                            '6',
-                        ],
-                        [
-                            '1',
-                            '2',
-                            '3',
-                        ],
-                        [
-                            'tab',
-                            'quantity',
-                        ]
-                    ]
-                });
-            });
-        </script>
+    <script src="{% static 'js/softkeys-0.0.1.js' %}"></script>
 
-{#<script type='text/javascript'>#}
-{#function updateElementIndex(el, prefix, ndx) {#}
-{#    var id_regex = new RegExp('(' + prefix + '-\\d+)');#}
-{#    var replacement = prefix + '-' + ndx;#}
-{#    if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));#}
-{#    if (el.id) el.id = el.id.replace(id_regex, replacement);#}
-{#    if (el.name) el.name = el.name.replace(id_regex, replacement);#}
-{#}#}
-{##}
-{#function cloneMore(selector, prefix) {#}
-{#    var newElement = $(selector).clone(true);#}
-{#    var total = $('#id_' + prefix + '-TOTAL_FORMS').val();#}
-{#    newElement.find(':input').each(function() {#}
-{#        var name = $(this).attr('name').replace('-' + (total-1) + '-', '-' + total + '-');#}
-{#        var id = 'id_' + name;#}
-{#        $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');#}
-{#    });#}
-{#    total++;#}
-{#    $('#id_' + prefix + '-TOTAL_FORMS').val(total);#}
-{#    $(selector).after(newElement);#}
-{#    var conditionRow = $('.form-row:not(:last)');#}
-{#    conditionRow.find('.btn.add-form-row')#}
-{#    .removeClass('btn-success').addClass('btn-danger')#}
-{#    .removeClass('add-form-row').addClass('remove-form-row')#}
-{#    .html('<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>');#}
-{#    return false;#}
-{#}#}
-{##}
-{#function deleteForm(prefix, btn) {#}
-{#    var total = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());#}
-{#    if (total > 1){#}
-{#        btn.closest('.form-row').remove();#}
-{#        var forms = $('.form-row');#}
-{#        $('#id_' + prefix + '-TOTAL_FORMS').val(forms.length);#}
-{#        for (var i=0, formCount=forms.length; i<formCount; i++) {#}
-{#            $(forms.get(i)).find(':input').each(function() {#}
-{#                updateElementIndex(this, prefix, i);#}
-{#            });#}
-{#        }#}
-{#    }#}
-{#    return false;#}
-{#}#}
-{##}
-{#$(document).on('click', '.add-form-row', function(e){#}
-{#    e.preventDefault();#}
-{#    cloneMore('.form-row:last', 'form');#}
-{#    return false;#}
-{#});#}
-{##}
-{#$(document).on('click', '.remove-form-row', function(e){#}
-{#    e.preventDefault();#}
-{#    deleteForm('form', $(this));#}
-{#    return false;#}
-{#});#}
-{##}
-{#</script>#}
+    <script>
+        var total = 0;
+
+        document.getElementById('entry').onsubmit = enter;
+
+        function next_form_number() {
+            var current = document.getElementById('id_form-TOTAL_FORMS');
+            current_num = parseInt(current.value);
+            current.value = current_num + 1;
+            return current_num;
+
+        }
+        function next_amount(cnt, entry) {
+            return '<input type="text" name="form-'+cnt+'-price" class="form-control" title="" id="id_form-'+cnt+'-price" value="' + entry +'">';
+        }
+        function next_quantity(cnt) {
+            return '<input type="number" name="form-'+cnt+'-quantity" min="0" class="form-control" id="id_form-'+cnt+'-quantity" value="1">';
+        }
+        function enter() {
+            var entry = document.getElementById('newEntry').value;
+            var entry = parseFloat(entry);
+            currency = currencyFormat(entry);
+            var cnt = next_form_number();
+            document.getElementById('entries').innerHTML +=
+                '<tr><td>' + next_amount(cnt, currencyPad(entry)) + '</td>' +
+                '<td>' + next_quantity(cnt) + '</td></tr>';
+            total += entry;
+            document.getElementById('total').innerHTML = currencyFormat(total);
+
+            document.getElementById('newEntry').value = '';
+            return false;
+        }
+
+        function currencyPad(number) {
+            var currency = parseFloat(number);
+            currency = currency.toFixed(2);
+            return currency;
+        }
+
+        function currencyFormat(number) {
+            var currency = currencyPad(number);
+            currency = '$' + currency;
+            return currency;
+        }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('.softkeys').softkeys({
+                target: $('.softkeys').data('target'),
+                layout: [
+                    [
+                        '7',
+                        '8',
+                        '9',
+                    ],
+                    [
+                        '4',
+                        '5',
+                        '6',
+                    ],
+                    [
+                        '1',
+                        '2',
+                        '3',
+                    ],
+                    [
+                        'delete',
+                        '.',
+                        'return',
+                    ]
+                ]
+            });
+        });
+    </script>
 {% endblock %}
