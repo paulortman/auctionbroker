@@ -3,7 +3,7 @@
 {% block main %}
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-primary {{ message.tags }}">{{ message }}</div>
+            <div class="alert alert-dismissible {{ message.tags }}">{{ message }}</div>
         {% endfor %}
     {% endif %}
 

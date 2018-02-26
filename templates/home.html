@@ -1,9 +1,49 @@
 {% extends 'base.html' %}
+
 {% block main %}
-    <h1>SD MCC Sale</h1>
-    <ul>
-        <li><a href="{% url 'item_list' %}" >Items</a></li>
-        <li><a href="{% url 'buyer_list' %}" >Buyers</a></li>
-    </ul>
-    <div id="reacter">Add Charge React</div>
+    <div class="jumbotron">
+        <h1 class="display-3">Welcome to the <acronym title="South Dakota">SD</acronym> <acronym
+                title="Mennonite Central Commiteee">MCC</acronym> Sale!</h1>
+        <p class="lead">All sales management are to be managed through this application so that checkout, auction
+            bidding, payments and receipts can happen smoothly and efficiently.
+        <hr class="my-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card border-dark mb-3">
+                        <div class="card-header">Auction Management</div>
+                        <div class="card-body">
+                            <p class="card-text">Add and edit auction items and record auction item sales.</p>
+                            <a class="btn btn-primary btn-lg" href="{% url 'item_management' %}" role="button">Auction
+                                Management</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-dark mb-3" style="max-width: 20rem;">
+                        <div class="card-header">Buyer List</div>
+                        <div class="card-body">
+                            <p class="card-text">Provision buyer numbers or provide account settlement.</p>
+                            <a class="btn btn-primary btn-lg" href="{% url 'buyer_list' %}" role="button">Buyer List</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-dark mb-3" style="max-width: 20rem;">
+                        <div class="card-header">Booth Checkout</div>
+                        <div class="card-body">
+                            <p class="card-text">Provide cashier services at the various booths to allow patrons to
+                                purchase priced items using just their buyer number.</p>
+                            <div class="list-group">
+                                {% for booth in booths %}
+                                    <a class="list-group-item list-group-item-action"
+                                       href="{% url 'checkout_buyer' booth_slug=booth.slug %}">{{ booth.name }}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

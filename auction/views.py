@@ -320,7 +320,7 @@ class CheckoutConfirm(FormView):
 
         msg = "Completed Purchase of {amount} by {name} ({number})".format(
             amount=USD(purchase_total), name=self.buyer.name, number=self.buyer.buyer_num)
-        messages.add_message(self.request, messages.INFO, msg)
+        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
 
         return redirect('checkout_buyer', booth_slug=self.booth.slug)
 
@@ -348,6 +348,6 @@ class BiddingRecorder(FormView):
         msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
             b_num=buyer.buyer_num, b_name=buyer.name, i_name=self.item.name, i_num=self.item.item_number,
             amount=USD(amount))
-        messages.add_message(self.request, messages.INFO, msg)
+        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
         return redirect('item_management')
 
