@@ -52,14 +52,22 @@ class CheckoutBuyerForm(forms.Form):
 
 
 class CheckoutPurchaseForm(forms.Form):
-    price = forms.DecimalField(max_digits=15, decimal_places=2)
-    quantity = forms.IntegerField(min_value=0, )
+    price = forms.DecimalField(max_digits=15, decimal_places=2,
+                               widget=forms.TextInput(attrs={'autofocus': 'autofocu'}))
+    quantity = forms.IntegerField(min_value=0, required=False)
 
     @property
     def entry_total(self):
         if self.cleaned_data:
             return self.cleaned_data['price'] * self.cleaned_data['quantity']
         return 0
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data['quantity']
+        if quantity is None or quantity == '':
+            quantity = 1
+        return quantity
+
 
     def serialize(self):
         return {'price': str(self.cleaned_data['price']), 'quantity': self.cleaned_data['quantity']}

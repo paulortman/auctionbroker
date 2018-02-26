@@ -265,6 +265,7 @@ class CheckoutBuyer(FormView):
 class CheckoutPurchase(FormSetView):
     template_name = 'auction/checkout_purchase.html'
     form_class = CheckoutPurchaseForm
+    extra = 10
 
     def dispatch(self, request, *args, **kwargs):
         booth_slug = self.kwargs.get('booth_slug')
