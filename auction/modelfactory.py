@@ -8,11 +8,22 @@ from .models import Buyer, Booth, AuctionItem
 import factory
 
 
+def fake_address_line2():
+    cities = ['Freeman', 'Marion', 'Parker', 'Hurley', 'Bridgewater', 'Emery', 'Menno']
+    city = random.choice(cities)
+    return "{city}, SD".format(city=city)
+
 class BuyerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Buyer
 
-    name = factory.Faker('name')
+    first_name = factory.Faker('first_name')
+    last_name = factory.Faker('last_name')
+    email = factory.Faker('email')
+    address_line1 = factory.Faker('street_address')
+    address_line2 = factory.LazyFunction(fake_address_line2)
+    address_line3 = factory.Faker('zipcode')
+    phone1 = factory.Faker('phone_number')
     buyer_num = factory.Sequence(lambda n: "{}".format(settings.BASE_BUYER_NUMBER + n))
 
 

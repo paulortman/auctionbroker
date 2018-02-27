@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import widgets
 
 from .models import Item, Booth, Buyer, Payment, buyer_number_validator, AuctionItem, Purchase
 
@@ -30,6 +31,13 @@ class PurchaseForm(forms.ModelForm):
         model = Purchase
         exclude = []
 
+
+class BuyerCreateForm(forms.ModelForm):
+    buyer_num = forms.CharField(max_length=8, required=False, widget=widgets.HiddenInput)
+
+    class Meta:
+        model = Buyer
+        exclude = []
 
 class BuyerForm(forms.ModelForm):
     class Meta:

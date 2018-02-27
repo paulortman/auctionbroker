@@ -9,6 +9,9 @@
     {% if not object_list %}
         <p>No Buyers are registered.</p>
     {% else %}
+        <div class="toolbar">
+            <a class="tool-lg btn btn-primary" href="{% url 'buyer_create' %}" >Add Buyer</a>
+        </div>
     <table class="table table-bordered table-hover">
     <thead class="thead-dark">
         <tr>

@@ -11,9 +11,9 @@ from extra_views import FormSetView
 from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
-from .models import Item, Buyer, Purchase, Booth, Payment, AuctionItem, USD, D
+from .models import Item, Buyer, Purchase, Booth, Payment, AuctionItem, USD, D, buyer_number_generator
 from .forms import BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
-    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, AuctionItemForm, BuyerPaymentForm, PurchaseForm
+    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, AuctionItemForm, BuyerPaymentForm, PurchaseForm, BuyerCreateForm
 
 
 class AuctionItemMixin:
@@ -159,7 +159,11 @@ class BuyerDetail(BuyerMixin, DetailView):
 
 
 class BuyerCreate(BuyerMixin, CreateView):
-    form_class = BuyerForm
+    form_class = BuyerCreateForm
+
+    def form_valid(self, form):
+        form.instance.buyer_num = buyer_number_generator()
+        return super().form_valid(form)
 
 
 class BuyerUpdate(BuyerMixin, UpdateView):

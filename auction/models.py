@@ -80,16 +80,31 @@ def send_sale_event(sender, instance, **kwargs):
         print("Sent Event")
 
 
+def buyer_number_generator():
+    max_num = int(Buyer.objects.aggregate(Max('buyer_num'))['buyer_num__max'])
+    return max(max_num + 1, settings.BASE_BUYER_NUMBER)
+
+
 class Buyer(models.Model):
 
-    buyer_num = models.CharField(max_length=8)
-    name = models.CharField(max_length=100)
+    buyer_num = models.CharField(max_length=8, default=buyer_number_generator, unique=True, db_index=True )
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    email = models.EmailField(blank=True, verbose_name="Email Address")
+    address_line1 = models.CharField(max_length=50, verbose_name="Address Line 1", help_text="Example: 21075 425 St")
+    address_line2 = models.CharField(blank=True, max_length=50, verbose_name="Address Line 2", help_text="Marion, SD")
+    address_line3 = models.CharField(blank=True, max_length=50, verbose_name="Address Line 3", help_text="57043")
+    phone1 = models.CharField(blank=True, max_length=10)
 
     def __str__(self):
         return "Buyer {name} ({number})".format(name=self.name, number=self.buyer_num)
 
     def get_absolute_url(self):
         return reverse('buyer_detail', kwargs={'pk': self.pk})
+
+    @property
+    def name(self):
+        return "{} {}".format(self.first_name, self.last_name)
 
     @property
     def outstanding_purchases_total(self):
