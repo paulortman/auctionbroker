@@ -7,10 +7,18 @@
 {% block page-heading %}{{ booth.name }} Checkout: {{ buyer.name }} (#{{ buyer.buyer_num }}){% endblock %}
 
 {% block content %}
-    <div class="row container-fluid">
+    <div class="row container-fluid top-space-big" >
         <div class="col col-md-6">
-            <h2>Total: <span id="total"></span></h2>
             <form action="{% url 'checkout_purchase' buyer_num=buyer.buyer_num booth_slug=booth.slug %}" method="post" class="form">
+            <h2>
+                <div class="float-right">
+                    {% buttons %}
+                        <input class="btn btn-primary btn-lg" type="submit" value="Checkout"/>
+                        <a class="btn btn-secondary btn-lg" href="{% url 'checkout_buyer' booth_slug=booth.slug %}" >Cancel Checkout</a>
+                    {% endbuttons %}
+                </div>
+                Total: <span id="total"></span>
+            </h2>
                 {% csrf_token %}
                 <input type="hidden" name="form-TOTAL_FORMS" value="0" id="id_form-TOTAL_FORMS">
                 <input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS">
@@ -21,24 +29,12 @@
                 <table class="table table-sm">
                     <thead >
                         <tr>
-                            <th scope="col">Price</th>
-                            <th scope="col">Quantity</th>
+                            <th scope="col">Item Price</th>
                         </tr>
                     </thead>
                     <tbody id="entries">
                     </tbody>
-                    <tfoot class="">
-                        <tr>
-                            <th id="total">$0.00</th>
-                            <th>Total</th>
-                        </tr>
-                    </tfoot>
                 </table>
-{#                {% bootstrap_formset formset %}#}
-                {% buttons %}
-                    <input class="btn btn-primary" type="submit" value="Checkout"/>
-                    <input class="btn btn-secondary" type="reset" value="Cancel Checkout"/>
-                {% endbuttons %}
             </form>
         </div>
         <div class="col col-md-6">
@@ -47,7 +43,7 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">Add Item</span>
                     </div>
-                    <input class="form-control" id="newEntry" autofocus placeholder="$0.00t">
+                    <input class="form-control" id="newEntry" autofocus placeholder="$0.00">
                 </div>
             </form>
             <div class="softkeys" data-target="input[id=newEntry]"></div>
@@ -59,44 +55,9 @@
 {% block extra_header %}
     <link rel="stylesheet" href="{% static 'css/softkeys-0.0.1.css' %}">
     <style>
-        #register {
-            width: 20em;
-            margin: auto;
+        #total {
+            font-weight: bold;
         }
-
-        #ticket {
-            background: white;
-            margin: 0 1em;
-            padding: 1em;
-            box-shadow: 0 0 5px rgba(0, 0, 0, .25);
-        }
-
-        #ticket h1 {
-            text-align: center;
-        }
-
-        #ticket table {
-            font-family: monospace;
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        #ticket td, #ticket th {
-            padding: 5px;
-        }
-
-        #ticket th {
-            text-align: left;
-        }
-
-        #ticket td, #ticket #total {
-            text-align: right;
-        }
-
-        #ticket tfoot th {
-            border-top: 1px solid black;
-        }
-
     </style>
 {% endblock %}
 
@@ -118,9 +79,6 @@
         function next_amount(cnt, entry) {
             return '<input type="text" name="form-'+cnt+'-price" class="form-control" title="" id="id_form-'+cnt+'-price" value="' + entry +'">';
         }
-        function next_quantity(cnt) {
-            return '<input type="number" name="form-'+cnt+'-quantity" min="0" class="form-control" id="id_form-'+cnt+'-quantity" value="1">';
-        }
         function enter() {
             var entry = document.getElementById('newEntry').value;
             var entry = parseFloat(entry);
@@ -128,7 +86,7 @@
             var cnt = next_form_number();
             document.getElementById('entries').innerHTML +=
                 '<tr><td class="input-group"><div class="input-group-prepend"><span class="input-group-text">$</span></div>' + next_amount(cnt, currencyPad(entry)) + '</td>' +
-                '<td>' + next_quantity(cnt) + '</td></tr>';
+                '</tr>';
             total += entry;
             document.getElementById('total').innerHTML = currencyFormat(total);
 

@@ -5,12 +5,13 @@
 {% block page-heading %}{{ booth.name }} Checkout: {{ buyer.name }} (#{{ buyer.buyer_num }}){% endblock %}
 
 {% block content %}
-    <p>The total purchase price is {{ purchase_total|money }}. Is this correct?</p>
     <form action="{% url 'checkout_confirm' buyer_num=buyer.buyer_num booth_slug=booth.slug %}" method="post" class="form">
         {% csrf_token %}
+        <h2 class="top-space-big">The total purchase price is <b>{{ purchase_total|money }}</b>. Is this correct?</h2>
         {% bootstrap_form form %}
         {% buttons %}
-            <button class="btn btn-primary" type="submit">Yes</button>
+            <button class="btn btn-primary btn-lg" type="submit">Yes</button>
+            <a href="#" onclick="window.history.go(-1); return false;" class="btn btn-secondary btn-lg" >No</a>
         {% endbuttons %}
     </form>
 {% endblock %}

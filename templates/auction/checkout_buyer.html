@@ -1,5 +1,6 @@
 {% extends 'action_page.html' %}
 {% load bootstrap4 %}
+{% load static %}
 
 {% block title %}
     {{ booth.name }} Checkout
@@ -9,12 +10,52 @@
 
 {% block content %}
 
-    <form action="{% url 'checkout_buyer' booth_slug=booth.slug %}" method="post" class="form">
-        {% csrf_token %}
-        {% bootstrap_form form layout='inline' %}
-        {% buttons %}
-            <button class="btn btn-primary" type="submit" >Select Bidder</button>
-            <button class="btn btn-secondary" type="reset" >Clear</button>
-        {% endbuttons %}
-    </form>
+    <div class="row container-fluid top-space-big">
+        <div class="col col-md-6">
+            <form action="{% url 'checkout_buyer' booth_slug=booth.slug %}" method="post" class="form">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                {% buttons %}
+                    <button class="btn btn-primary" type="submit" >Select Bidder</button>
+                    <button class="btn btn-secondary" type="reset" >Clear</button>
+                {% endbuttons %}
+            </form>
+        </div>
+        <div class="col col-md-6">
+            <div class="softkeys" data-target="input[id=id_buyer_num]"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_header %}
+    <link rel="stylesheet" href="{% static 'css/softkeys-0.0.1.css' %}">
+{% endblock %}
+
+{% block script_footer %}
+    <script src="{% static 'js/softkeys-0.0.1.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.softkeys').softkeys({
+                target: $('.softkeys').data('target'),
+                layout: [
+                    [
+                        '7',
+                        '8',
+                        '9',
+                    ],
+                    [
+                        '4',
+                        '5',
+                        '6',
+                    ],
+                    [
+                        '1',
+                        '2',
+                        '3',
+                    ],
+                ]
+            });
+        });
+    </script>
 {% endblock %}
