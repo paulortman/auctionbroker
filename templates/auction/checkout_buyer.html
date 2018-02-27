@@ -10,7 +10,7 @@
 
 {% block content %}
 
-    <div class="row container-fluid top-space-big">
+    <div class="row container-fluid top-space-lg">
         <div class="col col-md-6">
             <form action="{% url 'checkout_buyer' booth_slug=booth.slug %}" method="post" class="form">
                 {% csrf_token %}
@@ -54,6 +54,9 @@
                         '2',
                         '3',
                     ],
+                    [
+                        '0'
+                    ]
                 ]
             });
         });

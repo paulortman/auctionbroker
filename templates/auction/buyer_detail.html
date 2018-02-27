@@ -1,12 +1,17 @@
 {% extends 'action_page.html' %}
+{% load static %}
 
 {% block title %}Buyer {{ buyer.name }}{% endblock %}
 
-{% block page-heading %}Buyer {{ buyer.name }}{% endblock %}
+{% block page-heading %}Buyer: {{ buyer.name }} ({{ buyer.buyer_num }}){% endblock %}
 
 {% block content %}
-    <h1>Buyer: {{ buyer.name }} | <a href="{% url 'buyer_update' pk=buyer.pk %}" >Edit</a> | <a href="{% url 'buyer_receipt' pk=buyer.pk %}" >Receipt</a></h1>
-    <p>Buyer Number: {{ buyer.buyer_num }}</p>
+    <div class="toolbar">
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'buyer_update' pk=buyer.pk %}" >
+            <img class="icon-lg" src="{% static 'svg/pencil.svg'%}" alt="pencil" /> Edit Buyer</a>
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'buyer_receipt' pk=buyer.pk %}" >
+            <img class="icon-lg" src="{% static 'svg/print.svg' %}" alt="print" /> Print Receipt</a>
+    </div>
 
     {% include 'auction/buyer_charges_payment_table.html' %}
 

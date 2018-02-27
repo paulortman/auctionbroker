@@ -23,6 +23,39 @@ input[type=number] {
   -webkit-appearance: textfield;
 }
 
-.top-space-big {
+.top-space-lg {
   margin-top: 50px;
 }
+.top-space-md {
+  margin-top: 30px;
+}
+.top-space-sm {
+  margin-top: 10px;
+}
+
+.toolbar {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.tool {
+  margin-left : 1em;
+  margin-right : 1em;
+}
+/*.tool .btn:hover {*/
+  /*margin: 1em;*/
+/*}*/
+
+.tool-lg {
+  font-size: 115%;
+}
+
+.icon-lg {
+  width: 20px;
+  height: 20px;
+}
+.icon-sm {
+  width: 14px;
+  height: 14px;
+}
+

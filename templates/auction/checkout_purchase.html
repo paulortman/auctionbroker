@@ -7,7 +7,7 @@
 {% block page-heading %}{{ booth.name }} Checkout: {{ buyer.name }} (#{{ buyer.buyer_num }}){% endblock %}
 
 {% block content %}
-    <div class="row container-fluid top-space-big" >
+    <div class="row container-fluid top-space-lg" >
         <div class="col col-md-6">
             <form action="{% url 'checkout_purchase' buyer_num=buyer.buyer_num booth_slug=booth.slug %}" method="post" class="form">
             <h2>
@@ -128,9 +128,12 @@
                         '3',
                     ],
                     [
-                        'delete',
+                        '0',
                         '.',
                         'return',
+                    ],
+                    [
+                        'delete'
                     ]
                 ]
             });

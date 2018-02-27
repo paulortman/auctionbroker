@@ -17,9 +17,9 @@
             <tr>
                 <td class="col-action">
                     <a class="btn btn-sm btn-secondary " href="{% url 'purchase_update' pk=purchase.pk %}" title="Edit">
-                        <img style="width:14px; height: 14px;" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
+                        <img class="icon-sm" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
                     <a class="btn btn-sm btn-secondary" href="{% url 'purchase_delete' pk=purchase.pk %}" title="Delete">
-                        <img style="width:14px; height: 14px;" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
+                        <img class="icon-sm" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
                 <td>
                     <em>{{ purchase.item.booth.name }}</em>: {{ purchase.item.name }}
                 </td>
@@ -58,9 +58,9 @@
             <tr>
                 <td class="col-action">
                     <a class="btn btn-sm btn-secondary " href="{% url 'payment_update' pk=payment.pk %}" title="Edit">
-                        <img style="width:14px; height: 14px;" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
+                        <img class="icon-sm" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
                     <a class="btn btn-sm btn-secondary" href="{% url 'payment_delete' pk=payment.pk %}" title="Delete">
-                        <img style="width:14px; height: 14px;" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
+                        <img class="icon-sm" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
                 </td>
                 <td>
                     {{ payment.transaction_time|date:"SHORT_DATETIME_FORMAT" }} {{ payment.get_method_display }} {{ payment.notes }}
@@ -83,10 +83,10 @@
 <p class="hidden-print"><a href="{% url 'buyer_pay' pk=buyer.pk %}" class="btn btn-primary btn-sm" >Add Payment</a></p>
 
 {% if not buyer.account_is_settled %}
-    <h2>Balance Due: {{ buyer.outstanding_balance|money }}</h2>
+    <h2 class="text-warning">Balance Due: <b>{{ buyer.outstanding_balance|money }}</b></h2>
 {% else %}
-    <h2>Account is Paid in Full</h2>
-    <p><img style="width:25px; height: 25px;" src="{% static 'svg/circle-check.svg' %}" alt="circle check" /> No payments are necessary, payments are equal to charges.</p>
+    <h2>Account is <span class="text-success" >Paid in Full</span></h2>
+    <p>No payments are necessary, payments are equal to charges.</p>
 {% endif %}
 
 {% if buyer.donations_total %}
