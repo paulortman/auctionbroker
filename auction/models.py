@@ -87,9 +87,10 @@ def buyer_number_generator():
 
 class Buyer(models.Model):
 
-    buyer_num = models.CharField(max_length=8, default=buyer_number_generator, unique=True, db_index=True )
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+    buyer_num = models.CharField(max_length=8, default=buyer_number_generator, unique=True, db_index=True,
+                                 verbose_name="Buyer Number")
+    first_name = models.CharField(max_length=30, verbose_name="First Name")
+    last_name = models.CharField(max_length=30, verbose_name="Last Name")
     email = models.EmailField(blank=True, verbose_name="Email Address")
     address_line1 = models.CharField(max_length=50, verbose_name="Address Line 1", help_text="Example: 21075 425 St")
     address_line2 = models.CharField(blank=True, max_length=50, verbose_name="Address Line 2", help_text="Marion, SD")
