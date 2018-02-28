@@ -1,17 +1,24 @@
 from django import forms
+from django.conf import settings
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms import widgets
+from django.utils import timezone
 
 from .models import Item, Booth, Buyer, Payment, buyer_number_validator, AuctionItem, Purchase
 
 
 class AuctionItemEditForm(forms.ModelForm):
+    scheduled_sale_time = forms.SplitDateTimeField(widget=widgets.SplitDateTimeWidget)
+
     class Meta:
         model = AuctionItem
         exclude = ['purchase', 'booth']
 
 
 class AuctionItemCreateForm(forms.ModelForm):
+    scheduled_sale_time = forms.SplitDateTimeField(widget=widgets.SplitDateTimeWidget,
+                                              help_text="Enter the scheduled date ('YYYY-MM-DD') and the time ('HH:MM PM')")
+
     class Meta:
         model = AuctionItem
         exclude = ['purchase', 'booth', 'is_purchased', 'sale_time']

@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
+from django.forms import widgets
 from django.utils import timezone
 from django.shortcuts import reverse
 from channels.channel import Group
@@ -22,18 +23,27 @@ def USD(d):
     return "${}".format(d.quantize(decimal.Decimal('.01'), decimal.ROUND_HALF_UP))
 
 
+class TrackedModel(models.Model):
+    class Meta:
+        abstract = True
+
+    ctime = models.DateTimeField(auto_now_add=True)
+    mtime = models.DateTimeField(auto_now=True)
+
+
 class Item(models.Model):
     class Meta:
         abstract = True
 
     name = models.CharField(max_length=50, blank=False, help_text="Short but descriptive name of item.")
-    long_desc = models.TextField(blank=True)
+    long_desc = models.TextField(blank=True, verbose_name="Long Description",
+                                 help_text="Enter a description, donor information, etc.")
     purchase = models.OneToOneField('Purchase', blank=True, null=True)
     booth = models.ForeignKey('Booth', blank=True, null=True)
     sale_time = models.DateTimeField(blank=True, null=True, verbose_name="Sale Time",
                                      help_text="When the item sold. Leave blank when creating")
     fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=D(0),
-                                            verbose_name="Fair Market Value (FMV)")
+                                            verbose_name="Fair Market Value (FMV)", help_text="Dollars, e.g. 10.00")
     is_purchased = models.BooleanField(default=False)
 
     def __str__(self):
@@ -46,7 +56,7 @@ class Item(models.Model):
         self.save()
 
 
-class PricedItem(Item):
+class PricedItem(TrackedModel, Item):
     pass
 
 
@@ -59,7 +69,17 @@ def item_number_generator():
     return max([value, settings.BASE_AUCTION_NUMBER]) + 1
 
 
-class AuctionItem(Item):
+def round_scheduled_sale_time(dt):
+    discard = timezone.timedelta(minutes=dt.minute % settings.AUCTIONITEM_SCHEDULED_TIME_INCREMENT,
+                                 seconds=dt.second,
+                                 microseconds=dt.microsecond)
+    dt -= discard
+    half = settings.AUCTIONITEM_SCHEDULED_TIME_INCREMENT / 2.0
+    if discard >= timezone.timedelta(minutes=half):
+        dt += timezone.timedelta(minutes=settings.AUCTIONITEM_SCHEDULED_TIME_INCREMENT)
+    return dt
+
+class AuctionItem(TrackedModel, Item):
     class Meta:
         pass
 
@@ -89,17 +109,17 @@ def buyer_number_generator():
     return max(max_num + 1, settings.BASE_BUYER_NUMBER)
 
 
-class Buyer(models.Model):
+class Buyer(TrackedModel, models.Model):
 
     buyer_num = models.CharField(max_length=8, default=buyer_number_generator, unique=True, db_index=True,
                                  verbose_name="Buyer Number")
     first_name = models.CharField(max_length=30, verbose_name="First Name")
     last_name = models.CharField(max_length=30, verbose_name="Last Name")
     email = models.EmailField(blank=True, verbose_name="Email Address")
-    address_line1 = models.CharField(max_length=50, verbose_name="Address Line 1", help_text="Example: 21075 425 St")
-    address_line2 = models.CharField(blank=True, max_length=50, verbose_name="Address Line 2", help_text="Marion, SD")
-    address_line3 = models.CharField(blank=True, max_length=50, verbose_name="Address Line 3", help_text="57043")
-    phone1 = models.CharField(blank=True, max_length=10)
+    address_line1 = models.CharField(max_length=50, verbose_name="Address")
+    address_line2 = models.CharField(blank=True, max_length=50, verbose_name="Address Line 2, e.g. Marion, SD")
+    address_line3 = models.CharField(blank=True, max_length=50, verbose_name="Address Line 3, e.g. 57043")
+    phone1 = models.CharField(blank=True, max_length=20)
 
     def __str__(self):
         return "Buyer {name} ({number})".format(name=self.name, number=self.buyer_num)
@@ -157,7 +177,7 @@ def buyer_number_validator(value):
 
 
 
-class Payment(models.Model):
+class Payment(TrackedModel, models.Model):
     CASH = 'CASH'
     CHECK = 'CHECK'
     CARD = 'CARD'
@@ -178,7 +198,7 @@ class Payment(models.Model):
 
 
 
-class Purchase(models.Model):
+class Purchase(TrackedModel, models.Model):
     UNPAID = 'UNPAID'
     PAID = 'PAID'
     VOID = 'VOID'

@@ -1,4 +1,5 @@
 from braces.views import GroupRequiredMixin
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles import finders
 from django.forms import formset_factory
@@ -6,12 +7,14 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
 from extra_views import FormSetView
 from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
-from .models import Item, Buyer, Purchase, Booth, Payment, AuctionItem, USD, D, buyer_number_generator
+from .models import Item, Buyer, Purchase, Booth, Payment, AuctionItem, USD, D, buyer_number_generator, \
+    round_scheduled_sale_time
 from .forms import BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, BuyerPaymentForm, PurchaseForm, BuyerCreateForm, \
     BuyerDonateForm, AuctionItemEditForm, AuctionItemCreateForm
@@ -51,7 +54,32 @@ class AuctionItemCreate(AuctionItemMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.booth = Booth.objects.get(name__iexact='auction')
-        return super().form_valid(form)
+
+        # import ipdb; ipdb.set_trace()
+        form.instance.save()
+        i = form.instance
+        msg = "Auction Item '{name}' ({num}) created successfully.".format(name=i.name, num=i.item_number)
+        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
+
+        if 'save_and_add_another' in self.request.POST:
+            return redirect('item_create')
+        if 'save_and_return_to_list' in self.request.POST:
+            return redirect('item_management')
+
+        return redirect('item_detail', item_number=i.item_number)
+
+    def get_initial(self):
+        initial = super().get_initial()
+
+        # mra = most recently added
+        try:
+            mra_scheduled_sale_time = AuctionItem.objects.all().order_by('-ctime')[0].scheduled_sale_time
+        except AuctionItem.DoesNotExist:
+            mra_scheduled_sale_time = timezone.now()
+        mra_scheduled_sale_time += timezone.timedelta(minutes=settings.AUCTIONITEM_SCHEDULED_TIME_INCREMENT)
+        initial['scheduled_sale_time'] = round_scheduled_sale_time(mra_scheduled_sale_time)
+
+        return initial
 
 
 class AuctionItemUpdate(AuctionItemMixin, UpdateView):
@@ -219,7 +247,7 @@ class BuyerPay(BuyerMixin, FormView):
         amount = form.cleaned_data['amount']
         Payment.objects.create(buyer=buyer, amount=amount, method=form.cleaned_data['method'])
         msg = "Payment of {amount} made by {name}".format(amount=USD(amount), name=buyer.name)
-        messages.add_message(self.request, messages.INFO, msg)
+        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
         return redirect('buyer_detail', pk=buyer.pk)
 
 
@@ -238,7 +266,7 @@ class BuyerDonate(BuyerMixin, FormView):
         Purchase.create_donation(buyer=buyer, amount=amount, booth=None)
 
         msg = "Doncation of {amount} made by {name}".format(amount=USD(amount), name=buyer.name)
-        messages.add_message(self.request, messages.INFO, msg)
+        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
         return redirect('buyer_detail', pk=buyer.pk)
 
 

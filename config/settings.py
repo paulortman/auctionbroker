@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'channels',
     'debug_toolbar',
 
+    'easy_timezones',
     'bootstrap4',
     'djmoney',
     'auction',
@@ -54,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'easy_timezones.middleware.EasyTimezoneMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -120,7 +122,9 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
+GEOIP_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCity.dat')
+GEOIPV6_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCityv6.dat')
+TIME_INPUT_FORMATS=['%I:%M %p', '%H:%M']
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -148,3 +152,4 @@ LOGIN_REDIRECT_URL = '/'
 
 BASE_BUYER_NUMBER = 100
 BASE_AUCTION_NUMBER = 1000
+AUCTIONITEM_SCHEDULED_TIME_INCREMENT = 5 # minutes

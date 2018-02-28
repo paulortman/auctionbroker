@@ -8,9 +8,32 @@
 {% block content %}
     <form action="" method="post">
         {% csrf_token %}
-        {% bootstrap_form form layout="horizontal" %}
+        <div class="form-row">
+            <div class="col-md-5">
+                {% bootstrap_field form.first_name %}
+            </div>
+            <div class="col-md-5">
+                {% bootstrap_field form.last_name %}
+            </div>
+            <div class="col-md-2">
+                {% bootstrap_field form.buyer_num %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                {% bootstrap_field form.address_line1 %}
+                {% bootstrap_field form.address_line2 layout='inline' %}
+                {% bootstrap_field form.address_line3 layout='inline' %}
+            </div>
+            <div class="col-md-6">
+                {% bootstrap_field form.email %}
+                {% bootstrap_field form.phone1 %}
+            </div>
+        </div>
         {% buttons %}
             <button type="submit" class="btn btn-primary" value="Submit" >Save</button>
+            <button type="submit" class="btn btn-secondary" name="save_and_add_another">Save and Add Another</button>
+            <button type="submit" class="btn btn-secondary" name="save_and_return_to_list">Save and List All</button>
         {% endbuttons %}
     </form>
 {% endblock %}

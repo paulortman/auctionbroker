@@ -5,13 +5,15 @@
 
 {% block page-heading %}Buyer List{% endblock %}
 
-{% block main %}
+{% block content %}
+    <div class="toolbar hidden-print">
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'buyer_create' %}" >
+            <img class="icon-lg" src="{% static 'svg/plus.svg'%}" alt="plus" /> Add Buyer</a>
+    </div>
+
     {% if not object_list %}
         <p>No Buyers are registered.</p>
     {% else %}
-        <div class="toolbar">
-            <a class="tool-lg btn btn-primary" href="{% url 'buyer_create' %}" >Add Buyer</a>
-        </div>
     <table class="table table-bordered table-hover">
     <thead class="thead-dark">
         <tr>

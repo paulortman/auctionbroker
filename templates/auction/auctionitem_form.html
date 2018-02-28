@@ -1,5 +1,6 @@
 {% extends 'action_page.html' %}
 {% load bootstrap4 %}
+{% load static %}
 
 {% block title %}Add/Edit Auction Item{% endblock %}
 
@@ -8,13 +9,45 @@
 {% block content %}
     <form action="" method="post">
         {% csrf_token %}
-        {% bootstrap_form form %}
+        {% bootstrap_form_errors form %}
+        <div class="form-row">
+            <div class="col-md-6">
+                {% bootstrap_field form.name %}
+                {% bootstrap_field form.fair_market_value %}
+            </div>
+            <div class="col-md-2">
+                {% bootstrap_field form.item_number %}
+            </div>
+            <div class="col-md-4">
+                {% bootstrap_field form.scheduled_sale_time %}
+            </div>
+        </div>
+        <div class="form-group">
+            {% bootstrap_field form.long_desc %}
+        </div>
+
         {% buttons %}
-            <button type="submit" class="btn btn-primary" >Save</button>
+            <button type="submit" class="btn btn-primary" name="save">Save</button>
+            <button type="submit" class="btn btn-secondary" name="save_and_add_another">Save and Add Another</button>
+            <button type="submit" class="btn btn-secondary" name="save_and_return_to_list">Save and List All</button>
         {% endbuttons %}
     </form>
 {% endblock %}
 
 {% block extra_header %}
-    {{ form.media }}
+    <link href="{% static 'css/jquery.timepicker.min.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block script_footer %}
+    <script src="{% static 'js/jquery.timepicker.min.js' %}"></script>
+    <script>
+        $('#id_scheduled_sale_time_1').timepicker({
+            timeFormat: 'hh:mm p',
+            interval: 5,
+            dynamic: true,
+            dropdown: true,
+            scrollbar: true
+        });
+    </script>
+
 {% endblock %}

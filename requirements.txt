@@ -9,3 +9,4 @@ django-extra-views
 WeasyPrint
 django-braces
 django-bootstrap4
+django-easy-timezones
