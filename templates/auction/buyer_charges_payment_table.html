@@ -21,7 +21,7 @@
                     <a class="btn btn-sm btn-secondary" href="{% url 'purchase_delete' pk=purchase.pk %}" title="Delete">
                         <img class="icon-sm" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
                 <td>
-                    <em>{{ purchase.item.booth.name }}</em>: {{ purchase.item.name }}
+                    {% if purchase.item.booth %}<em>{{ purchase.item.booth.name }}</em>: {% endif %}{{ purchase.item.name }}
                 </td>
                 <td class="col-price"> {% if purchase.donation_amount %} {{ purchase.donation_amount|money }} {% else %} - {% endif %} </td>
                 <td class="col-price">{{ purchase.amount|money }}</td>
@@ -40,8 +40,6 @@
 {% else %}
     <h2>No purchases</h2>
 {% endif %}
-<p class="hidden-print"><a href="#" class="btn btn-secondary btn-sm" >Add Purchase</a>
-    <a href="#" class="btn btn-secondary btn-sm" >Add Donation</a></p>
 
 {% if buyer.payments.all %}
     <h2>Payments</h2>

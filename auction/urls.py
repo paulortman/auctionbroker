@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^buyer/(?P<pk>\d+)/delete/$', views.BuyerDelete.as_view(), name="buyer_delete"),
     url(r'^buyer/(?P<pk>\d+)/receipt/$', views.BuyerReceipt.as_view(), name="buyer_receipt"),
     url(r'^buyer/(?P<pk>\d+)/pay/$', views.BuyerPay.as_view(), name="buyer_pay"),
+    url(r'^buyer/(?P<pk>\d+)/donate/$', views.BuyerDonate.as_view(), name="buyer_donate"),
 
     url(r'^payments/$', views.PaymentList.as_view(), name="payment_list"),
     url(r'^payment/create/$', views.PaymentCreate.as_view(), name="payment_create"),

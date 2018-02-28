@@ -13,7 +13,8 @@ from weasyprint.fonts import FontConfiguration
 
 from .models import Item, Buyer, Purchase, Booth, Payment, AuctionItem, USD, D, buyer_number_generator
 from .forms import BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
-    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, AuctionItemForm, BuyerPaymentForm, PurchaseForm, BuyerCreateForm
+    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, BuyerPaymentForm, PurchaseForm, BuyerCreateForm, \
+    BuyerDonateForm, AuctionItemEditForm, AuctionItemCreateForm
 
 
 class AuctionItemMixin:
@@ -26,8 +27,10 @@ class AuctionItemMixin:
             raise Exception("item_number not specified")
         return self.model.objects.get(item_number=item_number)
 
+
 class AuctionItemList(AuctionItemMixin, ListView):
     model = AuctionItem
+
 
 class AuctionItemManagement(AuctionItemMixin, ListView):
     model = AuctionItem
@@ -37,18 +40,23 @@ class AuctionItemManagement(AuctionItemMixin, ListView):
         qs = super().get_queryset()
         return qs.select_related('purchase', 'purchase__buyer')
 
+
 class AuctionItemDetail(AuctionItemMixin, DetailView):
     model = AuctionItem
 
 
 class AuctionItemCreate(AuctionItemMixin, CreateView):
     model = AuctionItem
-    form_class = AuctionItemForm
+    form_class = AuctionItemCreateForm
+
+    def form_valid(self, form):
+        form.instance.booth = Booth.objects.get(name__iexact='auction')
+        return super().form_valid(form)
 
 
 class AuctionItemUpdate(AuctionItemMixin, UpdateView):
     model = AuctionItem
-    form_class = AuctionItemForm
+    form_class = AuctionItemEditForm
 
 
 class AuctionItemDelete(AuctionItemMixin, DeleteView):
@@ -215,12 +223,32 @@ class BuyerPay(BuyerMixin, FormView):
         return redirect('buyer_detail', pk=buyer.pk)
 
 
+class BuyerDonate(BuyerMixin, FormView):
+    form_class = BuyerDonateForm
+    template_name = 'auction/buyer_donate.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['buyer'] = self.get_object()
+        return context
+
+    def form_valid(self, form):
+        buyer = self.get_object()
+        amount = form.cleaned_data['donation']
+        Purchase.create_donation(buyer=buyer, amount=amount, booth=None)
+
+        msg = "Doncation of {amount} made by {name}".format(amount=USD(amount), name=buyer.name)
+        messages.add_message(self.request, messages.INFO, msg)
+        return redirect('buyer_detail', pk=buyer.pk)
+
+
+
 class RandomSale(TemplateView):
     template_name = 'sale.html'
     def get(self, request, *args, **kwargs):
-        from auction.modelfactory import ItemFactory, BuyerFactory
+        from auction.modelfactory import AuctionItemFactory, BuyerFactory
         b = BuyerFactory.create()
-        ai = ItemFactory.create()
+        ai = AuctionItemFactory.create()
         c = Purchase.objects.create(buyer=b, amount='1')
         ai.charge = c
         ai.save()

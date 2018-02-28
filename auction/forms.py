@@ -1,13 +1,21 @@
 from django import forms
+from django.contrib.admin.widgets import AdminDateWidget
 from django.forms import widgets
 
 from .models import Item, Booth, Buyer, Payment, buyer_number_validator, AuctionItem, Purchase
 
 
-class AuctionItemForm(forms.ModelForm):
+class AuctionItemEditForm(forms.ModelForm):
     class Meta:
         model = AuctionItem
-        exclude = ['purchase']
+        exclude = ['purchase', 'booth']
+
+
+class AuctionItemCreateForm(forms.ModelForm):
+    class Meta:
+        model = AuctionItem
+        exclude = ['purchase', 'booth', 'is_purchased', 'sale_time']
+
 
 class ItemBiddingForm(forms.Form):
     amount = forms.DecimalField(max_digits=15, decimal_places=2)
@@ -55,13 +63,13 @@ class CheckoutBuyerForm(forms.Form):
                                 validators=[buyer_number_validator],
                                 label="Enter Buyer Number",
                                 help_text="Enter the Buyer's Purchase number to start the checkout.",
-                                widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
+                                widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
 
 
 
 class CheckoutPurchaseForm(forms.Form):
     price = forms.DecimalField(max_digits=15, decimal_places=2,
-                               widget=forms.TextInput(attrs={'autofocus': 'autofocu'}))
+                               widget=widgets.TextInput(attrs={'autofocus': 'autofocu'}))
     quantity = forms.IntegerField(min_value=0, required=False)
 
     @property
@@ -89,3 +97,10 @@ class BuyerPaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
         exclude = ['buyer', 'transaction_time']
+
+
+class BuyerDonateForm(forms.Form):
+    donation = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Enter Dollar Amount, ex. $100.00",
+                               widget=widgets.TextInput(attrs={'autofocus': 'autofocu'}))
+
+

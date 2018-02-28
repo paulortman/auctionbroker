@@ -26,12 +26,14 @@ class Item(models.Model):
     class Meta:
         abstract = True
 
-    name = models.CharField(max_length=50, blank=False)
+    name = models.CharField(max_length=50, blank=False, help_text="Short but descriptive name of item.")
     long_desc = models.TextField(blank=True)
     purchase = models.OneToOneField('Purchase', blank=True, null=True)
     booth = models.ForeignKey('Booth', blank=True, null=True)
-    sale_time = models.DateTimeField(blank=True, null=True)
-    fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=D(0))
+    sale_time = models.DateTimeField(blank=True, null=True, verbose_name="Sale Time",
+                                     help_text="When the item sold. Leave blank when creating")
+    fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=D(0),
+                                            verbose_name="Fair Market Value (FMV)")
     is_purchased = models.BooleanField(default=False)
 
     def __str__(self):
@@ -61,8 +63,10 @@ class AuctionItem(Item):
     class Meta:
         pass
 
-    item_number = models.PositiveIntegerField(unique=True, db_index=True, default=item_number_generator)
-    scheduled_sale_time = models.DateTimeField(blank=True, null=True)
+    item_number = models.PositiveIntegerField(unique=True, db_index=True, default=item_number_generator,
+                                              help_text="Leave blank to auto-generate.")
+    scheduled_sale_time = models.DateTimeField(blank=True, null=True, verbose_name="Scheduled Sale Time",
+                                               help_text="The time when the item is scheduled during the auction.")
 
     def get_absolute_url(self):
         return reverse('item_detail', kwargs={'item_number': self.item_number})
@@ -231,8 +235,7 @@ class Purchase(models.Model):
     @classmethod
     def create_priced_item(cls, buyer, amount, booth):
         p = Purchase.objects.create(buyer=buyer, amount=D(amount))
-        i = PricedItem.objects.create(name='{} Item'.format(booth.name),
-                                      fair_market_value=D(amount), purchase=p, booth=booth)
+        i = PricedItem.objects.create(name='Priced Item', fair_market_value=D(amount), purchase=p, booth=booth)
         i.commit_to_purchase(p)
         return p
 

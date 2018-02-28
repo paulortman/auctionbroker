@@ -1,4 +1,5 @@
 {% extends 'action_page.html' %}
+{% load static %}
 {% load money %}
 
 {% block title %}Auction Management{% endblock %}
@@ -6,9 +7,13 @@
 {% block page-heading %}Auction Item Management{% endblock %}
 
 {% block content %}
-    <div class="tools">
-
+    <div class="toolbar hidden-print">
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'item_create' %}" >
+            <img class="icon-lg" src="{% static 'svg/plus.svg'%}" alt="plus" /> Add Auction Item</a>
+        <a class="tool tool-lg btn btn-secondary" href="" >
+            <img class="icon-lg" src="{% static 'svg/dollar.svg' %}" alt="dollar" /> Add Donation</a>
     </div>
+
     <table class="table table-bordered table-hover">
     <thead class="thead-dark">
         <tr>

@@ -42,14 +42,10 @@ input[type=number] {
   margin-left : 1em;
   margin-right : 1em;
 }
-/*.tool .btn:hover {*/
-  /*margin: 1em;*/
-/*}*/
 
 .tool-lg {
   font-size: 115%;
 }
-
 .icon-lg {
   width: 20px;
   height: 20px;
@@ -59,3 +55,6 @@ input[type=number] {
   height: 14px;
 }
 
+.tool-lg img.icon-lg {
+  margin-right: 10px;
+}
