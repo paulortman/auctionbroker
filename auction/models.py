@@ -44,7 +44,7 @@ class Item(models.Model):
                                      help_text="When the item sold. Leave blank when creating")
     fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=D(0),
                                             verbose_name="Fair Market Value (FMV)", help_text="Dollars, e.g. 10.00")
-    is_purchased = models.BooleanField(default=False)
+    is_purchased = models.BooleanField(default=False, help_text="Unchecking this item will delete anv void the purchase")
 
     def __str__(self):
         return "({}) {}{}".format(self.id, self.name, "*" if self.purchase else "")
@@ -54,6 +54,21 @@ class Item(models.Model):
         self.sale_time = timezone.now()
         self.is_purchased = True
         self.save()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_is_purchased = self.is_purchased
+        self.__original_purchase = self.purchase
+
+    def save(self, *args):
+        if self.__original_is_purchased and not self.is_purchased:
+            # someone unchecked the box, so delete the purchase
+            self.__original_purchase.delete()
+            self.purchase = None
+            self.sale_time = None
+
+        super().save(*args)
+
 
 
 class PricedItem(TrackedModel, Item):

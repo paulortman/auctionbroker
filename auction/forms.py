@@ -8,7 +8,8 @@ from .models import Item, Booth, Buyer, Payment, buyer_number_validator, Auction
 
 
 class AuctionItemEditForm(forms.ModelForm):
-    scheduled_sale_time = forms.SplitDateTimeField(widget=widgets.SplitDateTimeWidget)
+    scheduled_sale_time = forms.SplitDateTimeField(widget=widgets.SplitDateTimeWidget,
+                                                   help_text="Enter the scheduled date ('YYYY-MM-DD') and the time ('HH:MM PM')")
 
     class Meta:
         model = AuctionItem
@@ -25,8 +26,8 @@ class AuctionItemCreateForm(forms.ModelForm):
 
 
 class ItemBiddingForm(forms.Form):
-    amount = forms.DecimalField(max_digits=15, decimal_places=2)
-    buyer_num = forms.CharField(max_length=10)
+    amount = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Dollar amount, e.g. 10.00")
+    buyer_num = forms.CharField(max_length=10, label="Buyer Number")
 
 
 class BoothForm(forms.ModelForm):

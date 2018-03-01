@@ -1,6 +1,7 @@
 {% extends 'action_page.html' %}
 {% load bootstrap4 %}
 {% load static %}
+{% load money %}
 
 {% block title %}Add/Edit Auction Item{% endblock %}
 
@@ -13,13 +14,26 @@
         <div class="form-row">
             <div class="col-md-6">
                 {% bootstrap_field form.name %}
-                {% bootstrap_field form.fair_market_value %}
             </div>
             <div class="col-md-2">
                 {% bootstrap_field form.item_number %}
             </div>
             <div class="col-md-4">
                 {% bootstrap_field form.scheduled_sale_time %}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-4">
+                {% bootstrap_field form.fair_market_value %}
+            </div>
+            <div class="col-md-4">
+                {% bootstrap_field form.is_purchased %}
+                {% if form.instance.is_purchased %}
+                    Winning Bidder: {{ form.instance.purchase.buyer.name }} ({{ form.instance.purchase.amount|money }})
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                {% bootstrap_field form.sale_time %}
             </div>
         </div>
         <div class="form-group">

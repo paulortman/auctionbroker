@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block main %}
+    <h1>Purchases</h1>
+    <ul>
+    {% for purchase in purchase_list %}
+        <li><a href="{% url 'purchase_detail' pk=purchase.pk %}" >{{ purchase.buyer.name }} - {{ purchase.amount }}</a> - ({{ purchase.id }})</li>
+    {% endfor %}
+    </ul>
+{% endblock %}

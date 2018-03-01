@@ -6,7 +6,7 @@ from django.forms import formset_factory
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
 from extra_views import FormSetView
@@ -20,7 +20,22 @@ from .forms import BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, Checkou
     BuyerDonateForm, AuctionItemEditForm, AuctionItemCreateForm
 
 
-class AuctionItemMixin(GroupRequiredMixin):
+class HonorNextMixin:
+    def get_success_url(self):
+        """
+        This allows any class view to honor an action with a 'next' query string attached.  If the 'next' querystring is
+        not provided, resume default behavior.
+
+        :return:
+        """
+        next_url = self.request.GET.get('next', None)  # here method should be GET or POST.
+        if next_url:
+            return next_url
+        else:
+            return super().get_success_url()
+
+
+class AuctionItemMixin(GroupRequiredMixin, HonorNextMixin):
     group_required = 'auction_managers'
     raise_exception = True
 
@@ -149,15 +164,16 @@ class PurchaseUpdate(UpdateView):
     raise_exception = True
 
 
-class PurchaseDelete(DeleteView):
+class PurchaseDelete(HonorNextMixin, DeleteView):
     template_name = 'auction/generic_confirm_delete.html'
     model = Purchase
     group_required = u'account_managers'
     raise_exception = True
+    success_url = reverse_lazy('purchase_list')
 
-    def get_success_url(self):
-        buyer = self.get_object().buyer
-        return reverse('buyer_detail', kwargs={'pk': buyer.pk})
+    # def get_success_url(self):
+    #     buyer = self.get_object().buyer
+    #     return reverse('buyer_detail', kwargs={'pk': buyer.pk})
 
 
 class PaymentList(ListView):

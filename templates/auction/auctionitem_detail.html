@@ -1,13 +1,32 @@
-{% extends 'base.html' %}
-{% block main %}
+{% extends 'action_page.html' %}
+{% load static %}
+{% load money %}
+
+{% block title %}Auction Item{% endblock %}
+
+{% block page-heading %}{{ object.name }}{% endblock %}
+
+{% block content %}
     {% with object as item %}
-    <h1>Item: {{ item.name }} | <a href="{% url 'item_update' item_number=item.item_number %}" >Edit</a></h1>
+
+    <div class="toolbar hidden-print">
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'item_update' item_number=item.item_number %}" >
+            <img class="icon-lg" src="{% static 'svg/pencil.svg'%}" alt="pencil" /> Edit Item</a>
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'bidding_recorder' item_number=item.item_number %}" >
+            <img class="icon-lg" src="{% static 'svg/circle-check.svg' %}" alt="circle-check" /> Record Bid</a>
+    </div>
 
     <ul>
-        <li>Desc: {{ item.long_desc }}</li>
+        <li>Number: {{ item.item_number }}</li>
+        <li>Is Sold: {{ item.is_purchased|yesno:"Yes,No" }}</li>
+        {% if item.purchase %}
         <li>Winner: {{ item.purchase.buyer.name }}</li>
+        <li>Purchase Price: {{ item.purchase.amount|money }}</li>
+        {% endif %}
+        <li>Fair Market Value: {{ item.fair_market_value|money }}</li>
         <li>Auction Time: {{ item.scheduled_sale_time }}</li>
-        <li><a href="{% url "bidding_recorder" item_number=item.item_number %}">Bid Now</a></li>
+        <li>Sale Time: {{ item.sale_time }}</li>
+        <li>Desc: {{ item.long_desc }}</li>
     </ul>
     {% endwith %}
 {% endblock %}

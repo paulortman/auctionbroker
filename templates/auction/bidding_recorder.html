@@ -1,30 +1,36 @@
 {% extends 'action_page.html' %}
 {% load bootstrap4 %}
+{% load money %}
 
 {% block title %}Record Bid for {{ item.name }}{% endblock %}
 
-{% block page-heading %}Record Bid{% endblock %}
+{% block page-heading %}Record Bid for {{ item.name }}{% endblock %}
 
 {% block content %}
 
-    <h1>Item: {{ item.name }} | <a href="{% url 'item_update' item_number=item.item_number %}" >Edit</a></h1>
-
     <ul>
-        <li>Description: {{ item.long_desc }}</li>
-        <li>Winner: {{ item.purchase.buyer.name }}</li>
-        <li>Amount: {{ item.purchase.amount }}</li>
-        {% if item.sale_time %}
-        <li>Sale Time: {{ item.sale_time }}</li>
-        {% else %}
+        <li>Item Number: {{ item.item_number }}</li>
         <li>Auction Time: {{ item.scheduled_sale_time }}</li>
-        {% endif %}
+        <li>Fair Market Value: {{ item.fair_market_value|money }}</li>
+        <li>Description: {{ item.long_desc }}</li>
     </ul>
     <form action="{% url "bidding_recorder" item_number=item.item_number %}" method="post">
         {% csrf_token %}
-        {% bootstrap_form form layout="horizontal" %}
-        {% buttons %}
-        <button class="btn btn-primary" type="submit" >Record Winning Bid</button>
-        <button class="btn" type="reset" >Cancel</button>
-        {% endbuttons %}
+        <div class="form-row">
+            <div class="col-md-3">
+                {% bootstrap_field form.amount %}
+            </div>
+            <div class="col-md-3">
+                {% bootstrap_field form.buyer_num %}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-3">
+                {% buttons %}
+                    <button class="btn btn-primary" type="submit" >Record Winning Bid</button>
+                    <button class="btn" type="reset" >Cancel</button>
+                {% endbuttons %}
+            </div>
+        </div>
     </form>
 {% endblock %}
