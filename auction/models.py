@@ -196,6 +196,8 @@ class Payment(TrackedModel, models.Model):
     def __str__(self):
         return "{amount} payment by {buyer}".format(amount=USD(self.amount), buyer=self.buyer.name)
 
+    def get_absolute_url(self):
+        return reverse('payment_detail', kwargs={'pk': self.pk})
 
 
 class Purchase(TrackedModel, models.Model):

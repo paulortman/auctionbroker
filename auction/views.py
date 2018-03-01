@@ -1,4 +1,4 @@
-from braces.views import GroupRequiredMixin
+from braces.views import GroupRequiredMixin, UserPassesTestMixin
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles import finders
@@ -20,7 +20,10 @@ from .forms import BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, Checkou
     BuyerDonateForm, AuctionItemEditForm, AuctionItemCreateForm
 
 
-class AuctionItemMixin:
+class AuctionItemMixin(GroupRequiredMixin):
+    group_required = 'auction_managers'
+    raise_exception = True
+
     def get_queryset(self):
         return self.model.objects.all().order_by('sale_time','scheduled_sale_time')
 
@@ -120,27 +123,37 @@ class BoothDelete(GroupRequiredMixin, DeleteView):
     group_required = u'admins'
 
 
-class PurchaseList(ListView):
+class PurchaseList(GroupRequiredMixin, ListView):
     model = Purchase
+    group_required = u'account_managers'
+    raise_exception = True
 
 
 class PurchaseDetail(DetailView):
     model = Purchase
+    group_required = u'account_managers'
+    raise_exception = True
 
 
 class PurchaseCreate(CreateView):
     model = Purchase
     form_class = PurchaseForm
+    group_required = u'account_managers'
+    raise_exception = True
 
 
 class PurchaseUpdate(UpdateView):
     model = Purchase
     form_class = PurchaseForm
+    group_required = u'account_managers'
+    raise_exception = True
 
 
 class PurchaseDelete(DeleteView):
     template_name = 'auction/generic_confirm_delete.html'
     model = Purchase
+    group_required = u'account_managers'
+    raise_exception = True
 
     def get_success_url(self):
         buyer = self.get_object().buyer
@@ -149,33 +162,46 @@ class PurchaseDelete(DeleteView):
 
 class PaymentList(ListView):
     model = Payment
+    group_required = u'account_managers'
+    raise_exception = True
 
 
 class PaymentDetail(DetailView):
     model = Payment
+    group_required = u'account_managers'
+    raise_exception = True
 
 
 class PaymentCreate(CreateView):
     model = Payment
     form_class = PaymentForm
+    group_required = u'account_managers'
+    raise_exception = True
 
 
 class PaymentUpdate(UpdateView):
     model = Payment
     form_class = PaymentForm
+    group_required = u'account_managers'
+    raise_exception = True
 
 
 class PaymentDelete(DeleteView):
     template_name = 'auction/generic_confirm_delete.html'
     model = Payment
+    group_required = u'account_managers'
+    raise_exception = True
 
     def get_success_url(self):
         buyer = self.get_object().buyer
         return reverse('buyer_detail', kwargs={'pk': buyer.pk})
 
 
-class BuyerMixin:
+class BuyerMixin(GroupRequiredMixin):
     model = Buyer
+    group_required = u'account_managers'
+    raise_exception = True
+
     def get_object(self):
         pk = self.kwargs.get('pk', None)
         if not pk:
@@ -270,7 +296,6 @@ class BuyerDonate(BuyerMixin, FormView):
         return redirect('buyer_detail', pk=buyer.pk)
 
 
-
 class RandomSale(TemplateView):
     template_name = 'sale.html'
     def get(self, request, *args, **kwargs):
@@ -297,7 +322,22 @@ def priced_item_checkout(request):
     })
 
 
-class CheckoutBuyer(FormView):
+def checkout_auth_func(view, user):
+    # allow if the username is in part of the booth name -- truly a hack
+    if user.username.lower() in view.booth.name.lower():
+        return True
+    if user.is_superuser:  # always allow superusers
+        return True
+    return False
+
+
+class CheckoutAuthMixin(GroupRequiredMixin, UserPassesTestMixin):
+    group_required = 'checkout'
+    test_func = checkout_auth_func
+    raise_exception = True
+
+
+class CheckoutBuyer(CheckoutAuthMixin, FormView):
     template_name = 'auction/checkout_buyer.html'
     form_class = CheckoutBuyerForm
 
@@ -322,7 +362,7 @@ class CheckoutBuyer(FormView):
         return redirect('checkout_purchase', buyer_num=buyer.buyer_num, booth_slug=self.booth.slug)
 
 
-class CheckoutPurchase(FormSetView):
+class CheckoutPurchase(CheckoutAuthMixin, FormSetView):
     template_name = 'auction/checkout_purchase.html'
     form_class = CheckoutPurchaseForm
     extra = 10
@@ -350,7 +390,7 @@ class CheckoutPurchase(FormSetView):
         return redirect('checkout_confirm', buyer_num=self.buyer.buyer_num, booth_slug=self.booth.slug)
 
 
-class CheckoutConfirm(FormView):
+class CheckoutConfirm(CheckoutAuthMixin, FormView):
     form_class = CheckoutConfirmForm
     template_name = 'auction/checkout_confirm.html'
 
@@ -385,10 +425,11 @@ class CheckoutConfirm(FormView):
         return redirect('checkout_buyer', booth_slug=self.booth.slug)
 
 
-class BiddingRecorder(FormView):
+class BiddingRecorder(GroupRequiredMixin, FormView):
     model = Item
     form_class = ItemBiddingForm
     template_name = 'auction/bidding_recorder.html'
+    group_required = 'auction_managers'
 
     def dispatch(self, request, *args, **kwargs):
         item_number = self.kwargs.get('item_number')

@@ -1,7 +1,9 @@
 from decimal import Decimal
-from django.test import TestCase
+from django.test import TestCase, override_settings
+from django.utils import timezone
 
-from .models import Purchase, Payment
+from auction.templatetags.money import money
+from .models import Purchase, Payment, round_scheduled_sale_time
 from .modelfactory import AuctionItemFactory, BuyerFactory, BoothFactory
 
 
@@ -96,3 +98,29 @@ class PaymentsTestCase(TestCase):
         assert self.b.purchases_total == Decimal('10.00')
         assert self.b.donations_total == Decimal('0.00')
 
+
+class MoneyTestCase(TestCase):
+
+    def test_zero_format(self):
+        assert "$0.00" == money(Decimal('0'))
+
+    def test_100_format(self):
+        assert "$100.00" == money(Decimal('100'))
+
+    def test_negative_format(self):
+        assert "$-100.00" == money(Decimal('-100'))
+
+
+class ScheduledTimeTestCase(TestCase):
+
+    @override_settings(AUCTIONITEM_SCHEDULED_TIME_INCREMENT=5)
+    def test_round_up(self):
+        dt = timezone.datetime(year=2018, month=2, day=28, hour=12, minute=7, second=30)
+        rounded = round_scheduled_sale_time(dt)
+        assert rounded == timezone.datetime(year=2018, month=2, day=28, hour=12, minute=10, second=0)
+
+    @override_settings(AUCTIONITEM_SCHEDULED_TIME_INCREMENT=5)
+    def test_round_down(self):
+        dt = timezone.datetime(year=2018, month=2, day=28, hour=12, minute=7, second=29)
+        rounded = round_scheduled_sale_time(dt)
+        assert rounded == timezone.datetime(year=2018, month=2, day=28, hour=12, minute=5, second=0)
