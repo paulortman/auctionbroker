@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.utils import timezone
 from django.conf import settings
 
-from .models import Buyer, Booth, AuctionItem
+from .models import Buyer, Booth, AuctionItem, round_scheduled_sale_time
 import factory
 
 
@@ -41,6 +41,6 @@ class AuctionItemFactory(factory.django.DjangoModelFactory):
     name = factory.Sequence(lambda n: 'item %d' % n)
     booth = factory.SubFactory(BoothFactory)
     long_desc = factory.Faker('paragraph')
-    scheduled_sale_time = factory.Sequence(lambda n: timezone.now() + timezone.timedelta(minutes=5 * n))
+    scheduled_sale_time = factory.Sequence(lambda n: round_scheduled_sale_time(timezone.now() + timezone.timedelta(minutes=settings.AUCTIONITEM_SCHEDULED_TIME_INCREMENT * n)))
     fair_market_value = factory.LazyFunction(lambda: Decimal("{}.00".format(random.randint(10, 800))))
 
