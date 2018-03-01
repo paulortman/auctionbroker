@@ -38,8 +38,8 @@ class Item(models.Model):
     name = models.CharField(max_length=50, blank=False, help_text="Short but descriptive name of item.")
     long_desc = models.TextField(blank=True, verbose_name="Long Description",
                                  help_text="Enter a description, donor information, etc.")
-    purchase = models.OneToOneField('Purchase', blank=True, null=True)
-    booth = models.ForeignKey('Booth', blank=True, null=True)
+    purchase = models.OneToOneField('Purchase', blank=True, null=True, on_delete=models.SET_NULL)
+    booth = models.ForeignKey('Booth', blank=True, null=True, on_delete=models.SET_NULL)
     sale_time = models.DateTimeField(blank=True, null=True, verbose_name="Sale Time",
                                      help_text="When the item sold. Leave blank when creating")
     fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=D(0),
@@ -106,7 +106,7 @@ class AuctionItem(TrackedModel, Item):
     def get_absolute_url(self):
         return reverse('item_detail', kwargs={'item_number': self.item_number})
 
-@receiver(post_save, sender=Item)
+@receiver(post_save, sender=AuctionItem)
 def send_sale_event(sender, instance, **kwargs):
     if instance.purchase_id:
         Group('sales_events').send({
@@ -116,8 +116,19 @@ def send_sale_event(sender, instance, **kwargs):
                 'purchase_id': instance.purchase_id
             })
         })
-        print("Sent Event")
+        print("Auction Sales Event")
 
+@receiver(post_save, sender=PricedItem)
+def send_sale_event(sender, instance, **kwargs):
+    if instance.purchase_id:
+        Group('sales_events').send({
+            'text': json.dumps({
+                'id': instance.id,
+                'name': instance.name,
+                'purchase_id': instance.purchase_id
+            })
+        })
+        print("Priced Item Event")
 
 def buyer_number_generator():
     max_num = int(Buyer.objects.aggregate(Max('buyer_num'))['buyer_num__max'])
@@ -201,7 +212,7 @@ class Payment(TrackedModel, models.Model):
         (CHECK, 'Check'),
         (CARD, 'Card')
     )
-    buyer = models.ForeignKey('Buyer', related_name='payments')
+    buyer = models.ForeignKey('Buyer', related_name='payments', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     method = models.CharField(choices=METHODS, default='CHECK', max_length=6,
                               help_text="The method or type of payment made.")
@@ -225,7 +236,7 @@ class Purchase(TrackedModel, models.Model):
         (VOID, 'Void')
     )
 
-    buyer = models.ForeignKey('Buyer', related_name='purchases')
+    buyer = models.ForeignKey('Buyer', related_name='purchases', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     state = models.CharField(choices=STATES, default='UNPAID', max_length=7)
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
