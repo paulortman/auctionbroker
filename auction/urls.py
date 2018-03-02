@@ -50,8 +50,7 @@ urlpatterns = [
     url(r'^purchase/(?P<pk>\d+)/edit/$', views.PurchaseUpdate.as_view(), name="purchase_update"),
     url(r'^purchase/(?P<pk>\d+)/delete/$', views.PurchaseDelete.as_view(), name="purchase_delete"),
 
-    url(r'^sale/$', views.RandomSale.as_view(), name="test_sale"),
-    url(r'^add_charge/$', views.priced_item_checkout, name="add_charge"),
+    url(r'^dashboard/$', views.TemplateView.as_view(template_name='dashboard.html'), name="dashboard"),
 
     url(r'^bidding/(?P<item_number>\d+)/$', views.BiddingRecorder.as_view(), name='bidding_recorder'),
     url(r'^management/$', views.AuctionItemManagement.as_view(), name='item_management'),

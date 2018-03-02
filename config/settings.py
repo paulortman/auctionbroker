@@ -133,6 +133,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Channels
+ASGI_APPLICATION = "auction.routing.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgiref.inmemory.ChannelLayer",
@@ -148,7 +149,8 @@ INTERNAL_IPS = ['127.0.0.1',]
 
 CURRENCIES = ('USD',)
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
 
 BASE_BUYER_NUMBER = 100
 BASE_AUCTION_NUMBER = 1000

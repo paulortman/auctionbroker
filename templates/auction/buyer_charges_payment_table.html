@@ -1,6 +1,14 @@
 {% load static %}
 {% load money %}
 
+{% if not buyer.account_is_settled %}
+    <h2 class="top-space-md text-warning">Balance Due: <b>{{ buyer.outstanding_balance|money }}</b></h2>
+{% else %}
+    <h2 class="top-space-md">Account is <span class="text-success" >Paid in Full</span></h2>
+    <p>No payments are necessary, payments are equal to charges.</p>
+{% endif %}
+
+
 {% if buyer.purchases.all %}
     <h2>Purchases</h2>
     <table class="table table-bordered table-hover">
@@ -79,13 +87,6 @@
     <h2>No payments</h2>
 {% endif %}
 <p class="hidden-print"><a href="{% url 'buyer_pay' pk=buyer.pk %}" class="btn btn-primary btn-sm" >Add Payment</a></p>
-
-{% if not buyer.account_is_settled %}
-    <h2 class="text-warning">Balance Due: <b>{{ buyer.outstanding_balance|money }}</b></h2>
-{% else %}
-    <h2>Account is <span class="text-success" >Paid in Full</span></h2>
-    <p>No payments are necessary, payments are equal to charges.</p>
-{% endif %}
 
 {% if buyer.donations_total %}
     <h2>Donation Amount: {{ buyer.donations_total|money }}</h2>

@@ -12,7 +12,7 @@
 
     <div class="row container-fluid top-space-lg">
         <div class="col col-md-6">
-            <form action="{% url 'checkout_buyer' booth_slug=booth.slug %}" method="post" class="form">
+            <form action="{% url 'checkout_buyer' booth_slug=booth.slug %}" method="post" class="form" autocomplete="off">
                 {% csrf_token %}
                 {% bootstrap_form form %}
                 {% buttons %}

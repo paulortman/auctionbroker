@@ -1,14 +1,15 @@
 import json
 
 import decimal
+
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
-from django.forms import widgets
 from django.utils import timezone
 from django.shortcuts import reverse
-from channels.channel import Group
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.utils.text import slugify
@@ -60,14 +61,14 @@ class Item(models.Model):
         self.__original_is_purchased = self.is_purchased
         self.__original_purchase = self.purchase
 
-    def save(self, *args):
+    def save(self, *args, **kwargs):
         if self.__original_is_purchased and not self.is_purchased:
             # someone unchecked the box, so delete the purchase
             self.__original_purchase.delete()
             self.purchase = None
             self.sale_time = None
 
-        super().save(*args)
+        super().save(*args, **kwargs)
 
 
 
@@ -106,29 +107,33 @@ class AuctionItem(TrackedModel, Item):
     def get_absolute_url(self):
         return reverse('item_detail', kwargs={'item_number': self.item_number})
 
-@receiver(post_save, sender=AuctionItem)
-def send_sale_event(sender, instance, **kwargs):
-    if instance.purchase_id:
-        Group('sales_events').send({
-            'text': json.dumps({
-                'id': instance.id,
-                'name': instance.name,
-                'purchase_id': instance.purchase_id
-            })
-        })
-        print("Auction Sales Event")
-
-@receiver(post_save, sender=PricedItem)
-def send_sale_event(sender, instance, **kwargs):
-    if instance.purchase_id:
-        Group('sales_events').send({
-            'text': json.dumps({
-                'id': instance.id,
-                'name': instance.name,
-                'purchase_id': instance.purchase_id
-            })
-        })
-        print("Priced Item Event")
+# @receiver(post_save, sender=AuctionItem)
+# def send_sale_event(sender, instance, **kwargs):
+#     if instance.purchase_id:
+#         channel_layer = get_channel_layer()
+#         async_to_sync(channel_layer.group_send)("sales", {
+#             "type": "sales.message",
+#             "text": json.dumps({
+#                 'id': instance.id,
+#                 'name': instance.name,
+#                 'purchase_id': instance.purchase_id
+#             })
+#         })
+#         print("Auction Sales Event")
+#
+# @receiver(post_save, sender=PricedItem)
+# def send_sale_event(sender, instance, **kwargs):
+#     if instance.purchase_id:
+#         channel_layer = get_channel_layer()
+#         async_to_sync(channel_layer.group_send)("sales", {
+#             "type": "sales.message",
+#             "text": json.dumps({
+#                 'id': instance.id,
+#                 'name': instance.name,
+#                 'purchase_id': instance.purchase_id
+#             })
+#         })
+#         print("Priced Item Event")
 
 def buyer_number_generator():
     max_num = int(Buyer.objects.aggregate(Max('buyer_num'))['buyer_num__max'])

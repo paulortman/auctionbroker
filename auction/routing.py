@@ -1,8 +1,7 @@
-from channels.routing import route
-from .consumers import ws_add, ws_disconnect
+from channels.routing import ProtocolTypeRouter
 
-
-channel_routing = [
-    route("websocket.connect", ws_add),
-    route("websocket.disconnect", ws_disconnect)
-]
+application = ProtocolTypeRouter({
+    # route("websocket.connect", ws_add),
+    # route("websocket.disconnect", ws_disconnect)
+    # Empty for now (http->django views is added by default)
+})

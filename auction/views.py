@@ -1,6 +1,8 @@
 from braces.views import GroupRequiredMixin, UserPassesTestMixin
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView
 from django.contrib.staticfiles import finders
 from django.forms import formset_factory
 from django.http import HttpResponse
@@ -176,33 +178,33 @@ class PurchaseDelete(HonorNextMixin, DeleteView):
     #     return reverse('buyer_detail', kwargs={'pk': buyer.pk})
 
 
-class PaymentList(ListView):
+class PaymentList(HonorNextMixin, ListView):
     model = Payment
     group_required = u'account_managers'
     raise_exception = True
 
 
-class PaymentDetail(DetailView):
+class PaymentDetail(HonorNextMixin, DetailView):
     model = Payment
     group_required = u'account_managers'
     raise_exception = True
 
 
-class PaymentCreate(CreateView):
-    model = Payment
-    form_class = PaymentForm
-    group_required = u'account_managers'
-    raise_exception = True
-
-
-class PaymentUpdate(UpdateView):
+class PaymentCreate(HonorNextMixin, CreateView):
     model = Payment
     form_class = PaymentForm
     group_required = u'account_managers'
     raise_exception = True
 
 
-class PaymentDelete(DeleteView):
+class PaymentUpdate(HonorNextMixin, UpdateView):
+    model = Payment
+    form_class = PaymentForm
+    group_required = u'account_managers'
+    raise_exception = True
+
+
+class PaymentDelete(HonorNextMixin, DeleteView):
     template_name = 'auction/generic_confirm_delete.html'
     model = Payment
     group_required = u'account_managers'
@@ -213,7 +215,7 @@ class PaymentDelete(DeleteView):
         return reverse('buyer_detail', kwargs={'pk': buyer.pk})
 
 
-class BuyerMixin(GroupRequiredMixin):
+class BuyerMixin(HonorNextMixin, GroupRequiredMixin):
     model = Buyer
     group_required = u'account_managers'
     raise_exception = True
@@ -313,7 +315,7 @@ class BuyerDonate(BuyerMixin, FormView):
 
 
 class RandomSale(TemplateView):
-    template_name = 'sale.html'
+    template_name = 'dashboard.html'
     def get(self, request, *args, **kwargs):
         from auction.modelfactory import AuctionItemFactory, BuyerFactory
         b = BuyerFactory.create()

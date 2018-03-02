@@ -27,13 +27,17 @@
                 {% bootstrap_field form.fair_market_value %}
             </div>
             <div class="col-md-4">
+                {% if form.is_purchased %}
                 {% bootstrap_field form.is_purchased %}
                 {% if form.instance.is_purchased %}
                     Winning Bidder: {{ form.instance.purchase.buyer.name }} ({{ form.instance.purchase.amount|money }})
                 {% endif %}
+                {% endif %}
             </div>
             <div class="col-md-4">
+                {% if form.sale_time %}
                 {% bootstrap_field form.sale_time %}
+                {% endif %}
             </div>
         </div>
         <div class="form-group">

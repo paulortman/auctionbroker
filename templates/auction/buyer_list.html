@@ -26,9 +26,9 @@
         {% for buyer in object_list %}
         <tr>
             <td>
-                <a class="btn btn-sm btn-secondary " href="{% url 'buyer_update' pk=buyer.pk %}" title="Edit">
+                <a class="btn btn-sm btn-secondary " href="{% url 'buyer_update' pk=buyer.pk %}?next={% url 'buyer_list' %}" title="Edit">
                     <img style="width:14px; height: 14px;" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
-                <a class="btn btn-sm btn-secondary" href="{% url 'buyer_delete' pk=buyer.pk %}" title="Delete">
+                <a class="btn btn-sm btn-secondary" href="{% url 'buyer_delete' pk=buyer.pk %}?next={% url 'buyer_list' %}" title="Delete">
                     <img style="width:14px; height: 14px;" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
             </td>
             <td><a href="{% url 'buyer_detail' pk=buyer.pk %}" >{{ buyer.name }}</a></td>
