@@ -5,7 +5,8 @@ ADD Pipfile /Pipfile
 ADD Pipfile.lock /Pipfile.lock
 
 # Require the psql client
-RUN apk add --no-cache postgresql-client
+RUN apk --update --upgrade add --no-cache postgresql-client cairo pango gdk-pixbuf
+RUN apk add py3-lxml py3-cffi py3-pillow --repository http://dl-cdn.alpinelinux.org/alpine/edge/main/gi --alow-untrusted
 
 # Install build deps, then run `pip install`, then remove unneeded build deps all in a single step. Correct the path to your production requirements file, if needed.
 RUN set -ex \
@@ -20,8 +21,9 @@ RUN set -ex \
             libffi-dev \
             openssl-dev \
             libjpeg-turbo-dev \
+            cairo-dev \
     && pip install -U pip pipenv \
-    && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pipenv install -v --three --system --ignore-pipfile --deploy" \
+    && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pipenv install --three --system --ignore-pipfile --deploy" \
     && runDeps="$( \
             scanelf --needed --nobanner --recursive /venv \
                     | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
