@@ -1,38 +1,27 @@
-FROM python:3.6.4-alpine
+FROM python:3.6-stretch
 
 # Copy in your requirements file
 ADD Pipfile /Pipfile
 ADD Pipfile.lock /Pipfile.lock
 
-# Require the psql client
-RUN apk --update --upgrade add --no-cache postgresql-client cairo pango gdk-pixbuf
-RUN apk add py3-lxml py3-cffi py3-pillow --repository http://dl-cdn.alpinelinux.org/alpine/edge/main/gi --alow-untrusted
+# Install required packages
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        python3-dev \
+        python3-pip \
+        python3-cffi \
+        libcairo2 \
+        libpango-1.0-0 \
+        libpangocairo-1.0-0 \
+        libgdk-pixbuf2.0-0 \
+        libffi-dev \
+        shared-mime-info \
+        postgresql-client \
+    && pip install --upgrade pip pipenv \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install build deps, then run `pip install`, then remove unneeded build deps all in a single step. Correct the path to your production requirements file, if needed.
-RUN set -ex \
-    && apk add --no-cache --virtual .build-deps \
-            gcc \
-            make \
-            libc-dev \
-            musl-dev \
-            linux-headers \
-            pcre-dev \
-            postgresql-dev \
-            libffi-dev \
-            openssl-dev \
-            libjpeg-turbo-dev \
-            cairo-dev \
-    && pip install -U pip pipenv \
-    && LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "pipenv install --three --system --ignore-pipfile --deploy" \
-    && runDeps="$( \
-            scanelf --needed --nobanner --recursive /venv \
-                    | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-                    | sort -u \
-                    | xargs -r apk info --installed \
-                    | sort -u \
-    )" \
-    && apk add --virtual .python-rundeps $runDeps \
-    && apk del .build-deps
+RUN pipenv install --system --deploy
 
 # Copy your application code to the container (make sure you create a .dockerignore file if any large files or directories should be excluded)
 RUN mkdir /code/
@@ -46,7 +35,7 @@ EXPOSE 8000
 ENV DJANGO_SETTINGS_MODULE=config.settings.production
 
 # uWSGI configuration (customize as needed):
-ENV UWSGI_WSGI_FILE=auctionbroker/config/wsgi.py UWSGI_HTTP=:8000 UWSGI_MASTER=1 UWSGI_WORKERS=2 UWSGI_THREADS=8 UWSGI_UID=1000 UWSGI_GID=2000 UWSGI_LAZY_APPS=1 UWSGI_WSGI_ENV_BEHAVIOR=holy
+ENV UWSGI_WSGI_FILE=config/wsgi.py UWSGI_HTTP=:8000 UWSGI_MASTER=1 UWSGI_WORKERS=2 UWSGI_THREADS=8 UWSGI_UID=1000 UWSGI_GID=2000 UWSGI_LAZY_APPS=1 UWSGI_WSGI_ENV_BEHAVIOR=holy
 
 # Call collectstatic (customize the following line with the minimal environment variables needed for manage.py to run):
 #RUN DATABASE_URL=none python manage.py collectstatic --noinput

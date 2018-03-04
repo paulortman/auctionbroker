@@ -3,11 +3,13 @@ from .base import *
 
 DEBUG = True
 
-INSTALLED_APPS.extend([
+INSTALLED_APPS += [
     'debug_toolbar',
-])
+]
 
-MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware',].extend(MIDDLEWARE)
+MIDDLEWARE += [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+]
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases

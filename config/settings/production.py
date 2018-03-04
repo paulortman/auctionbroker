@@ -1,5 +1,5 @@
-import dj_database_url
 from .base import *
+import dj_database_url
 
 
 DEBUG = False
@@ -9,6 +9,6 @@ DEBUG = False
 
 DATABASES = {'default': dj_database_url.config(conn_max_age=600)}
 
-MIDDLEWARE = [MIDDLEWARE[0], 'debug_toolbar.middleware.DebugToolbarMiddleware',].extend(MIDDLEWARE[1:])
+MIDDLEWARE = [MIDDLEWARE[0], 'whitenoise.middleware.WhiteNoiseMiddleware', ] + MIDDLEWARE[1:]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

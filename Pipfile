@@ -7,23 +7,23 @@ name = "pypi"
 
 [packages]
 
-channels = "*"
-django = "<2.1"
-factory-boy = "*"
-django-extra-views = "*"
-weasyprint = "*"
-django-braces = "*"
 "django-bootstrap4" = "*"
-django-easy-timezones = "*"
-whitenoise = "*"
-uwsgi = "*"
+channels = "*"
 dj-database-url = "*"
-psycopg2 = "*"
+django = "<2.1"
+django-braces = "*"
+django-easy-timezones = "*"
+django-extra-views = "*"
+factory-boy = "*"
+"psycopg2-binary" = "*"
+uwsgi = "*"
+weasyprint = "*"
+whitenoise = "*"
 
 
 [dev-packages]
 
-django-debug-toolbar = {git = "https://github.com/jazzband/django-debug-toolbar.git"}
+django-debug-toolbar = "*"
 pytest-django = "*"
 coverage = "*"
 ipdb = "*"
