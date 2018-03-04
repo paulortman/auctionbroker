@@ -1,0 +1,29 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+channels = "*"
+django = "<2.1"
+factory-boy = "*"
+django-extra-views = "*"
+weasyprint = "*"
+django-braces = "*"
+"django-bootstrap4" = "*"
+django-easy-timezones = "*"
+whitenoise = "*"
+uwsgi = "*"
+dj-database-url = "*"
+psycopg2 = "*"
+
+
+[dev-packages]
+
+django-debug-toolbar = {git = "https://github.com/jazzband/django-debug-toolbar.git"}
+pytest-django = "*"
+coverage = "*"
+ipdb = "*"
