@@ -11,6 +11,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.text import slugify
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
 from extra_views import FormSetView
 from weasyprint import HTML, CSS
@@ -295,7 +296,7 @@ class BuyerReceipt(BuyerMixin, DetailView):
 
         # Create a PDF response and use Weasy to print to it
         response = HttpResponse(content_type="application/pdf")
-        response['Content-Disposition'] = 'filename="somefilename.pdf"'
+        response['Content-Disposition'] = 'filename="relief_sale_receipt_{}.pdf"'.format(slugify(self.object.name))
         html.write_pdf(target=response, stylesheets=[css,], font_config=font_config)
 
         return response
