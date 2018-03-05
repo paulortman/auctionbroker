@@ -47,6 +47,17 @@ class AuctionBidEntry(TestCase):
 
 
 
+class TestAuctionItemForms():
+
+    def test_update_auction_item(self):
+        i = AuctionItemFactory()
+        b = BuyerFactory()
+        Purchase.purchase_item(buyer=b, item=i, amount='10')
+
+        form = AuctionItemEditForm(instance=i)
+        data = form.initial
+
+
 
 
 

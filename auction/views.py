@@ -76,7 +76,6 @@ class AuctionItemCreate(AuctionItemMixin, CreateView):
     def form_valid(self, form):
         form.instance.booth = Booth.objects.get(name__iexact='auction')
 
-        # import ipdb; ipdb.set_trace()
         form.instance.save()
         i = form.instance
         msg = "Auction Item '{name}' ({num}) created successfully.".format(name=i.name, num=i.item_number)
@@ -95,7 +94,7 @@ class AuctionItemCreate(AuctionItemMixin, CreateView):
         # mra = most recently added
         try:
             mra_scheduled_sale_time = AuctionItem.objects.all().order_by('-ctime')[0].scheduled_sale_time
-        except AuctionItem.DoesNotExist:
+        except (AuctionItem.DoesNotExist, IndexError):
             mra_scheduled_sale_time = timezone.now()
         mra_scheduled_sale_time += timezone.timedelta(minutes=settings.AUCTIONITEM_SCHEDULED_TIME_INCREMENT)
         initial['scheduled_sale_time'] = round_scheduled_sale_time(mra_scheduled_sale_time)
@@ -249,6 +248,15 @@ class BuyerCreate(BuyerMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.buyer_num = buyer_number_generator()
+
+        msg = "Buyer '{name}' ({num}) created successfully.".format(name=form.instance.name, num=form.instance.buyer_num)
+        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
+
+        if 'save_and_add_another' in self.request.POST:
+            return redirect('buyer_create')
+        if 'save_and_return_to_list' in self.request.POST:
+            return redirect('buyder_list')
+
         return super().form_valid(form)
 
 

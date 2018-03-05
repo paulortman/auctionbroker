@@ -54,6 +54,9 @@ class BuyerCreateForm(forms.ModelForm):
     class Meta:
         model = Buyer
         exclude = []
+        widgets = {
+            'first_name': widgets.TextInput(attrs={'autofocus': 'autofocus'})
+        }
 
 class BuyerForm(forms.ModelForm):
     class Meta:

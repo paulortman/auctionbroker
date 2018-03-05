@@ -21,6 +21,7 @@ services:
 #      REDIS_URL: redis://redis
       DJANGO_MANAGEPY_MIGRATE: 'on'
       DJANGO_MANAGEPY_COLLECTSTATIC: 'on'
+      DJANGO_SETTINGS_MODULE: config.settings.production
     image: auctionbroker
     build:
       context: .

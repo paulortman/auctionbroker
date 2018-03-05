@@ -137,7 +137,8 @@ class AuctionItem(TrackedModel, Item):
 #         print("Priced Item Event")
 
 def buyer_number_generator():
-    max_num = int(Buyer.objects.aggregate(Max('buyer_num'))['buyer_num__max'])
+    max_num = Buyer.objects.aggregate(Max('buyer_num'))['buyer_num__max']
+    max_num = int(max_num if max_num else 0)
     return max(max_num + 1, settings.BASE_BUYER_NUMBER)
 
 
