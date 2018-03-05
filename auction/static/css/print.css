@@ -5,18 +5,25 @@
 	/*see http://diethardsteiner.github.io/reporting/2015/02/17/CSS-for-print.html*/
     @bottom-center {
 		width: 100%;
-		content: "Reporting Powered by Open Source Software";
+        content: "Page " counter(page) " of " counter(pages);
 		vertical-align: middle;
-		font-family: sans-serif;
-		font-weight: bold;
-		font-size: 0.3cm;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 10pt;
 	}
 }
 
 body {
-    font-family: "Bitstream Vera Sans", Verdana, Arial, sans-serif;
+    /*font-family: "Times", serif;*/
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+}
+h1 {
+    font-size: 12pt;
+}
+h2 {
     font-size: 11pt;
 }
+
 .hidden-print, .col-action {
     display: none;
 }
@@ -36,4 +43,24 @@ body {
 }
 .table tfoot th {
     border-top: 1px solid gray;
+}
+
+.receipt-head {
+    font-size: 20pt;
+}
+.receipt-sub {
+    font-size: 10pt;
+}
+.receipt-info {
+    font-size: 10pt;
+}
+.receipt-info th {
+    text-align: center;
+}
+.table.receipt-info{
+    border: 1px solid gray;
+}
+.table.receipt-info td {
+    vertical-align: top;
+    border-bottom: none;
 }

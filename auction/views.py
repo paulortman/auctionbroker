@@ -263,8 +263,18 @@ class BuyerDelete(BuyerMixin, DeleteView):
 class BuyerReceipt(BuyerMixin, DetailView):
     template_name = 'auction/buyer_receipt.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        meta = {
+            'printing_time': timezone.now()
+        }
+        context['meta'] = meta
+        context['buyer'] = self.get_object()
+        return context
+
     def get(self, *args, **kwargs):
-        context={'buyer': self.get_object()}
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
         font_config = FontConfiguration()
         html = HTML(string=render_to_string(self.template_name, context=context))
         css_files = ['css/bootstrap.min.css', 'css/print.css']

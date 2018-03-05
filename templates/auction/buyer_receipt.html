@@ -1,6 +1,36 @@
 {% extends 'paper.html' %}
+{% load static %}
+
 {% block main %}
-    <h1>Buyer: {{ buyer.name }}</h1>
+    <h1 class="receipt-head">SD MCC Relief Sale &mdash; Receipt</h1>
+    <p class="receipt-sub">PO Box 416 Freeman SD 57029 &middot; 605.925.7009 &middot; SDMCCReliefSale@gmail.com</p>
+
+    <table class="table receipt-info">
+        <thead>
+            <tr>
+                <th colspan="2">
+                    Buyer
+                </th>
+                <th>
+                    Info
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ buyer.name }}</td>
+                <td>{{ buyer.email }}</td>
+                <td>Date: {{ meta.printing_time|date:"SHORT_DATE_FORMAT" }}</td>
+            </tr>
+            <tr>
+                <td>{{ buyer.address_line1 }}<br />
+                    {{ buyer.address_line2 }}<br />
+                    {{ buyer.address_line3 }}</td>
+                <td>{{ buyer.phone1 }}</td>
+                <td>Buyer Number: {{ buyer.buyer_num }}</td>
+            </tr>
+        </tbody>
+    </table>
 
     {% include 'auction/buyer_charges_payment_table.html' %}
 {% endblock %}
