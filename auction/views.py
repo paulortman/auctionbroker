@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.contrib.staticfiles import finders
+from django.core.exceptions import ValidationError
 from django.forms import formset_factory
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -19,7 +20,7 @@ from .models import Item, Buyer, Purchase, Booth, Payment, AuctionItem, USD, D, 
     round_scheduled_sale_time
 from .forms import BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, BuyerPaymentForm, PurchaseForm, BuyerCreateForm, \
-    BuyerDonateForm, AuctionItemEditForm, AuctionItemCreateForm
+    BuyerDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm
 
 
 class HonorNextMixin:
@@ -105,6 +106,11 @@ class AuctionItemCreate(AuctionItemMixin, CreateView):
 class AuctionItemUpdate(AuctionItemMixin, UpdateView):
     model = AuctionItem
     form_class = AuctionItemEditForm
+
+    def form_valid(self, form):
+        if 'is_purchased' in form.changed_data and form.cleaned_data['is_purchased'] is False:
+            form.instance.void_purchase()
+        return super().form_valid(form)
 
 
 class AuctionItemDelete(AuctionItemMixin, DeleteView):
@@ -312,6 +318,27 @@ class BuyerDonate(BuyerMixin, FormView):
         msg = "Doncation of {amount} made by {name}".format(amount=USD(amount), name=buyer.name)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
         return redirect('buyer_detail', pk=buyer.pk)
+
+
+class Donate(HonorNextMixin, FormView):
+    form_class = DonateForm
+    template_name = 'auction/donate.html'
+    success_url = reverse_lazy('home')
+
+    def form_valid(self, form):
+        buyer_num = form.cleaned_data['buyer_num']
+        amount = form.cleaned_data['donation']
+        try:
+            buyer = Buyer.objects.get(buyer_num=buyer_num)
+        except Buyer.DoesNotExist:
+            raise ValidationError("Invalid Buyer Number -- no buyer exists")
+
+        Purchase.create_donation(buyer=buyer, amount=amount, booth=None)
+
+        msg = "Doncation of {amount} made by {name}".format(amount=USD(amount), name=buyer.name)
+        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
+
+        return super().form_valid(form)
 
 
 class RandomSale(TemplateView):

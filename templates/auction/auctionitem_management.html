@@ -10,7 +10,7 @@
     <div class="toolbar hidden-print">
         <a class="tool tool-lg btn btn-secondary" href="{% url 'item_create' %}" >
             <img class="icon-lg" src="{% static 'svg/plus.svg'%}" alt="plus" /> Add Auction Item</a>
-        <a class="tool tool-lg btn btn-secondary" href="" >
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'donate' %}?next={% url 'item_management' %}" >
             <img class="icon-lg" src="{% static 'svg/dollar.svg' %}" alt="dollar" /> Add Donation</a>
     </div>
 

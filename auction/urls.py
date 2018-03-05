@@ -36,7 +36,7 @@ urlpatterns = [
     url(r'^buyer/(?P<pk>\d+)/delete/$', views.BuyerDelete.as_view(), name="buyer_delete"),
     url(r'^buyer/(?P<pk>\d+)/receipt/$', views.BuyerReceipt.as_view(), name="buyer_receipt"),
     url(r'^buyer/(?P<pk>\d+)/pay/$', views.BuyerPay.as_view(), name="buyer_pay"),
-    url(r'^buyer/(?P<pk>\d+)/donate/$', views.BuyerDonate.as_view(), name="buyer_donate"),
+    # url(r'^buyer/(?P<pk>\d+)/donate/$', views.BuyerDonate.as_view(), name="buyer_donate"),
 
     url(r'^payments/$', views.PaymentList.as_view(), name="payment_list"),
     url(r'^payment/create/$', views.PaymentCreate.as_view(), name="payment_create"),
@@ -54,6 +54,9 @@ urlpatterns = [
 
     url(r'^bidding/(?P<item_number>\d+)/$', views.BiddingRecorder.as_view(), name='bidding_recorder'),
     url(r'^management/$', views.AuctionItemManagement.as_view(), name='item_management'),
+
+    url(r'^donate/$', views.Donate.as_view(), name="donate"),
+    url(r'^donate/(?P<pk>\d+)/$', views.BuyerDonate.as_view(), name="buyer_donate"),
 
     url(r'^(?P<booth_slug>[-\w]+)/checkout/$', views.CheckoutBuyer.as_view(), name='checkout_buyer'),
     url(r'^(?P<booth_slug>[-\w]+)/checkout/(?P<buyer_num>\d+)/$', views.CheckoutPurchase.as_view(), name='checkout_purchase'),

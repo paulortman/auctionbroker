@@ -18,7 +18,7 @@ class AuctionItemEditForm(forms.ModelForm):
 
 class AuctionItemCreateForm(forms.ModelForm):
     scheduled_sale_time = forms.SplitDateTimeField(widget=widgets.SplitDateTimeWidget,
-                                              help_text="Enter the scheduled date ('YYYY-MM-DD') and the time ('HH:MM PM')")
+                                                   help_text="Enter the scheduled date ('YYYY-MM-DD') and the time ('HH:MM PM')")
 
     class Meta:
         model = AuctionItem
@@ -102,9 +102,17 @@ class CheckoutConfirmForm(forms.Form):
 
 
 class BuyerPaymentForm(forms.ModelForm):
+
     class Meta:
         model = Payment
         exclude = ['buyer', 'transaction_time']
+        widgets = {'method': widgets.RadioSelect(),}
+
+
+class DonateForm(forms.Form):
+    buyer_num = forms.CharField(max_length=8, label='Buyer Number')
+    donation = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Enter Dollar Amount, ex. $100.00",
+                                  widget=widgets.TextInput(attrs={'autofocus': 'autofocu'}))
 
 
 class BuyerDonateForm(forms.Form):

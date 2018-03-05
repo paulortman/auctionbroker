@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
+from django.forms import widgets
 from django.utils import timezone
 from django.shortcuts import reverse
 from django.dispatch import receiver
@@ -45,7 +46,7 @@ class Item(models.Model):
                                      help_text="When the item sold. Leave blank when creating")
     fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=D(0),
                                             verbose_name="Fair Market Value (FMV)", help_text="Dollars, e.g. 10.00")
-    is_purchased = models.BooleanField(default=False, help_text="Unchecking this item will delete anv void the purchase")
+    is_purchased = models.BooleanField(default=False, help_text="Un-checking this item will delete and void the purchase")
 
     def __str__(self):
         return "({}) {}{}".format(self.id, self.name, "*" if self.purchase else "")
@@ -56,20 +57,19 @@ class Item(models.Model):
         self.is_purchased = True
         self.save()
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__original_is_purchased = self.is_purchased
-        self.__original_purchase = self.purchase
-
-    def save(self, *args, **kwargs):
-        if self.__original_is_purchased and not self.is_purchased:
-            # someone unchecked the box, so delete the purchase
-            self.__original_purchase.delete()
+    def void_purchase(self):
+        if self.purchase:
+            self.purchase.delete()
             self.purchase = None
-            self.sale_time = None
+        self.sale_time = None
+        self.is_purchased = False
+        self.save()
 
-        super().save(*args, **kwargs)
-
+    @property
+    def donation_amount(self):
+        if self.purchase:
+            return self.purchase.donation_amount
+        return None
 
 
 class PricedItem(TrackedModel, Item):
@@ -106,6 +106,7 @@ class AuctionItem(TrackedModel, Item):
 
     def get_absolute_url(self):
         return reverse('item_detail', kwargs={'item_number': self.item_number})
+
 
 # @receiver(post_save, sender=AuctionItem)
 # def send_sale_event(sender, instance, **kwargs):
@@ -179,11 +180,7 @@ class Buyer(TrackedModel, models.Model):
 
     @property
     def donations_total(self):
-        fmv_priced = self.purchases.all().aggregate(models.Sum('priceditem__fair_market_value'))['priceditem__fair_market_value__sum']
-        fmv_auction = self.purchases.all().aggregate(models.Sum('auctionitem__fair_market_value'))['auctionitem__fair_market_value__sum']
-        fmv_priced = D(fmv_priced)
-        fmv_auction = D(fmv_auction)
-        return self.purchases_total - (fmv_priced + fmv_auction)
+        return sum([p.donation_amount for p in self.purchases.all()])
 
     @property
     def outstanding_balance(self):
@@ -272,7 +269,7 @@ class Purchase(TrackedModel, models.Model):
 
     @property
     def donation_amount(self):
-        return self.amount - self.item.fair_market_value
+        return D(max(self.amount - self.item.fair_market_value, 0))
 
     @property
     def fair_market_value(self):

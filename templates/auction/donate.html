@@ -1,0 +1,24 @@
+{% extends 'action_page.html' %}
+{% load bootstrap4 %}
+{% load money %}
+
+{% block title %}Record Donation{% endblock %}
+
+{% block page-heading %}Record a Donation{% endblock %}
+
+{% block content %}
+    <form class="top-space-md" action="" method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="col-md-3">
+                {% bootstrap_field form.buyer_num %}
+            </div>
+            <div class="col-md-3">
+                {% bootstrap_field form.donation %}
+            </div>
+        </div>
+        {% buttons %}
+            <button class="btn btn-primary" type="submit">Record Donation</button>
+        {% endbuttons %}
+    </form>
+{% endblock %}

@@ -2,8 +2,9 @@ from decimal import Decimal
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
+from auction.forms import AuctionItemEditForm
 from auction.templatetags.money import money
-from .models import Purchase, Payment, round_scheduled_sale_time
+from .models import Purchase, Payment, round_scheduled_sale_time, AuctionItem
 from .modelfactory import AuctionItemFactory, BuyerFactory, BoothFactory
 
 
@@ -11,15 +12,43 @@ class AuctionBidEntry(TestCase):
 
     def test_winning_bid_time_set(self):
         b = BuyerFactory()
-        p = Purchase.objects.create(buyer=b, amount='10')
-        i = AuctionItemFactory(purchase=p)
-        i.save()
+        i = AuctionItemFactory()
+        p = Purchase.purchase_item(buyer=b, amount='10', item=i)
         assert i.purchase.transaction_time is not None
 
     def test_winning_bid_time_not_set(self):
         i = AuctionItemFactory()
         i.save()
         assert i.purchase is None
+
+    def test_unpurchasing_1(self):
+        i = AuctionItemFactory()
+        b = BuyerFactory()
+        assert i.purchase is None
+        p = Purchase.purchase_item(buyer=b, item=i, amount='10')
+        i = AuctionItem.objects.get(pk=i.pk)
+        assert i.is_purchased is True
+        assert i.purchase is not None
+        i.void_purchase()
+        i.refresh_from_db()
+        assert i.is_purchased is False
+        assert i.purchase is None
+
+    def test_unpurchasing_2(self):
+        i = AuctionItemFactory.create()
+        b = BuyerFactory.create()
+        Purchase.purchase_item(buyer=b, item=i, amount='10')
+        assert i.purchase is not None
+        assert i.is_purchased is True
+        i.void_purchase()
+        assert i.purchase is None
+        assert i.is_purchased is False
+        assert Purchase.objects.all().count() == 0
+
+
+
+
+
 
 
 class PurchaseTestCase(TestCase):
@@ -62,6 +91,8 @@ class PurchaseTestCase(TestCase):
         assert p.donation_amount == Decimal('0.00')
 
 
+
+
 class PaymentsTestCase(TestCase):
 
     def setUp(self):
@@ -97,6 +128,15 @@ class PaymentsTestCase(TestCase):
         assert not self.b.account_is_settled
         assert self.b.purchases_total == Decimal('10.00')
         assert self.b.donations_total == Decimal('0.00')
+
+    def test_no_negative_donation(self):
+        i = AuctionItemFactory(fair_market_value='10')
+        b = BuyerFactory()
+        p = Purchase.purchase_item(buyer=b, item=i, amount='5')
+        pay = Payment.objects.create(buyer=b, amount='5')
+        assert b.donations_total == 0
+        assert b.outstanding_balance == 0
+
 
 
 class MoneyTestCase(TestCase):

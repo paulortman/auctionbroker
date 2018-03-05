@@ -11,7 +11,7 @@
         {% csrf_token %}
         {% bootstrap_form form %}
         {% buttons %}
-            <button class="btn btn-primary" type="submit">Make Donation</button>
+            <button class="btn btn-primary" type="submit">Record Donation</button>
             <a class="btn btn-secondary" href="{% url 'buyer_detail' pk=buyer.pk %}">Cancel</a>
         {% endbuttons %}
     </form>
