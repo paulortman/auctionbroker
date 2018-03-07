@@ -2,6 +2,7 @@ import random
 
 from decimal import Decimal
 from django.core.management.base import BaseCommand, CommandError
+from django.utils import timezone
 
 from auction.models import Buyer, Booth, Purchase, AuctionItem
 
@@ -15,6 +16,8 @@ class Command(BaseCommand):
         buyer_cnt = Buyer.objects.all().count()
         buyer_sample = random.sample(list(Buyer.objects.all()), int(buyer_cnt * 0.5))  # 50% sample
 
+        base_time = timezone.now()
+
         booths = list(Booth.objects.exclude(name="Auction"))
         prices = ['1', '1.5', '2', '2', '2.5', '2.5', '2.5', '4', '5', '10']
 
@@ -23,7 +26,10 @@ class Command(BaseCommand):
             for purchase in range(priced_purchases):
                 booth = random.choice(booths)
                 price = Decimal(random.choice(prices))
-                Purchase.create_priced_item(buyer=buyer, amount=price, booth=booth)
+                p = Purchase.create_priced_item(buyer=buyer, amount=price, booth=booth)
+                minutes = random.randint(1, 8 * 60)  # spread purchases over 8 hours
+                p.transaction_time = base_time + timezone.timedelta(minutes=minutes)
+                p.save()
                 print('p', end='')
 
         # 90 percent of the auction items are purchased -- in scheduled order
@@ -35,7 +41,10 @@ class Command(BaseCommand):
             # amount is between 100 - 115 % of the fmv
             amount = item.fair_market_value * Decimal(random.randint(100, 115) / 100.0)
             buyer = random.choice(buyer_sample)
-            Purchase.purchase_item(buyer=buyer, amount=amount, item=item)
+            p = Purchase.purchase_item(buyer=buyer, amount=amount, item=item)
+            minutes = 4 * 60 + random.randint(1, 4 * 60)  # spread purchases over 4 hours, later
+            p.transaction_time = base_time + timezone.timedelta(minutes=minutes)
+            p.save()
             print('i', end='')
 
         print("\nPurchases Done.")
