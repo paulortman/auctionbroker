@@ -95,6 +95,7 @@ def round_scheduled_sale_time(dt):
         dt += timezone.timedelta(minutes=settings.AUCTIONITEM_SCHEDULED_TIME_INCREMENT)
     return dt
 
+
 class AuctionItem(TrackedModel, Item):
     class Meta:
         pass
@@ -165,11 +166,6 @@ class Buyer(TrackedModel, models.Model):
         return "{} {}".format(self.first_name, self.last_name)
 
     @property
-    def outstanding_purchases_total(self):
-        s = self.purchases.filter(state=Purchase.UNPAID).aggregate(models.Sum('amount'))['amount__sum']
-        return D(s)
-
-    @property
     def purchases_total(self):
         purchases = self.purchases.all().aggregate(models.Sum('amount'))['amount__sum']
         return D(purchases)
@@ -204,8 +200,6 @@ def buyer_number_validator(value):
         raise ValidationError("No buyer exists for buyer number '%(value)s'", params={'value': value})
 
 
-
-
 class Payment(TrackedModel, models.Model):
     CASH = 'CASH'
     CHECK = 'CHECK'
@@ -230,34 +224,15 @@ class Payment(TrackedModel, models.Model):
 
 
 class Purchase(TrackedModel, models.Model):
-    UNPAID = 'UNPAID'
-    PAID = 'PAID'
-    VOID = 'VOID'
-    STATES = (
-        (UNPAID, 'Unpaid'),
-        (PAID, 'Paid'),
-        (VOID, 'Void')
-    )
-
     buyer = models.ForeignKey('Buyer', related_name='purchases', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
-    state = models.CharField(choices=STATES, default='UNPAID', max_length=7)
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    paid_time = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return "{amount} purchase by {buyer}".format(amount=USD(self.amount), buyer=self.buyer.name)
 
     def get_absolute_url(self):
         return reverse('purchase_detail', kwargs={'pk': self.pk})
-
-    def save(self, *args, **kwargs):
-        if self.state == self.PAID:
-            self.paid_time = timezone.now()
-        else:
-            self.paid_time = None
-
-        super().save(*args, **kwargs)
 
     @property
     def item(self):
@@ -298,11 +273,8 @@ class Purchase(TrackedModel, models.Model):
 
 
 class Booth(models.Model):
-
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, blank=True, editable=False)
-    uses_item_inventory = models.BooleanField(default=False)
-    can_adjust_fmv = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

@@ -81,14 +81,6 @@ class PurchaseTestCase(TestCase):
         Purchase.objects.create(buyer=b, amount='10.00')
         assert b.outstanding_purchases_total == Decimal('40.00')
 
-    def test_some_paid(self):
-        b = BuyerFactory()
-        Purchase.objects.create(buyer=b, amount='10.00')
-        Purchase.objects.create(buyer=b, amount='10.00')
-        Purchase.objects.create(buyer=b, amount='10.00', state=Purchase.PAID)
-        Purchase.objects.create(buyer=b, amount='10.00', state=Purchase.PAID)
-        assert b.outstanding_purchases_total == Decimal('20.00')
-
     def test_new_donation(self):
         b = BuyerFactory()
         booth = BoothFactory()
@@ -100,8 +92,6 @@ class PurchaseTestCase(TestCase):
         booth = BoothFactory()
         p = Purchase.create_priced_item(buyer=b, amount='10.00', booth=booth)
         assert p.donation_amount == Decimal('0.00')
-
-
 
 
 class PaymentsTestCase(TestCase):
