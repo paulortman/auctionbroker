@@ -99,8 +99,10 @@
 
                         case 'return' :
                             // character = '\n';
-                            $(settings.target).submit();
-                            targetValue = '';
+                            if (targetValue != '') {
+                                $(settings.target).submit();
+                                targetValue = '';
+                            }
                             break;
 
                         case 'tab' :
