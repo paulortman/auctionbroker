@@ -7,12 +7,20 @@
 
 {% block content %}
     <div class="toolbar hidden-print">
+        <div class="float-right">
+            <form class="form form-inline" method="get" action="{% url 'buyer_list' %}">
+                <div class="input-group">
+                    <input class="form-control" type="search" placeholder="Search" aria-label="Search" name="q" value="{{ q }}"/>
+                        <button class="input-group-append" type="submit"><img class="icon-lg" src="{% static 'svg/magnifying-glass.svg' %}" /></button>
+                </div>
+            </form>
+        </div>
         <a class="tool tool-lg btn btn-secondary" href="{% url 'buyer_create' %}" >
             <img class="icon-lg" src="{% static 'svg/plus.svg'%}" alt="plus" /> Add Buyer</a>
     </div>
 
     {% if not object_list %}
-        <p>No Buyers are registered.</p>
+        <p>No Buyers are registered {% if q %} that match the query: {{ q }}{% endif %}</p>
     {% else %}
     <table class="table table-bordered table-hover">
     <thead class="thead-dark">

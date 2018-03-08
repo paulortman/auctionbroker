@@ -166,6 +166,11 @@ class Buyer(TrackedModel, models.Model):
         return "{} {}".format(self.first_name, self.last_name)
 
     @property
+    def outstanding_purchases_total(self):
+        s = self.purchases.aggregate(models.Sum('amount'))['amount__sum']
+        return D(s)
+
+    @property
     def purchases_total(self):
         purchases = self.purchases.all().aggregate(models.Sum('amount'))['amount__sum']
         return D(purchases)
@@ -261,7 +266,7 @@ class Purchase(TrackedModel, models.Model):
     @classmethod
     def create_priced_item(cls, buyer, amount, booth):
         p = Purchase.objects.create(buyer=buyer, amount=D(amount))
-        i = PricedItem.objects.create(name='Priced Item', fair_market_value=D(amount), purchase=p, booth=booth)
+        i = PricedItem.objects.create(name='Priced Item(s)', fair_market_value=D(amount), purchase=p, booth=booth)
         i.commit_to_purchase(p)
         return p
 

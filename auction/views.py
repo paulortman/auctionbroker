@@ -1,3 +1,5 @@
+import json
+
 from braces.views import GroupRequiredMixin, UserPassesTestMixin
 from django.conf import settings
 from django.contrib import messages
@@ -5,13 +7,15 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.contrib.staticfiles import finders
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.forms import formset_factory
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.text import slugify
+from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
 from extra_views import FormSetView
 from weasyprint import HTML, CSS
@@ -39,6 +43,24 @@ class HonorNextMixin:
             return super().get_success_url()
 
 
+class AuctionItemSearchMixin:
+    def _query_fields(self, terms):
+        self._query_terms = terms
+
+        query = Q()
+        for t in terms:
+            query |= Q(name__icontains=t)
+            query |= Q(item_number__icontains=t)
+            query |= Q(long_desc__icontains=t)
+        return query
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if hasattr(self, '_query_terms'):
+            context['q'] = ' '.join(self._query_terms)
+        return context
+
+
 class AuctionItemMixin(GroupRequiredMixin, HonorNextMixin):
     group_required = 'auction_managers'
     raise_exception = True
@@ -57,12 +79,19 @@ class AuctionItemList(AuctionItemMixin, ListView):
     model = AuctionItem
 
 
-class AuctionItemManagement(AuctionItemMixin, ListView):
+class AuctionItemManagement(AuctionItemSearchMixin, AuctionItemMixin, ListView):
     model = AuctionItem
     template_name = 'auction/auctionitem_management.html'
 
     def get_queryset(self):
         qs = super().get_queryset()
+
+        filter = self.request.GET.get('q')
+        if filter:
+            terms = filter.split()
+            query = self._query_fields(terms)
+            qs = qs.filter(query)
+
         return qs.select_related('purchase', 'purchase__buyer')
 
 
@@ -232,11 +261,34 @@ class BuyerMixin(HonorNextMixin, GroupRequiredMixin):
             raise Exception("pk not specified")
         return self.model.objects.get(pk=pk)
 
-class BuyerList(BuyerMixin, ListView):
 
+class BuyerSearchMixin:
+    def _query_fields(self, terms):
+        self._query_terms = terms
+        query = Q()
+        for t in terms:
+            query |= Q(first_name__icontains=t)
+            query |= Q(last_name__icontains=t)
+            query |= Q(buyer_num__icontains=t)
+        return query
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if hasattr(self, '_query_terms'):
+            context['q'] = ' '.join(self._query_terms)
+        return context
+
+
+class BuyerList(BuyerSearchMixin, BuyerMixin, ListView):
     def get_queryset(self):
         qs = super().get_queryset()
-        # return qs.select_related('payments', 'purchases')
+
+        filter = self.request.GET.get('q')
+        if filter:
+            terms = filter.split()
+            query = self._query_fields(terms)
+            qs = qs.filter(query)
+
         return qs.prefetch_related('payments', 'purchases')
 
 
@@ -314,9 +366,13 @@ class BuyerPay(BuyerMixin, FormView):
     def form_valid(self, form):
         buyer = self.get_object()
         amount = form.cleaned_data['amount']
-        Payment.objects.create(buyer=buyer, amount=amount, method=form.cleaned_data['method'])
+        Payment.objects.create(buyer=buyer, amount=amount,
+                               method=form.cleaned_data['method'],
+                               note=form.cleaned_data['note'])
+
         msg = "Payment of {amount} made by {name}".format(amount=USD(amount), name=buyer.name)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
+
         return redirect('buyer_detail', pk=buyer.pk)
 
 
@@ -515,4 +571,30 @@ class BiddingRecorder(GroupRequiredMixin, FormView):
             amount=USD(amount))
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
         return redirect('item_management')
+
+
+
+class ModelSearch(View):
+    def _query_fields(self, terms):
+        raise NotImplemented
+
+    def _to_json(self, query):
+        return list(query.values())
+
+    def get(self, *args, **kwargs):
+        query_string = self.request.GET.get('q')
+        if query_string:
+            query = self._query_fields(query_string.split())
+            results = self._to_json(self.model.objects.filter(query))
+            return JsonResponse({'results': results})
+        else:
+            return JsonResponse({})
+
+
+class BuyerSearch(BuyerSearchMixin, ModelSearch):
+    model = Buyer
+
+
+class AuctionItemSearch(AuctionItemSearchMixin, ModelSearch):
+    model = AuctionItem
 

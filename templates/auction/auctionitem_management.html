@@ -8,12 +8,23 @@
 
 {% block content %}
     <div class="toolbar hidden-print">
+        <div class="float-right">
+            <form class="form form-inline" method="get" action="{% url 'item_management' %}">
+                <div class="input-group">
+                    <input class="form-control" type="search" placeholder="Search" aria-label="Search" name="q" value="{{ q }}"/>
+                    <button class="input-group-append" type="submit"><img class="icon-lg" src="{% static 'svg/magnifying-glass.svg' %}" /></button>
+                </div>
+            </form>
+        </div>
         <a class="tool tool-lg btn btn-secondary" href="{% url 'item_create' %}" >
             <img class="icon-lg" src="{% static 'svg/plus.svg'%}" alt="plus" /> Add Auction Item</a>
         <a class="tool tool-lg btn btn-secondary" href="{% url 'donate' %}?next={% url 'item_management' %}" >
             <img class="icon-lg" src="{% static 'svg/dollar.svg' %}" alt="dollar" /> Add Donation</a>
     </div>
 
+    {% if not object_list %}
+        <p>No Auction Items are registered {% if q %} that match the query: {{ q }}{% endif %}</p>
+    {% else %}
     <table class="table table-bordered table-hover">
     <thead class="thead-dark">
         <tr>
@@ -40,4 +51,5 @@
     {% endfor %}
     </tbody>
     </table>
+    {% endif %}
 {% endblock %}
