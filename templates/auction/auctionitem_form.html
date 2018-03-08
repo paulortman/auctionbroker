@@ -30,7 +30,7 @@
                 {% if form.is_purchased %}
                 {% bootstrap_field form.is_purchased %}
                 {% if form.instance.is_purchased %}
-                    Winning Bidder: {{ form.instance.purchase.buyer.name }} ({{ form.instance.purchase.amount|money }})
+                    Winning Bidder: {{ form.instance.purchase.patron.name }} ({{ form.instance.purchase.amount|money }})
                 {% endif %}
                 {% endif %}
             </div>

@@ -6,5 +6,5 @@
 {% block page-heading %} Purchase of {% purchase_total|money %} Complete for {{ buyer.name }}{% endblock %}
 
 {% block content %}
-    <p><a class="btn btn-primary" href="{% url 'checkout_buyer' booth_slug=booth.slug %}">Start New Purchase</a></p>
+    <p><a class="btn btn-primary" href="{% url 'checkout_patron' booth_slug=booth.slug %}">Start New Purchase</a></p>
 {% endblock %}

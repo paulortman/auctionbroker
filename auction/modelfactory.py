@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.utils import timezone
 from django.conf import settings
 
-from .models import Buyer, Booth, AuctionItem, round_scheduled_sale_time
+from .models import Patron, Booth, AuctionItem, round_scheduled_sale_time
 import factory
 
 
@@ -13,9 +13,9 @@ def fake_address_line2():
     city = random.choice(cities)
     return "{city}, SD".format(city=city)
 
-class BuyerFactory(factory.django.DjangoModelFactory):
+class PatronFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = Buyer
+        model = Patron
 
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')

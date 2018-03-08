@@ -24,9 +24,9 @@
         {% for purchase in buyer.purchases.all %}
             <tr>
                 <td class="col-action">
-                    <a class="btn btn-sm btn-secondary " href="{% url 'purchase_update' pk=purchase.pk %}?next={% url 'buyer_detail' pk=buyer.pk %}" title="Edit">
+                    <a class="btn btn-sm btn-secondary " href="{% url 'purchase_update' pk=purchase.pk %}?next={% url 'patron_detail' pk=buyer.pk %}" title="Edit">
                         <img class="icon-sm" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
-                    <a class="btn btn-sm btn-secondary" href="{% url 'purchase_delete' pk=purchase.pk %}?next={% url 'buyer_detail' pk=buyer.pk %}" title="Delete">
+                    <a class="btn btn-sm btn-secondary" href="{% url 'purchase_delete' pk=purchase.pk %}?next={% url 'patron_detail' pk=buyer.pk %}" title="Delete">
                         <img class="icon-sm" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
                 <td>
                     {% if purchase.item.booth %}<em>{{ purchase.item.booth.name }}</em>: {% endif %}{{ purchase.item.name }}
@@ -63,9 +63,9 @@
         {% for payment in buyer.payments.all %}
             <tr>
                 <td class="col-action">
-                    <a class="btn btn-sm btn-secondary " href="{% url 'payment_update' pk=payment.pk %}?next={% url 'buyer_detail' pk=buyer.pk %}" title="Edit">
+                    <a class="btn btn-sm btn-secondary " href="{% url 'payment_update' pk=payment.pk %}?next={% url 'patron_detail' pk=buyer.pk %}" title="Edit">
                         <img class="icon-sm" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
-                    <a class="btn btn-sm btn-secondary" href="{% url 'payment_delete' pk=payment.pk %}?next={% url 'buyer_detail' pk=buyer.pk %}" title="Delete">
+                    <a class="btn btn-sm btn-secondary" href="{% url 'payment_delete' pk=payment.pk %}?next={% url 'patron_detail' pk=buyer.pk %}" title="Delete">
                         <img class="icon-sm" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
                 </td>
                 <td>
@@ -86,7 +86,7 @@
 {% else %}
     <h2>No payments</h2>
 {% endif %}
-<p class="hidden-print"><a href="{% url 'buyer_pay' pk=buyer.pk %}" class="btn btn-primary btn-sm" >Add Payment</a></p>
+<p class="hidden-print"><a href="{% url 'patron_pay' pk=buyer.pk %}" class="btn btn-primary btn-sm" >Add Payment</a></p>
 
 {% if buyer.donations_total %}
     <h2>Donation Amount: {{ buyer.donations_total|money }}</h2>

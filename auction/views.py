@@ -21,11 +21,11 @@ from extra_views import FormSetView
 from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
-from .models import Item, Buyer, Purchase, Booth, Payment, AuctionItem, USD, D, buyer_number_generator, \
+from .models import Item, Patron, Purchase, Booth, Payment, AuctionItem, USD, D, buyer_number_generator, \
     round_scheduled_sale_time
-from .forms import BuyerForm, PricedItemPurchaseForm, CheckoutBuyerForm, CheckoutPurchaseForm, BoothForm, \
-    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, BuyerPaymentForm, PurchaseForm, BuyerCreateForm, \
-    BuyerDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm
+from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
+    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PatronPaymentForm, PurchaseForm, PatronCreateForm, \
+    PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm
 
 
 class HonorNextMixin:
@@ -92,7 +92,7 @@ class AuctionItemManagement(AuctionItemSearchMixin, AuctionItemMixin, ListView):
             query = self._query_fields(terms)
             qs = qs.filter(query)
 
-        return qs.select_related('purchase', 'purchase__buyer')
+        return qs.select_related('purchase', 'purchase__patron')
 
 
 class AuctionItemDetail(AuctionItemMixin, DetailView):
@@ -209,8 +209,8 @@ class PurchaseDelete(HonorNextMixin, DeleteView):
     success_url = reverse_lazy('purchase_list')
 
     # def get_success_url(self):
-    #     buyer = self.get_object().buyer
-    #     return reverse('buyer_detail', kwargs={'pk': buyer.pk})
+    #     patron = self.get_object().patron
+    #     return reverse('patron_detail', kwargs={'pk': patron.pk})
 
 
 class PaymentList(HonorNextMixin, ListView):
@@ -246,12 +246,12 @@ class PaymentDelete(HonorNextMixin, DeleteView):
     raise_exception = True
 
     def get_success_url(self):
-        buyer = self.get_object().buyer
-        return reverse('buyer_detail', kwargs={'pk': buyer.pk})
+        patron = self.get_object().patron
+        return reverse('patron_detail', kwargs={'pk': patron.pk})
 
 
-class BuyerMixin(HonorNextMixin, GroupRequiredMixin):
-    model = Buyer
+class PatronMixin(HonorNextMixin, GroupRequiredMixin):
+    model = Patron
     group_required = u'account_managers'
     raise_exception = True
 
@@ -262,14 +262,14 @@ class BuyerMixin(HonorNextMixin, GroupRequiredMixin):
         return self.model.objects.get(pk=pk)
 
 
-class BuyerSearchMixin:
+class PatronSearchMixin:
     def _query_fields(self, terms):
         self._query_terms = terms
         query = Q()
         for t in terms:
             query |= Q(first_name__icontains=t)
             query |= Q(last_name__icontains=t)
-            query |= Q(buyer_num__icontains=t)
+            query |= Q(patron_num__icontains=t)
         return query
 
     def get_context_data(self, **kwargs):
@@ -279,7 +279,7 @@ class BuyerSearchMixin:
         return context
 
 
-class BuyerList(BuyerSearchMixin, BuyerMixin, ListView):
+class PatronList(PatronSearchMixin, PatronMixin, ListView):
     def get_queryset(self):
         qs = super().get_queryset()
 
@@ -292,37 +292,37 @@ class BuyerList(BuyerSearchMixin, BuyerMixin, ListView):
         return qs.prefetch_related('payments', 'purchases')
 
 
-class BuyerDetail(BuyerMixin, DetailView):
+class PatronDetail(PatronMixin, DetailView):
     pass
 
 
-class BuyerCreate(BuyerMixin, CreateView):
-    form_class = BuyerCreateForm
+class PatronCreate(PatronMixin, CreateView):
+    form_class = PatronCreateForm
 
     def form_valid(self, form):
         form.instance.buyer_num = buyer_number_generator()
 
-        msg = "Buyer '{name}' ({num}) created successfully.".format(name=form.instance.name, num=form.instance.buyer_num)
+        msg = "Patron '{name}' ({num}) created successfully.".format(name=form.instance.name, num=form.instance.buyer_num)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
 
         if 'save_and_add_another' in self.request.POST:
-            return redirect('buyer_create')
+            return redirect('patron_create')
         if 'save_and_return_to_list' in self.request.POST:
             return redirect('buyder_list')
 
         return super().form_valid(form)
 
 
-class BuyerUpdate(BuyerMixin, UpdateView):
-    form_class = BuyerForm
+class PatronUpdate(PatronMixin, UpdateView):
+    form_class = PatronForm
 
 
-class BuyerDelete(BuyerMixin, DeleteView):
+class PatronDelete(PatronMixin, DeleteView):
     template_name = 'auction/generic_confirm_delete.html'
 
 
-class BuyerReceipt(BuyerMixin, DetailView):
-    template_name = 'auction/buyer_receipt.html'
+class PatronReceipt(PatronMixin, DetailView):
+    template_name = 'auction/patron_receipt.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -330,7 +330,7 @@ class BuyerReceipt(BuyerMixin, DetailView):
             'printing_time': timezone.now()
         }
         context['meta'] = meta
-        context['buyer'] = self.get_object()
+        context['patron'] = self.get_object()
         return context
 
     def get(self, *args, **kwargs):
@@ -354,45 +354,45 @@ class BuyerReceipt(BuyerMixin, DetailView):
         return response
 
 
-class BuyerPay(BuyerMixin, FormView):
-    form_class = BuyerPaymentForm
-    template_name = 'auction/buyer_payment.html'
+class PatronPay(PatronMixin, FormView):
+    form_class = PatronPaymentForm
+    template_name = 'auction/patron_payment.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['buyer'] = self.get_object()
+        context['patron'] = self.get_object()
         return context
 
     def form_valid(self, form):
-        buyer = self.get_object()
+        patron = self.get_object()
         amount = form.cleaned_data['amount']
-        Payment.objects.create(buyer=buyer, amount=amount,
+        Payment.objects.create(patron=patron, amount=amount,
                                method=form.cleaned_data['method'],
                                note=form.cleaned_data['note'])
 
-        msg = "Payment of {amount} made by {name}".format(amount=USD(amount), name=buyer.name)
+        msg = "Payment of {amount} made by {name}".format(amount=USD(amount), name=patron.name)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
 
-        return redirect('buyer_detail', pk=buyer.pk)
+        return redirect('patron_detail', pk=patron.pk)
 
 
-class BuyerDonate(BuyerMixin, FormView):
-    form_class = BuyerDonateForm
-    template_name = 'auction/buyer_donate.html'
+class PatronDonate(PatronMixin, FormView):
+    form_class = PatronDonateForm
+    template_name = 'auction/patron_donate.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['buyer'] = self.get_object()
+        context['patron'] = self.get_object()
         return context
 
     def form_valid(self, form):
-        buyer = self.get_object()
+        patron = self.get_object()
         amount = form.cleaned_data['donation']
-        Purchase.create_donation(buyer=buyer, amount=amount, booth=None)
+        Purchase.create_donation(patron=patron, amount=amount, booth=None)
 
-        msg = "Doncation of {amount} made by {name}".format(amount=USD(amount), name=buyer.name)
+        msg = "Doncation of {amount} made by {name}".format(amount=USD(amount), name=patron.name)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
-        return redirect('buyer_detail', pk=buyer.pk)
+        return redirect('patron_detail', pk=patron.pk)
 
 
 class Donate(HonorNextMixin, FormView):
@@ -404,13 +404,13 @@ class Donate(HonorNextMixin, FormView):
         buyer_num = form.cleaned_data['buyer_num']
         amount = form.cleaned_data['donation']
         try:
-            buyer = Buyer.objects.get(buyer_num=buyer_num)
-        except Buyer.DoesNotExist:
-            raise ValidationError("Invalid Buyer Number -- no buyer exists")
+            patron = Patron.objects.get(buyer_num=buyer_num)
+        except Patron.DoesNotExist:
+            raise ValidationError("Invalid Patron Number -- no patron exists")
 
-        Purchase.create_donation(buyer=buyer, amount=amount, booth=None)
+        Purchase.create_donation(patron=patron, amount=amount, booth=None)
 
-        msg = "Doncation of {amount} made by {name}".format(amount=USD(amount), name=buyer.name)
+        msg = "Doncation of {amount} made by {name}".format(amount=USD(amount), name=patron.name)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
 
         return super().form_valid(form)
@@ -419,10 +419,10 @@ class Donate(HonorNextMixin, FormView):
 class RandomSale(TemplateView):
     template_name = 'dashboard.html'
     def get(self, request, *args, **kwargs):
-        from auction.modelfactory import AuctionItemFactory, BuyerFactory
-        b = BuyerFactory.create()
+        from auction.modelfactory import AuctionItemFactory, PatronFactory
+        b = PatronFactory.create()
         ai = AuctionItemFactory.create()
-        c = Purchase.objects.create(buyer=b, amount='1')
+        c = Purchase.objects.create(patron=b, amount='1')
         ai.charge = c
         ai.save()
         return super().get(request, args, kwargs)
@@ -457,29 +457,29 @@ class CheckoutAuthMixin(GroupRequiredMixin, UserPassesTestMixin):
     raise_exception = True
 
 
-class CheckoutBuyer(CheckoutAuthMixin, FormView):
-    template_name = 'auction/checkout_buyer.html'
-    form_class = CheckoutBuyerForm
+class CheckoutPatron(CheckoutAuthMixin, FormView):
+    template_name = 'auction/checkout_patron.html'
+    form_class = CheckoutPatronForm
 
     def dispatch(self, request, *args, **kwargs):
         booth_slug = self.kwargs.get('booth_slug')
         self.booth = get_object_or_404(Booth, slug=booth_slug)
-        return super(CheckoutBuyer, self).dispatch(request, *args, **kwargs)
+        return super(CheckoutPatron, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(CheckoutBuyer, self).get_context_data(**kwargs)
+        context = super(CheckoutPatron, self).get_context_data(**kwargs)
         context['booth'] = self.booth
         return context
 
     def form_valid(self, form):
         buyer_num = form.cleaned_data['buyer_num']
         try:
-            buyer = Buyer.objects.get(buyer_num=buyer_num)
-        except Buyer.DoesNotExist:
-            form.add_error('buyer_num', "Buyer {} unknown".format(buyer_num))
-            return redirect('checkout_buyer', booth_slug=self.booth.slug)
+            patron = Patron.objects.get(buyer_num=buyer_num)
+        except Patron.DoesNotExist:
+            form.add_error('buyer_num', "Patron {} unknown".format(buyer_num))
+            return redirect('checkout_patron', booth_slug=self.booth.slug)
 
-        return redirect('checkout_purchase', buyer_num=buyer.buyer_num, booth_slug=self.booth.slug)
+        return redirect('checkout_purchase', buyer_num=patron.buyer_num, booth_slug=self.booth.slug)
 
 
 class CheckoutPurchase(CheckoutAuthMixin, FormSetView):
@@ -491,12 +491,12 @@ class CheckoutPurchase(CheckoutAuthMixin, FormSetView):
         booth_slug = self.kwargs.get('booth_slug')
         buyer_num = self.kwargs.get('buyer_num')
         self.booth = get_object_or_404(Booth, slug=booth_slug)
-        self.buyer = get_object_or_404(Buyer, buyer_num=buyer_num)
+        self.patron = get_object_or_404(Patron, buyer_num=buyer_num)
         return super(CheckoutPurchase, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(CheckoutPurchase, self).get_context_data(**kwargs)
-        context['buyer'] = self.buyer
+        context['patron'] = self.patron
         context['booth'] = self.booth
         return context
 
@@ -507,7 +507,7 @@ class CheckoutPurchase(CheckoutAuthMixin, FormSetView):
         purchase_total = sum([form.entry_total for form in formset.forms])
         self.request.session['purchase_total'] = str(purchase_total)
 
-        return redirect('checkout_confirm', buyer_num=self.buyer.buyer_num, booth_slug=self.booth.slug)
+        return redirect('checkout_confirm', buyer_num=self.patron.buyer_num, booth_slug=self.booth.slug)
 
 
 class CheckoutConfirm(CheckoutAuthMixin, FormView):
@@ -518,12 +518,12 @@ class CheckoutConfirm(CheckoutAuthMixin, FormView):
         booth_slug = self.kwargs.get('booth_slug')
         buyer_num = self.kwargs.get('buyer_num')
         self.booth = get_object_or_404(Booth, slug=booth_slug)
-        self.buyer = get_object_or_404(Buyer, buyer_num=buyer_num)
+        self.patron = get_object_or_404(Patron, buyer_num=buyer_num)
         return super(CheckoutConfirm, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(CheckoutConfirm, self).get_context_data(**kwargs)
-        context['buyer'] = self.buyer
+        context['patron'] = self.patron
         context['booth'] = self.booth
         context['purchase_total'] = D(self.request.session['purchase_total'])
         return context
@@ -531,18 +531,18 @@ class CheckoutConfirm(CheckoutAuthMixin, FormView):
     def form_valid(self, form):
         purchase_total = D(self.request.session['purchase_total'])
 
-        # Save the purchase for the buyer
-        p = Purchase.create_priced_item(buyer=self.buyer, amount=purchase_total, booth=self.booth)
+        # Save the purchase for the patron
+        p = Purchase.create_priced_item(patron=self.patron, amount=purchase_total, booth=self.booth)
 
         # Clear the session state
         del(self.request.session['purchase_total'])
         del(self.request.session['purchase_forms'])
 
         msg = "Completed Purchase of {amount} by {name} ({number})".format(
-            amount=USD(purchase_total), name=self.buyer.name, number=self.buyer.buyer_num)
+            amount=USD(purchase_total), name=self.patron.name, number=self.patron.buyer_num)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
 
-        return redirect('checkout_buyer', booth_slug=self.booth.slug)
+        return redirect('checkout_patron', booth_slug=self.booth.slug)
 
 
 class BiddingRecorder(GroupRequiredMixin, FormView):
@@ -563,11 +563,11 @@ class BiddingRecorder(GroupRequiredMixin, FormView):
 
     def form_valid(self, form):
         buyer_num = form.cleaned_data['buyer_num']
-        buyer = get_object_or_404(Buyer, buyer_num=buyer_num)
+        patron = get_object_or_404(Patron, buyer_num=buyer_num)
         amount = form.cleaned_data['amount']
-        purchase = Purchase.purchase_item(buyer=buyer, amount=amount, item=self.item)
+        purchase = Purchase.purchase_item(patron=patron, amount=amount, item=self.item)
         msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
-            b_num=buyer.buyer_num, b_name=buyer.name, i_name=self.item.name, i_num=self.item.item_number,
+            b_num=patron.buyer_num, b_name=patron.name, i_name=self.item.name, i_num=self.item.item_number,
             amount=USD(amount))
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
         return redirect('item_management')
@@ -591,8 +591,8 @@ class ModelSearch(View):
             return JsonResponse({})
 
 
-class BuyerSearch(BuyerSearchMixin, ModelSearch):
-    model = Buyer
+class PatronSearch(PatronSearchMixin, ModelSearch):
+    model = Patron
 
 
 class AuctionItemSearch(AuctionItemSearchMixin, ModelSearch):

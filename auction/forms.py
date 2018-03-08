@@ -4,7 +4,7 @@ from django.contrib.admin.widgets import AdminDateWidget
 from django.forms import widgets
 from django.utils import timezone
 
-from .models import Item, Booth, Buyer, Payment, buyer_number_validator, AuctionItem, Purchase
+from .models import Item, Booth, Patron, Payment, buyer_number_validator, AuctionItem, Purchase
 
 
 class AuctionItemEditForm(forms.ModelForm):
@@ -27,7 +27,7 @@ class AuctionItemCreateForm(forms.ModelForm):
 
 class ItemBiddingForm(forms.Form):
     amount = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Dollar amount, e.g. 10.00")
-    buyer_num = forms.CharField(max_length=10, label="Buyer Number")
+    buyer_num = forms.CharField(max_length=10, label="Patron Number")
 
 
 class BoothForm(forms.ModelForm):
@@ -48,19 +48,19 @@ class PurchaseForm(forms.ModelForm):
         exclude = []
 
 
-class BuyerCreateForm(forms.ModelForm):
+class PatronCreateForm(forms.ModelForm):
     buyer_num = forms.CharField(max_length=8, required=False, widget=widgets.HiddenInput)
 
     class Meta:
-        model = Buyer
+        model = Patron
         exclude = []
         widgets = {
             'first_name': widgets.TextInput(attrs={'autofocus': 'autofocus'})
         }
 
-class BuyerForm(forms.ModelForm):
+class PatronForm(forms.ModelForm):
     class Meta:
-        model = Buyer
+        model = Patron
         exclude = []
 
 
@@ -69,11 +69,11 @@ class PricedItemPurchaseForm(forms.Form):
     quantity = forms.IntegerField(min_value=0)
 
 
-class CheckoutBuyerForm(forms.Form):
+class CheckoutPatronForm(forms.Form):
     buyer_num = forms.CharField(max_length=10,
                                 validators=[buyer_number_validator],
                                 label="Enter Buyer Number",
-                                help_text="Enter the Buyer's Purchase number to start the checkout.",
+                                help_text="Enter the Patron's Buyer number to start the checkout.",
                                 widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
 
 
@@ -104,7 +104,7 @@ class CheckoutConfirmForm(forms.Form):
     pass
 
 
-class BuyerPaymentForm(forms.ModelForm):
+class PatronPaymentForm(forms.ModelForm):
 
     class Meta:
         model = Payment
@@ -118,7 +118,7 @@ class DonateForm(forms.Form):
                                   widget=widgets.TextInput(attrs={'autofocus': 'autofocu'}))
 
 
-class BuyerDonateForm(forms.Form):
+class PatronDonateForm(forms.Form):
     donation = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Enter Dollar Amount, ex. $100.00",
                                widget=widgets.TextInput(attrs={'autofocus': 'autofocu'}))
 

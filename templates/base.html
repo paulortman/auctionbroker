@@ -41,7 +41,7 @@
                 <a class="nav-link" href="{% url 'item_management' %}">Auction Item Management</a>
             </li>
             <li class="nav-item ">
-                <a class="nav-link" href="{% url 'buyer_list' %}">Buyer List</a>
+                <a class="nav-link" href="{% url 'patron_list' %}">Patron List</a>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="dropdown02" data-toggle="dropdown" aria-haspopup="true"
@@ -49,7 +49,7 @@
                 <div class="dropdown-menu" aria-labelledby="dropdown02">
                     {% for booth in booths %}
                         <a class="dropdown-item"
-                           href="{% url 'checkout_buyer' booth_slug=booth.slug %}">{{ booth.name }}</a>
+                           href="{% url 'checkout_patron' booth_slug=booth.slug %}">{{ booth.name }}</a>
                     {% endfor %}
                 </div>
             </li>

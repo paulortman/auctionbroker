@@ -5,15 +5,15 @@ from django.utils import timezone
 from auction.forms import AuctionItemEditForm
 from auction.templatetags.money import money
 from .models import Purchase, Payment, round_scheduled_sale_time, AuctionItem
-from .modelfactory import AuctionItemFactory, BuyerFactory, BoothFactory
+from .modelfactory import AuctionItemFactory, PatronFactory, BoothFactory
 
 
 class AuctionBidEntry(TestCase):
 
     def test_winning_bid_time_set(self):
-        b = BuyerFactory()
+        p = PatronFactory()
         i = AuctionItemFactory()
-        p = Purchase.purchase_item(buyer=b, amount='10', item=i)
+        Purchase.purchase_item(patron=p, amount='10', item=i)
         assert i.purchase.transaction_time is not None
 
     def test_winning_bid_time_not_set(self):
@@ -23,9 +23,9 @@ class AuctionBidEntry(TestCase):
 
     def test_unpurchasing_1(self):
         i = AuctionItemFactory()
-        b = BuyerFactory()
+        p = PatronFactory()
         assert i.purchase is None
-        p = Purchase.purchase_item(buyer=b, item=i, amount='10')
+        Purchase.purchase_item(patron=p, item=i, amount='10')
         i = AuctionItem.objects.get(pk=i.pk)
         assert i.is_purchased is True
         assert i.purchase is not None
@@ -36,8 +36,8 @@ class AuctionBidEntry(TestCase):
 
     def test_unpurchasing_2(self):
         i = AuctionItemFactory.create()
-        b = BuyerFactory.create()
-        Purchase.purchase_item(buyer=b, item=i, amount='10')
+        p = PatronFactory.create()
+        Purchase.purchase_item(patron=p, item=i, amount='10')
         assert i.purchase is not None
         assert i.is_purchased is True
         i.void_purchase()
@@ -51,8 +51,8 @@ class AuctionBidEntry(TestCase):
 #
 #     def test_update_auction_item(self):
 #         i = AuctionItemFactory()
-#         b = BuyerFactory()
-#         Purchase.purchase_item(buyer=b, item=i, amount='10')
+#         p = PatronFactory()
+#         Purchase.purchase_item(patron=p, item=i, amount='10')
 #
 #         form = AuctionItemEditForm(instance=i)
 #         data = form.initial
@@ -65,78 +65,78 @@ class AuctionBidEntry(TestCase):
 class PurchaseTestCase(TestCase):
 
     def test_no_purchases(self):
-        b = BuyerFactory()
-        assert b.outstanding_purchases_total == Decimal('0')
+        p = PatronFactory()
+        assert p.outstanding_purchases_total == Decimal('0')
 
     def test_one_purchase(self):
-        b = BuyerFactory()
-        Purchase.objects.create(buyer=b, amount='10.00')
-        assert b.outstanding_purchases_total == Decimal('10.00')
+        p = PatronFactory()
+        Purchase.objects.create(patron=p, amount='10.00')
+        assert p.outstanding_purchases_total == Decimal('10.00')
 
     def test_multiple_purchases(self):
-        b = BuyerFactory()
-        Purchase.objects.create(buyer=b, amount='10.00')
-        Purchase.objects.create(buyer=b, amount='10.00')
-        Purchase.objects.create(buyer=b, amount='10.00')
-        Purchase.objects.create(buyer=b, amount='10.00')
-        assert b.outstanding_purchases_total == Decimal('40.00')
+        p = PatronFactory()
+        Purchase.objects.create(patron=p, amount='10.00')
+        Purchase.objects.create(patron=p, amount='10.00')
+        Purchase.objects.create(patron=p, amount='10.00')
+        Purchase.objects.create(patron=p, amount='10.00')
+        assert p.outstanding_purchases_total == Decimal('40.00')
 
     def test_new_donation(self):
-        b = BuyerFactory()
+        p = PatronFactory()
         booth = BoothFactory()
-        p = Purchase.create_donation(buyer=b, amount='10.00', booth=booth)
-        assert p.donation_amount == Decimal('10.00')
+        pur = Purchase.create_donation(patron=p, amount='10.00', booth=booth)
+        assert pur.donation_amount == Decimal('10.00')
 
     def test_new_priced_item(self):
-        b = BuyerFactory()
+        p = PatronFactory()
         booth = BoothFactory()
-        p = Purchase.create_priced_item(buyer=b, amount='10.00', booth=booth)
-        assert p.donation_amount == Decimal('0.00')
+        pur = Purchase.create_priced_item(patron=p, amount='10.00', booth=booth)
+        assert pur.donation_amount == Decimal('0.00')
 
 
 class PaymentsTestCase(TestCase):
 
     def setUp(self):
-        self.b = BuyerFactory()
+        self.p = PatronFactory()
         self.booth = BoothFactory()
 
     def test_full_payment(self):
-        Purchase.create_priced_item(buyer=self.b, amount='10.00', booth=self.booth)
-        assert self.b.purchases_total == Decimal('10.00')
-        assert self.b.outstanding_balance == Decimal('10.00')
-        Payment.objects.create(buyer=self.b, amount='10.00')
-        assert self.b.outstanding_balance == Decimal('0.00')
-        assert self.b.account_is_settled
-        assert self.b.purchases_total == Decimal('10.00')
-        assert self.b.donations_total == Decimal('0.00')
+        Purchase.create_priced_item(patron=self.p, amount='10.00', booth=self.booth)
+        assert self.p.purchases_total == Decimal('10.00')
+        assert self.p.outstanding_balance == Decimal('10.00')
+        Payment.objects.create(patron=self.p, amount='10.00')
+        assert self.p.outstanding_balance == Decimal('0.00')
+        assert self.p.account_is_settled
+        assert self.p.purchases_total == Decimal('10.00')
+        assert self.p.donations_total == Decimal('0.00')
 
     def test_partial_payment(self):
-        Purchase.create_priced_item(buyer=self.b, amount='10.00', booth=self.booth)
-        assert self.b.purchases_total == Decimal('10.00')
-        assert self.b.outstanding_balance == Decimal('10.00')
-        Payment.objects.create(buyer=self.b, amount='5.00')
-        assert self.b.outstanding_balance == Decimal('5.00')
-        assert not self.b.account_is_settled
-        assert self.b.purchases_total == Decimal('10.00')
-        assert self.b.donations_total == Decimal('0.00')
+        Purchase.create_priced_item(patron=self.p, amount='10.00', booth=self.booth)
+        assert self.p.purchases_total == Decimal('10.00')
+        assert self.p.outstanding_balance == Decimal('10.00')
+        Payment.objects.create(patron=self.p, amount='5.00')
+        assert self.p.outstanding_balance == Decimal('5.00')
+        assert not self.p.account_is_settled
+        assert self.p.purchases_total == Decimal('10.00')
+        assert self.p.donations_total == Decimal('0.00')
 
     def test_over_payment(self):
-        Purchase.create_priced_item(buyer=self.b, amount='10.00', booth=self.booth)
-        assert self.b.purchases_total == Decimal('10.00')
-        assert self.b.outstanding_balance == Decimal('10.00')
-        Payment.objects.create(buyer=self.b, amount='15.00')
-        assert self.b.outstanding_balance == Decimal('-5.00')
-        assert not self.b.account_is_settled
-        assert self.b.purchases_total == Decimal('10.00')
-        assert self.b.donations_total == Decimal('0.00')
+        Purchase.create_priced_item(patron=self.p, amount='10.00', booth=self.booth)
+        assert self.p.purchases_total == Decimal('10.00')
+        assert self.p.outstanding_balance == Decimal('10.00')
+        Payment.objects.create(patron=self.p, amount='15.00')
+        assert self.p.outstanding_balance == Decimal('-5.00')
+        assert not self.p.account_is_settled
+        assert self.p.purchases_total == Decimal('10.00')
+        assert self.p.donations_total == Decimal('0.00')
 
     def test_no_negative_donation(self):
         i = AuctionItemFactory(fair_market_value='10')
-        b = BuyerFactory()
-        p = Purchase.purchase_item(buyer=b, item=i, amount='5')
-        pay = Payment.objects.create(buyer=b, amount='5')
-        assert b.donations_total == 0
-        assert b.outstanding_balance == 0
+        p = PatronFactory()
+        pur = Purchase.purchase_item(patron=p, item=i, amount='5')
+        pay = Payment.objects.create(patron=p, amount='5')
+        assert p.donations_total == 0
+        assert p.outstanding_balance == 0
 
 
 

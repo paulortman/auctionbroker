@@ -1,26 +1,26 @@
 {% extends 'action_page.html' %}
 {% load static %}
 
-{% block title %}Buyer List{% endblock %}
+{% block title %}Patron List{% endblock %}
 
-{% block page-heading %}Buyer List{% endblock %}
+{% block page-heading %}Patron List{% endblock %}
 
 {% block content %}
     <div class="toolbar hidden-print">
         <div class="float-right">
-            <form class="form form-inline" method="get" action="{% url 'buyer_list' %}">
+            <form class="form form-inline" method="get" action="{% url 'patron_list' %}">
                 <div class="input-group">
                     <input class="form-control" type="search" placeholder="Search" aria-label="Search" name="q" value="{{ q }}"/>
                         <button class="input-group-append" type="submit"><img class="icon-lg" src="{% static 'svg/magnifying-glass.svg' %}" /></button>
                 </div>
             </form>
         </div>
-        <a class="tool tool-lg btn btn-secondary" href="{% url 'buyer_create' %}" >
-            <img class="icon-lg" src="{% static 'svg/plus.svg'%}" alt="plus" /> Add Buyer</a>
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_create' %}" >
+            <img class="icon-lg" src="{% static 'svg/plus.svg'%}" alt="plus" /> Add Patron</a>
     </div>
 
     {% if not object_list %}
-        <p>No Buyers are registered {% if q %} that match the query: {{ q }}{% endif %}</p>
+        <p>No Patrons are registered {% if q %} that match the query: {{ q }}{% endif %}</p>
     {% else %}
     <table class="table table-bordered table-hover">
     <thead class="thead-dark">
@@ -31,16 +31,16 @@
         </tr>
     </thead>
     <tbody>
-        {% for buyer in object_list %}
+        {% for patron in object_list %}
         <tr>
             <td>
-                <a class="btn btn-sm btn-secondary " href="{% url 'buyer_update' pk=buyer.pk %}?next={% url 'buyer_list' %}" title="Edit">
+                <a class="btn btn-sm btn-secondary " href="{% url 'patron_update' pk=patron.pk %}?next={% url 'patron_list' %}" title="Edit">
                     <img style="width:14px; height: 14px;" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
-                <a class="btn btn-sm btn-secondary" href="{% url 'buyer_delete' pk=buyer.pk %}?next={% url 'buyer_list' %}" title="Delete">
+                <a class="btn btn-sm btn-secondary" href="{% url 'patron_delete' pk=patron.pk %}?next={% url 'patron_list' %}" title="Delete">
                     <img style="width:14px; height: 14px;" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
             </td>
-            <td><a href="{% url 'buyer_detail' pk=buyer.pk %}" >{{ buyer.name }}</a></td>
-            <td><a href="{% url 'buyer_detail' pk=buyer.pk %}" >{{ buyer.buyer_num }}</a></td>
+            <td><a href="{% url 'patron_detail' pk=patron.pk %}" >{{ patron.name }}</a></td>
+            <td><a href="{% url 'patron_detail' pk=patron.pk %}" >{{ patron.buyer_num }}</a></td>
         </tr>
         {% endfor %}
     </tbody>

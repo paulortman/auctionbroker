@@ -138,15 +138,15 @@ class AuctionItem(TrackedModel, Item):
 #         print("Priced Item Event")
 
 def buyer_number_generator():
-    max_num = Buyer.objects.aggregate(Max('buyer_num'))['buyer_num__max']
+    max_num = Patron.objects.aggregate(Max('buyer_num'))['buyer_num__max']
     max_num = int(max_num if max_num else 0)
     return max(max_num + 1, settings.BASE_BUYER_NUMBER)
 
 
-class Buyer(TrackedModel, models.Model):
+class Patron(TrackedModel, models.Model):
 
     buyer_num = models.CharField(max_length=8, default=buyer_number_generator, unique=True, db_index=True,
-                                 verbose_name="Buyer Number")
+                                 verbose_name="Patron Number")
     first_name = models.CharField(max_length=30, verbose_name="First Name")
     last_name = models.CharField(max_length=30, verbose_name="Last Name")
     email = models.EmailField(blank=True, verbose_name="Email Address")
@@ -156,10 +156,10 @@ class Buyer(TrackedModel, models.Model):
     phone1 = models.CharField(blank=True, max_length=20)
 
     def __str__(self):
-        return "Buyer {name} ({number})".format(name=self.name, number=self.buyer_num)
+        return "Patron {name} ({number})".format(name=self.name, number=self.buyer_num)
 
     def get_absolute_url(self):
-        return reverse('buyer_detail', kwargs={'pk': self.pk})
+        return reverse('patron_detail', kwargs={'pk': self.pk})
 
     @property
     def name(self):
@@ -197,12 +197,12 @@ def buyer_number_validator(value):
     try:
         buyer_num = int(value)
     except ValueError:
-        raise ValidationError("'%(value)s' is not a valid Buyer Number", params={'value': value})
+        raise ValidationError("'%(value)s' is not a valid Patron Number", params={'value': value})
 
     try:
-        buyer = Buyer.objects.get(buyer_num=buyer_num)
-    except Buyer.DoesNotExist:
-        raise ValidationError("No buyer exists for buyer number '%(value)s'", params={'value': value})
+        Patron.objects.get(buyer_num=buyer_num)
+    except Patron.DoesNotExist:
+        raise ValidationError("No patron exists for buyer number '%(value)s'", params={'value': value})
 
 
 class Payment(TrackedModel, models.Model):
@@ -214,7 +214,7 @@ class Payment(TrackedModel, models.Model):
         (CHECK, 'Check'),
         (CARD, 'Card')
     )
-    buyer = models.ForeignKey('Buyer', related_name='payments', on_delete=models.CASCADE)
+    patron = models.ForeignKey(Patron, related_name='payments', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     method = models.CharField(choices=METHODS, default='CHECK', max_length=6,
                               help_text="The method or type of payment made.")
@@ -222,19 +222,19 @@ class Payment(TrackedModel, models.Model):
     note = models.TextField(blank=True, help_text="Record any notes about the payment.")
 
     def __str__(self):
-        return "{amount} payment by {buyer}".format(amount=USD(self.amount), buyer=self.buyer.name)
+        return "{amount} payment by {patron}".format(amount=USD(self.amount), patron=self.patron.name)
 
     def get_absolute_url(self):
         return reverse('payment_detail', kwargs={'pk': self.pk})
 
 
 class Purchase(TrackedModel, models.Model):
-    buyer = models.ForeignKey('Buyer', related_name='purchases', on_delete=models.CASCADE)
+    patron = models.ForeignKey(Patron, related_name='purchases', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def __str__(self):
-        return "{amount} purchase by {buyer}".format(amount=USD(self.amount), buyer=self.buyer.name)
+        return "{amount} purchase by {patron}".format(amount=USD(self.amount), patron=self.patron.name)
 
     def get_absolute_url(self):
         return reverse('purchase_detail', kwargs={'pk': self.pk})
@@ -257,22 +257,22 @@ class Purchase(TrackedModel, models.Model):
         return self.item.fair_market_value
 
     @classmethod
-    def create_donation(cls, buyer, amount, booth):
-        p = Purchase.objects.create(buyer=buyer, amount=D(amount))
+    def create_donation(cls, patron, amount, booth):
+        p = Purchase.objects.create(patron=patron, amount=D(amount))
         i = PricedItem.objects.create(name='Donation', purchase=p, booth=booth)
         i.commit_to_purchase(p)
         return p
 
     @classmethod
-    def create_priced_item(cls, buyer, amount, booth):
-        p = Purchase.objects.create(buyer=buyer, amount=D(amount))
+    def create_priced_item(cls, patron, amount, booth):
+        p = Purchase.objects.create(patron=patron, amount=D(amount))
         i = PricedItem.objects.create(name='Priced Item(s)', fair_market_value=D(amount), purchase=p, booth=booth)
         i.commit_to_purchase(p)
         return p
 
     @classmethod
-    def purchase_item(cls, buyer, amount, item):
-        p = Purchase.objects.create(buyer=buyer, amount=D(amount))
+    def purchase_item(cls, patron, amount, item):
+        p = Purchase.objects.create(patron=patron, amount=D(amount))
         item.commit_to_purchase(p)
         return p
 

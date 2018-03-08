@@ -12,11 +12,11 @@
 
     <div class="row container-fluid top-space-lg">
         <div class="col col-md-6">
-            <form action="{% url 'checkout_buyer' booth_slug=booth.slug %}" method="post" class="form" autocomplete="off">
+            <form action="{% url 'checkout_patron' booth_slug=booth.slug %}" method="post" class="form" autocomplete="off">
                 {% csrf_token %}
                 {% bootstrap_form form %}
                 {% buttons %}
-                    <button class="btn btn-primary" type="submit" >Select Bidder</button>
+                    <button class="btn btn-primary" type="submit" >Select Buyer</button>
                     <button class="btn btn-secondary" type="reset" >Clear</button>
                 {% endbuttons %}
             </form>

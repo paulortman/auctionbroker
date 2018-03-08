@@ -28,10 +28,10 @@
                 </div>
                 <div class="col-md-4">
                     <div class="card border-dark mb-3" style="max-width: 20rem;">
-                        <div class="card-header">Buyer List</div>
+                        <div class="card-header">Patron List</div>
                         <div class="card-body">
-                            <p class="card-text">Provision buyer numbers or provide account settlement.</p>
-                            <a class="btn btn-primary btn-lg" href="{% url 'buyer_list' %}" role="button">Buyer List</a>
+                            <p class="card-text">Provision buyer numbers, create Donors, provide account settlement.</p>
+                            <a class="btn btn-primary btn-lg" href="{% url 'patron_list' %}" role="button">Buyer List</a>
                         </div>
                     </div>
                 </div>
@@ -44,7 +44,7 @@
                             <div class="list-group">
                                 {% for booth in booths %}
                                     <a class="list-group-item list-group-item-action"
-                                       href="{% url 'checkout_buyer' booth_slug=booth.slug %}">{{ booth.name }}</a>
+                                       href="{% url 'checkout_patron' booth_slug=booth.slug %}">{{ booth.name }}</a>
                                 {% endfor %}
                             </div>
                         </div>

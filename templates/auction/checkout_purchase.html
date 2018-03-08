@@ -14,7 +14,7 @@
                 <div class="float-right">
                     {% buttons %}
                         <input class="btn btn-primary btn-lg" type="submit" value="Checkout"/>
-                        <a class="btn btn-secondary btn-lg" href="{% url 'checkout_buyer' booth_slug=booth.slug %}" >Cancel Checkout</a>
+                        <a class="btn btn-secondary btn-lg" href="{% url 'checkout_patron' booth_slug=booth.slug %}" >Cancel Checkout</a>
                     {% endbuttons %}
                 </div>
                 Total: <span id="total"></span>
