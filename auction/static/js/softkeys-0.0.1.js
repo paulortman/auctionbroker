@@ -46,8 +46,8 @@
                                 type = 'shift';
                                 break;
 
-                            case 'return' :
-                                character = '<span>return</span>';
+                            case 'ret' :
+                                character = '<span>ret</span>';
                                 type = 'return';
                                 break;
 
