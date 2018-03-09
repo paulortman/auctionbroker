@@ -27,7 +27,7 @@ class AuctionItemCreateForm(forms.ModelForm):
 
 class ItemBiddingForm(forms.Form):
     amount = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Dollar amount, e.g. 10.00")
-    buyer_num = forms.CharField(max_length=10, label="Patron Number")
+    buyer_num = forms.CharField(max_length=10, label="Buyer Number")
 
 
 class BoothForm(forms.ModelForm):
@@ -108,7 +108,7 @@ class PatronPaymentForm(forms.ModelForm):
 
     class Meta:
         model = Payment
-        exclude = ['buyer', 'transaction_time']
+        exclude = ['patron', 'transaction_time']
         widgets = {'method': widgets.RadioSelect(),}
 
 

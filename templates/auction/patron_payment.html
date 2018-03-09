@@ -2,14 +2,15 @@
 {% load bootstrap4 %}
 {% load money %}
 
-{% block title %}{{ buyer.name }} Payment{% endblock %}
+{% block title %}{{ patron.name }} Payment{% endblock %}
 
-{% block page-heading %}Record a Payment for {{ buyer.name }}{% endblock %}
+{% block page-heading %}Record a Payment for {{ patron.name }}{% endblock %}
 
 {% block content %}
-    <h2 class="top-space-med">{{ buyer.name }} has an outstanding balance of <b>{{ buyer.outstanding_balance|money }}</b>.</h2>
+    <h2 class="top-space-med">{{ patron.name }} has an outstanding balance of <b>{{ patron.outstanding_balance|money }}</b>.</h2>
     <form class="top-space-lg" action="" method="post">
         {% csrf_token %}
+        {% bootstrap_form_errors form %}
         <div class="row">
             <div class="col-md-6">
             {% bootstrap_field form.amount %}
@@ -21,7 +22,7 @@
         {% bootstrap_field form.note %}
         {% buttons %}
             <button class="btn btn-primary" type="submit">Make Payment</button>
-            <a class="btn btn-secondary" href="{% url 'patron_detail' pk=buyer.pk %}">Cancel</a>
+            <a class="btn btn-secondary" href="{% url 'patron_detail' pk=patron.pk %}">Cancel</a>
         {% endbuttons %}
     </form>
 {% endblock %}

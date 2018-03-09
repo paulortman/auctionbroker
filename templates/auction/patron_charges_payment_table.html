@@ -1,15 +1,15 @@
 {% load static %}
 {% load money %}
 
-{% if not buyer.account_is_settled %}
-    <h2 class="top-space-md text-warning">Balance Due: <b>{{ buyer.outstanding_balance|money }}</b></h2>
+{% if not patron.account_is_settled %}
+    <h2 class="top-space-md text-warning">Balance Due: <b>{{ patron.outstanding_balance|money }}</b></h2>
 {% else %}
     <h2 class="top-space-md">Account is <span class="text-success" >Paid in Full</span></h2>
     <p>No payments are necessary, payments are equal to charges.</p>
 {% endif %}
 
 
-{% if buyer.purchases.all %}
+{% if patron.purchases.all %}
     <h2>Purchases</h2>
     <table class="table table-bordered table-hover">
         <thead class="thead-dark">
@@ -21,12 +21,12 @@
             </tr>
         </thead>
         <tbody>
-        {% for purchase in buyer.purchases.all %}
+        {% for purchase in patron.purchases.all %}
             <tr>
                 <td class="col-action">
-                    <a class="btn btn-sm btn-secondary " href="{% url 'purchase_update' pk=purchase.pk %}?next={% url 'patron_detail' pk=buyer.pk %}" title="Edit">
+                    <a class="btn btn-sm btn-secondary " href="{% url 'purchase_update' pk=purchase.pk %}?next={% url 'patron_detail' pk=patron.pk %}" title="Edit">
                         <img class="icon-sm" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
-                    <a class="btn btn-sm btn-secondary" href="{% url 'purchase_delete' pk=purchase.pk %}?next={% url 'patron_detail' pk=buyer.pk %}" title="Delete">
+                    <a class="btn btn-sm btn-secondary" href="{% url 'purchase_delete' pk=purchase.pk %}?next={% url 'patron_detail' pk=patron.pk %}" title="Delete">
                         <img class="icon-sm" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
                 <td>
                     {% if purchase.item.booth %}<em>{{ purchase.item.booth.name }}</em>: {% endif %}{{ purchase.item.name }}
@@ -40,8 +40,8 @@
         <tr>
             <th class="col-action"></th>
             <th class="text-right" >Total Purchases</th>
-            <th class="col-price">{{ buyer.donations_total|money }}</th>
-            <th class="col-price">{{ buyer.outstanding_purchases_total|money }}</th>
+            <th class="col-price">{{ patron.donations_total|money }}</th>
+            <th class="col-price">{{ patron.outstanding_purchases_total|money }}</th>
         </tr>
         </tfoot>
     </table>
@@ -49,7 +49,7 @@
     <h2>No purchases</h2>
 {% endif %}
 
-{% if buyer.payments.all %}
+{% if patron.payments.all %}
     <h2>Payments</h2>
     <table class="table table-bordered table-hover">
         <thead class="thead-dark">
@@ -60,12 +60,12 @@
         </tr>
         </thead>
         <tbody>
-        {% for payment in buyer.payments.all %}
+        {% for payment in patron.payments.all %}
             <tr>
                 <td class="col-action">
-                    <a class="btn btn-sm btn-secondary " href="{% url 'payment_update' pk=payment.pk %}?next={% url 'patron_detail' pk=buyer.pk %}" title="Edit">
+                    <a class="btn btn-sm btn-secondary " href="{% url 'payment_update' pk=payment.pk %}?next={% url 'patron_detail' pk=patron.pk %}" title="Edit">
                         <img class="icon-sm" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
-                    <a class="btn btn-sm btn-secondary" href="{% url 'payment_delete' pk=payment.pk %}?next={% url 'patron_detail' pk=buyer.pk %}" title="Delete">
+                    <a class="btn btn-sm btn-secondary" href="{% url 'payment_delete' pk=payment.pk %}?next={% url 'patron_detail' pk=patron.pk %}" title="Delete">
                         <img class="icon-sm" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
                 </td>
                 <td>
@@ -79,17 +79,17 @@
         <tr>
             <th class="col-action"></th>
             <th class="text-right" >Total Payments</th>
-            <th class="col-price">{{ buyer.payments_total|money }}</th>
+            <th class="col-price">{{ patron.payments_total|money }}</th>
         </tr>
         </tfoot>
     </table>
 {% else %}
     <h2>No payments</h2>
 {% endif %}
-<p class="hidden-print"><a href="{% url 'patron_pay' pk=buyer.pk %}" class="btn btn-primary btn-sm" >Add Payment</a></p>
+<p class="hidden-print"><a href="{% url 'patron_pay' pk=patron.pk %}" class="btn btn-primary btn-sm" >Add Payment</a></p>
 
-{% if buyer.donations_total %}
-    <h2>Donation Amount: {{ buyer.donations_total|money }}</h2>
+{% if patron.donations_total %}
+    <h2>Donation Amount: {{ patron.donations_total|money }}</h2>
 
     <p style="font-style: italic;">The donation amount is the amount of the contribution that is deductible for federal
     income tax purposes. This amount is the price difference from what the buyer paid over and above the <q>Fair Market

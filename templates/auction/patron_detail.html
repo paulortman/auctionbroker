@@ -1,19 +1,19 @@
 {% extends 'action_page.html' %}
 {% load static %}
 
-{% block title %}Buyer {{ buyer.name }}{% endblock %}
+{% block title %}Patron {{ patron.name }}{% endblock %}
 
-{% block page-heading %}Buyer: {{ buyer.name }} ({{ buyer.buyer_num }}){% endblock %}
+{% block page-heading %}Patron: {{ patron.name }} ({{ patron.buyer_num }}){% endblock %}
 
 {% block content %}
     <div class="toolbar hidden-print">
-        <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_update' pk=buyer.pk %}" >
-            <img class="icon-lg" src="{% static 'svg/pencil.svg'%}" alt="pencil" /> Edit Buyer</a>
-        <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_pay' pk=buyer.pk %}" >
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_update' pk=patron.pk %}" >
+            <img class="icon-lg" src="{% static 'svg/pencil.svg'%}" alt="pencil" /> Edit Patron</a>
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_pay' pk=patron.pk %}" >
             <img class="icon-lg" src="{% static 'svg/dollar.svg' %}" alt="dollar" />  Add Payment</a>
-        <a class="tool tool-lg btn btn-secondary" href="{% url 'buyer_donate' pk=buyer.pk %}">
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_donate' pk=patron.pk %}">
             <img class="icon-lg" src="{% static 'svg/dollar.svg' %}" alt="dollar" />  Add Donation</a>
-        <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_receipt' pk=buyer.pk %}" >
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_receipt' pk=patron.pk %}" >
             <img class="icon-lg" src="{% static 'svg/print.svg' %}" alt="print" /> Print Receipt</a>
     </div>
 
