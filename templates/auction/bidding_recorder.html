@@ -18,7 +18,7 @@
         {% csrf_token %}
         <div class="form-row">
             <div class="col-md-3">
-                {% bootstrap_field form.amount %}
+                {% bootstrap_field form.amount addon_before='<div class="input-group-prepend"><span class="input-group-text">$</span></div>' %}
             </div>
             <div class="col-md-3">
                 {% bootstrap_field form.buyer_num %}

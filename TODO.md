@@ -1,10 +1,12 @@
 # Todo
 
 - in-kind donation recording for goods and services
+    - donor field search/autocomplete
 - autocomplete for buyer_numbers
 - admin dashboard/reports
 - add images to AuctionItems
-- priced item editing should synchronize amount paid and fmv
+- the widget for amounts/money should have a $ tied to the form-field
+- add fee model to record CC purchase fees paid
 
 ## Dashboard/Reports
 
@@ -17,3 +19,4 @@
 # Done
 - seach buyers by name, number, address
 - Buyers should really be Patrons
+- priced item editing should synchronize amount paid and fmv

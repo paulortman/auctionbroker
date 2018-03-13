@@ -9,6 +9,41 @@
 {% endif %}
 
 
+{% if patron.donations.all %}
+    <h2>In-Kind Donations</h2>
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+        <tr>
+            <th class="col-action">Action</th>
+            <th scope="col">Description</th>
+            <th scope="col" class="col-price">FMV Donation</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for donation in patron.donations.all %}
+            <tr>
+                <td class="col-action">
+                </td>
+                <td>
+                    {% if donation.booth %}<em>{{ donation.booth.name }}</em>: {% endif %}{{ donation.name }}
+                </td>
+                <td class="col-price">{{ donation.fair_market_value|money }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th class="col-action"></th>
+            <th class="text-right" >Total In-Kind Donations</th>
+            <th class="col-price">{{ patron.in_kind_donations_total|money }}</th>
+        </tr>
+        </tfoot>
+    </table>
+{% else %}
+    <h2>No In-Kind Donations</h2>
+{% endif %}
+
+
 {% if patron.purchases.all %}
     <h2>Purchases</h2>
     <table class="table table-bordered table-hover">
@@ -40,7 +75,7 @@
         <tr>
             <th class="col-action"></th>
             <th class="text-right" >Total Purchases</th>
-            <th class="col-price">{{ patron.donations_total|money }}</th>
+            <th class="col-price">{{ patron.purchase_donations_total|money }}</th>
             <th class="col-price">{{ patron.outstanding_purchases_total|money }}</th>
         </tr>
         </tfoot>
@@ -94,7 +129,8 @@
     <p style="font-style: italic;">The donation amount is the amount of the contribution that is deductible for federal
     income tax purposes. This amount is the price difference from what the buyer paid over and above the <q>Fair Market
     Value</q>.  Items that were purchased with a specific price at this sale are deemed to have a price equal to the
-    FMV.  Items sold at auction or with a negotiated price were assigned a FMV before the sale.  Payments where no gift
-    in kind was received are 100% donations. This disclosure is provided in keeping with IRS section 170 directives.</p>
+    FMV.  Items sold at auction or with a negotiated price were assigned a FMV before the sale and are listed as
+    "in-kind" donations for the patron who donated the item.  Payments where no gift in kind was received are 100%
+    donations. This disclosure is provided in keeping with IRS section 170 directives.</p>
 
 {% endif %}

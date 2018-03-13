@@ -1,18 +1,11 @@
-import json
-
 import decimal
 
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
-from django.forms import widgets
 from django.utils import timezone
 from django.shortcuts import reverse
-from django.dispatch import receiver
-from django.db.models.signals import post_save
 from django.utils.text import slugify
 
 
@@ -20,6 +13,7 @@ def D(val):
     if val is None:
         return decimal.Decimal(0)
     return decimal.Decimal(val)
+
 
 def USD(d):
     return "${}".format(d.quantize(decimal.Decimal('.01'), decimal.ROUND_HALF_UP))
@@ -46,7 +40,8 @@ class Item(models.Model):
                                      help_text="When the item sold. Leave blank when creating")
     fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=D(0),
                                             verbose_name="Fair Market Value (FMV)", help_text="Dollars, e.g. 10.00")
-    is_purchased = models.BooleanField(default=False, help_text="Un-checking this item will delete and void the purchase")
+    is_purchased = models.BooleanField(default=False,
+                                       help_text="Un-checking this item will delete and void the purchase")
 
     def __str__(self):
         return "({}) {}{}".format(self.id, self.name, "*" if self.purchase else "")
@@ -104,9 +99,22 @@ class AuctionItem(TrackedModel, Item):
                                               help_text="Leave blank to auto-generate.")
     scheduled_sale_time = models.DateTimeField(blank=True, null=True, verbose_name="Scheduled Sale Time",
                                                help_text="The time when the item is scheduled during the auction.")
+    donor_display = models.CharField(max_length=50, blank=True, null=True, verbose_name="Displayed Donor Name",
+                                     help_text="How the item's donor would be displayed to the public")
+    donor = models.ForeignKey('Patron', null=True, blank=True, help_text="The patron/donor for tax receipt purposes.",
+                              related_name="donations", on_delete=models.SET_NULL)
 
     def get_absolute_url(self):
         return reverse('item_detail', kwargs={'item_number': self.item_number})
+
+
+class AuctionItemImage(models.Model):
+    class Meta:
+        unique_together = ['item', 'sort_order']
+
+    item = models.ForeignKey(AuctionItem, related_name="images", on_delete=models.CASCADE)
+    image = models.ImageField()
+    sort_order = models.PositiveIntegerField(default=1)
 
 
 # @receiver(post_save, sender=AuctionItem)
@@ -181,8 +189,16 @@ class Patron(TrackedModel, models.Model):
         return D(payments)
 
     @property
-    def donations_total(self):
+    def in_kind_donations_total(self):
+        return sum([i.fair_market_value for i in self.donations.all()])
+
+    @property
+    def purchase_donations_total(self):
         return sum([p.donation_amount for p in self.purchases.all()])
+
+    @property
+    def donations_total(self):
+        return self.purchase_donations_total + self.in_kind_donations_total
 
     @property
     def outstanding_balance(self):

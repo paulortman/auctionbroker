@@ -1,10 +1,7 @@
 from django import forms
-from django.conf import settings
-from django.contrib.admin.widgets import AdminDateWidget
 from django.forms import widgets
-from django.utils import timezone
 
-from .models import Item, Booth, Patron, Payment, buyer_number_validator, AuctionItem, Purchase
+from .models import Booth, Patron, Payment, buyer_number_validator, AuctionItem, Purchase
 
 
 class AuctionItemEditForm(forms.ModelForm):

@@ -4,12 +4,12 @@
 
 {% block title %}{{ booth.name }} Checkout{% endblock %}
 
-{% block page-heading %}{{ booth.name }} Checkout: {{ buyer.name }} (#{{ buyer.buyer_num }}){% endblock %}
+{% block page-heading %}{{ booth.name }} Checkout: {{ patron.name }} (#{{ patron.buyer_num }}){% endblock %}
 
 {% block content %}
     <div class="row container-fluid top-space-lg" >
         <div class="col col-md-6">
-            <form action="{% url 'checkout_purchase' buyer_num=buyer.buyer_num booth_slug=booth.slug %}" method="post" class="form">
+            <form action="{% url 'checkout_purchase' buyer_num=patron.buyer_num booth_slug=booth.slug %}" method="post" class="form">
             <h2>
                 <div class="float-right">
                     {% buttons %}
@@ -41,7 +41,7 @@
             <form id="entry">
                 <div class="input-group input-group-lg">
                     <div class="input-group-prepend">
-                        <span class="input-group-text">Add Item</span>
+                        <span class="input-group-text">Add Item $</span>
                     </div>
                     <input class="form-control" id="newEntry" autofocus placeholder="$0.00">
                 </div>

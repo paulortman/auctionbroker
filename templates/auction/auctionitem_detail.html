@@ -20,7 +20,7 @@
         <li>Number: {{ item.item_number }}</li>
         <li>Is Sold: {{ item.is_purchased|yesno:"Yes,No" }}</li>
         {% if item.purchase %}
-        <li>Winner: {{ item.purchase.buyer.name }}</li>
+        <li>Winner: {{ item.purchase.patron.name }}</li>
         <li>Purchase Price: {{ item.purchase.amount|money }}</li>
         {% endif %}
         <li>Fair Market Value: {{ item.fair_market_value|money }}</li>

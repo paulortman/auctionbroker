@@ -194,11 +194,19 @@ class PurchaseCreate(CreateView):
     raise_exception = True
 
 
-class PurchaseUpdate(UpdateView):
+class PurchaseUpdate(HonorNextMixin, UpdateView):
     model = Purchase
     form_class = PurchaseForm
     group_required = u'account_managers'
     raise_exception = True
+
+    def form_valid(self, form):
+        # Priced items are an unuusal case, we ned to adjust the FMV so that editing a price paid doesn't end up
+        # creating a donation or negative donations.
+        if 'amount' in form.changed_data and hasattr(form.instance, 'priceditem'):
+            form.instance.priceditem.fair_market_value = form.cleaned_data['amount']
+            form.instance.priceditem.save()
+        return super().form_valid(form)
 
 
 class PurchaseDelete(HonorNextMixin, DeleteView):
