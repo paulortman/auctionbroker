@@ -22,7 +22,7 @@ from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
 from .models import Item, Patron, Purchase, Booth, Payment, AuctionItem, USD, D, buyer_number_generator, \
-    round_scheduled_sale_time
+    round_scheduled_sale_time, Fee
 from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PatronPaymentForm, PurchaseForm, PatronCreateForm, \
     PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm
@@ -219,6 +219,12 @@ class PurchaseDelete(HonorNextMixin, DeleteView):
     # def get_success_url(self):
     #     patron = self.get_object().patron
     #     return reverse('patron_detail', kwargs={'pk': patron.pk})
+
+class FeeDelete(HonorNextMixin, DeleteView):
+    template_name = 'auction/generic_confirm_delete.html'
+    model = Fee
+    group_required = u'account_managers'
+    raise_exception = True
 
 
 class PaymentList(HonorNextMixin, ListView):

@@ -5,8 +5,6 @@
 - autocomplete for buyer_numbers
 - admin dashboard/reports
 - add images to AuctionItems
-- the widget for amounts/money should have a $ tied to the form-field
-- add fee model to record CC purchase fees paid
 
 ## Dashboard/Reports
 
@@ -20,3 +18,5 @@
 - seach buyers by name, number, address
 - Buyers should really be Patrons
 - priced item editing should synchronize amount paid and fmv
+- add fee model to record CC purchase fees paid
+- the widget for amounts/money should have a $ tied to the form-field

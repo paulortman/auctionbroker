@@ -49,6 +49,8 @@ urlpatterns = [
     url(r'^purchase/(?P<pk>\d+)/edit/$', views.PurchaseUpdate.as_view(), name="purchase_update"),
     url(r'^purchase/(?P<pk>\d+)/delete/$', views.PurchaseDelete.as_view(), name="purchase_delete"),
 
+    url(r'^fee/(?P<pk>\d+)/delete/$', views.FeeDelete.as_view(), name="fee_delete"),
+
     url(r'^dashboard/$', views.TemplateView.as_view(template_name='dashboard.html'), name="dashboard"),
 
     url(r'^bidding/(?P<item_number>\d+)/$', views.BiddingRecorder.as_view(), name='bidding_recorder'),

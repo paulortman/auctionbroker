@@ -202,11 +202,16 @@ class Patron(TrackedModel, models.Model):
 
     @property
     def outstanding_balance(self):
-        return self.purchases_total - self.payments_total
+        return self.purchases_total + self.fees_total - self.payments_total
 
     @property
     def account_is_settled(self):
         return self.outstanding_balance == D(0)
+
+    @property
+    def fees_total(self):
+        fees = self.fees.all().aggregate(models.Sum('amount'))['amount__sum']
+        return D(fees)
 
 
 def buyer_number_validator(value):
@@ -242,6 +247,23 @@ class Payment(TrackedModel, models.Model):
 
     def get_absolute_url(self):
         return reverse('payment_detail', kwargs={'pk': self.pk})
+
+    def save(self, *args, **kwargs):
+        if self.method == self.CARD:
+            amount = self.amount * decimal.Decimal(settings.CC_TRANSACTION_FEE_PERCENTAGE)
+            percent = settings.CC_TRANSACTION_FEE_PERCENTAGE * 100
+            Fee.objects.create(patron=self.patron, amount=amount, description='Credit Card Fee ({}%)'.format(percent))
+        return super().save(*args, **kwargs)
+
+
+
+class Fee(TrackedModel, models.Model):
+    patron = models.ForeignKey(Patron, related_name='fees', on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    description = models.CharField(max_length=20)
+
+    def __str__(self):
+        return "{amount} fee paid by {patron}".format(amount=USD(self.amount), patron=self.patron.name)
 
 
 class Purchase(TrackedModel, models.Model):
