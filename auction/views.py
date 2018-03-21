@@ -283,7 +283,7 @@ class PatronSearchMixin:
         for t in terms:
             query |= Q(first_name__icontains=t)
             query |= Q(last_name__icontains=t)
-            query |= Q(patron_num__icontains=t)
+            query |= Q(buyer_num__icontains=t)
         return query
 
     def get_context_data(self, **kwargs):

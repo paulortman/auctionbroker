@@ -4,7 +4,7 @@
     - donor field search/autocomplete
 - autocomplete for buyer_numbers
 - admin dashboard/reports
-- add images to AuctionItems
+- add images to AuctionItems (https://github.com/alexsdutton/django-camera-imagefield ?)
 
 ## Dashboard/Reports
 

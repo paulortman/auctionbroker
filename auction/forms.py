@@ -1,12 +1,18 @@
 from django import forms
-from django.forms import widgets
+from django.forms import widgets, ModelChoiceField
 
 from .models import Booth, Patron, Payment, buyer_number_validator, AuctionItem, Purchase
+
+
+class PatronChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "{last_name}, {first_name}".format(last_name=obj.last_name, first_name=obj.first_name)
 
 
 class AuctionItemEditForm(forms.ModelForm):
     scheduled_sale_time = forms.SplitDateTimeField(widget=widgets.SplitDateTimeWidget,
                                                    help_text="Enter the scheduled date ('YYYY-MM-DD') and the time ('HH:MM PM')")
+    donor = PatronChoiceField(queryset=Patron.objects.all().order_by('last_name'), required=False)
 
     class Meta:
         model = AuctionItem
@@ -16,6 +22,7 @@ class AuctionItemEditForm(forms.ModelForm):
 class AuctionItemCreateForm(forms.ModelForm):
     scheduled_sale_time = forms.SplitDateTimeField(widget=widgets.SplitDateTimeWidget,
                                                    help_text="Enter the scheduled date ('YYYY-MM-DD') and the time ('HH:MM PM')")
+    donor = PatronChoiceField(queryset=Patron.objects.all().order_by('last_name'), required=False)
 
     class Meta:
         model = AuctionItem
