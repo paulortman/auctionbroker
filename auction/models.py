@@ -260,7 +260,7 @@ class Payment(TrackedModel, models.Model):
 class Fee(TrackedModel, models.Model):
     patron = models.ForeignKey(Patron, related_name='fees', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
-    description = models.CharField(max_length=20)
+    description = models.CharField(max_length=100)
 
     def __str__(self):
         return "{amount} fee paid by {patron}".format(amount=USD(self.amount), patron=self.patron.name)
