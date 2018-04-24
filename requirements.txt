@@ -10,3 +10,6 @@ WeasyPrint
 django-braces
 django-bootstrap4
 django-easy-timezones
+
+gunicorn
+django-heroku

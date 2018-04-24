@@ -19,7 +19,8 @@ factory-boy = "*"
 uwsgi = "*"
 weasyprint = "*"
 whitenoise = "*"
-
+gunicorn = "*"
+django-heroku = "*"
 
 [dev-packages]
 
