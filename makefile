@@ -20,5 +20,5 @@ push:
 
 # heroku deploy steps
 deploy:
-	python manage.py --settings config.settings.production collectstatic
-	python manage.py --settings config.settings.production migrate
+	python manage.py collectstatic && \
+	python manage.py migrate
