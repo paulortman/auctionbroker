@@ -52,7 +52,7 @@ urlpatterns = [
 
     url(r'^fee/(?P<pk>\d+)/delete/$', views.FeeDelete.as_view(), name="fee_delete"),
 
-    url(r'^dashboard/$', views.TemplateView.as_view(template_name='dashboard.html'), name="dashboard"),
+    url(r'^dashboard/$', views.SalesDashboard.as_view(template_name='dashboard.html'), name="dashboard"),
 
     url(r'^bidding/(?P<item_number>\d+)/$', views.BiddingRecorder.as_view(), name='bidding_recorder'),
     url(r'^management/$', views.AuctionItemManagement.as_view(), name='item_management'),

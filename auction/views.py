@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.contrib.staticfiles import finders
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.forms import formset_factory
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -23,7 +23,7 @@ from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
 from .models import Item, Patron, Purchase, Booth, Payment, AuctionItem, USD, D, buyer_number_generator, \
-    round_scheduled_sale_time, Fee
+    round_scheduled_sale_time, Fee, PricedItem
 from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PatronPaymentForm, PurchaseForm, PatronCreateForm, \
     PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm, PatronCCFeeForm
@@ -634,3 +634,11 @@ class PatronSearch(PatronSearchMixin, ModelSearch):
 class AuctionItemSearch(AuctionItemSearchMixin, ModelSearch):
     model = AuctionItem
 
+
+class SalesDashboard(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_sales'] = Purchase.objects.all().aggregate(Sum('amount'))['amount__sum']
+
+        return context
