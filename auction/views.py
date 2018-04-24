@@ -1,3 +1,4 @@
+import decimal
 import json
 
 from braces.views import GroupRequiredMixin, UserPassesTestMixin
@@ -25,7 +26,7 @@ from .models import Item, Patron, Purchase, Booth, Payment, AuctionItem, USD, D,
     round_scheduled_sale_time, Fee
 from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PatronPaymentForm, PurchaseForm, PatronCreateForm, \
-    PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm
+    PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm, PatronCCFeeForm
 
 
 class HonorNextMixin:
@@ -385,6 +386,27 @@ class PatronPay(PatronMixin, FormView):
                                note=form.cleaned_data['note'])
 
         msg = "Payment of {amount} made by {name}".format(amount=USD(amount), name=patron.name)
+        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
+
+        return redirect('patron_detail', pk=patron.pk)
+
+
+class PatronCCFee(PatronMixin, FormView):
+    form_class = PatronCCFeeForm
+    template_name = 'auction/patron_cc_fee.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['patron'] = self.get_object()
+        context['percent_fee'] = settings.CC_TRANSACTION_FEE_PERCENTAGE * 100
+
+        return context
+
+    def form_valid(self, form):
+        patron = self.get_object()
+        f = patron.apply_cc_usage_fee()
+
+        msg = "Credit Card Fee of {cc_fee} applied to {name}".format(cc_fee=USD(f.amount), name=patron.name)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
 
         return redirect('patron_detail', pk=patron.pk)

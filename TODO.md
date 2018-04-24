@@ -15,7 +15,8 @@
 - 
 
 # Done
-- seach buyers by name, number, address
+- payments with CC need multiple steps to correctly calculate fees (must fix)
+- search buyers by name, number, address
 - Buyers should really be Patrons
 - priced item editing should synchronize amount paid and fmv
 - add fee model to record CC purchase fees paid

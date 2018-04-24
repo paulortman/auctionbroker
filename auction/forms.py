@@ -116,6 +116,10 @@ class PatronPaymentForm(forms.ModelForm):
         widgets = {'method': widgets.RadioSelect(),}
 
 
+class PatronCCFeeForm(forms.Form):
+    pass
+
+
 class DonateForm(forms.Form):
     buyer_num = forms.CharField(max_length=8, label='Buyer Number')
     donation = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Enter Dollar Amount, ex. $100.00",

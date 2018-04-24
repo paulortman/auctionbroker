@@ -1,0 +1,21 @@
+{% extends 'action_page.html' %}
+{% load bootstrap4 %}
+{% load money %}
+
+{% block title %}{{ patron.name }} CC Fee{% endblock %}
+
+{% block page-heading %}Apply a Credit Card Payment Fee to {{ patron.name }}{% endblock %}
+
+{% block content %}
+    <p class="top-space-lg">To use a Credit Card we pass along the merchant fees (<strong>{{ percent_fee }}%</strong>)
+        applied to the outstanding balance <strong>{{ patron.outstanding_balance|money }}</strong>.  This fee amounts to
+        <strong>{{ patron.get_cc_usage_fee|money }}</strong>.  Apply this fee to {{ patron.name }}? </p>
+
+    <form class="top-space-lg" action="" method="post">
+        {% csrf_token %}
+        {% buttons %}
+            <button class="btn btn-primary" type="submit">Apply Fee</button>
+            <a class="btn btn-secondary" href="{% url 'patron_detail' pk=patron.pk %}">Cancel</a>
+        {% endbuttons %}
+    </form>
+{% endblock %}

@@ -205,6 +205,10 @@ class Patron(TrackedModel, models.Model):
         return self.purchases_total + self.fees_total - self.payments_total
 
     @property
+    def outstanding_balance_no_fees(self):
+        return self.purchases_total - self.payments_total
+
+    @property
     def account_is_settled(self):
         return self.outstanding_balance == D(0)
 
@@ -212,6 +216,16 @@ class Patron(TrackedModel, models.Model):
     def fees_total(self):
         fees = self.fees.all().aggregate(models.Sum('amount'))['amount__sum']
         return D(fees)
+
+    def apply_cc_usage_fee(self):
+        cc_fee = self.get_cc_usage_fee()
+        percent = settings.CC_TRANSACTION_FEE_PERCENTAGE * 100
+        f = Fee.objects.create(patron=self, amount=cc_fee, description='Credit Card Fee ({}%)'.format(percent))
+        return f
+
+    def get_cc_usage_fee(self):
+        cc_fee = self.outstanding_balance_no_fees * decimal.Decimal(settings.CC_TRANSACTION_FEE_PERCENTAGE)
+        return cc_fee
 
 
 def buyer_number_validator(value):
@@ -247,14 +261,6 @@ class Payment(TrackedModel, models.Model):
 
     def get_absolute_url(self):
         return reverse('payment_detail', kwargs={'pk': self.pk})
-
-    def save(self, *args, **kwargs):
-        if self.method == self.CARD:
-            amount = self.amount * decimal.Decimal(settings.CC_TRANSACTION_FEE_PERCENTAGE)
-            percent = settings.CC_TRANSACTION_FEE_PERCENTAGE * 100
-            Fee.objects.create(patron=self.patron, amount=amount, description='Credit Card Fee ({}%)'.format(percent))
-        return super().save(*args, **kwargs)
-
 
 
 class Fee(TrackedModel, models.Model):
