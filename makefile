@@ -17,3 +17,8 @@ push:
 	docker build -t auctionbroker . && \
 	docker tag auctionbroker:latest 594645421903.dkr.ecr.us-east-1.amazonaws.com/paulortman/auctionbroker:latest && \
 	docker push 594645421903.dkr.ecr.us-east-1.amazonaws.com/paulortman/auctionbroker:latest
+
+# heroku deploy steps
+deploy:
+	python manage.py --settings config.settings.production collectstatic
+	python manage.py --settings config.settings.production migrate
