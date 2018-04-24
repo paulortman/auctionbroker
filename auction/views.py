@@ -499,7 +499,7 @@ class CheckoutPatron(CheckoutAuthMixin, FormView):
 class CheckoutPurchase(CheckoutAuthMixin, FormSetView):
     template_name = 'auction/checkout_purchase.html'
     form_class = CheckoutPurchaseForm
-    extra = 10
+    factory_kwargs = {'extra': 10}
 
     def dispatch(self, request, *args, **kwargs):
         booth_slug = self.kwargs.get('booth_slug')
