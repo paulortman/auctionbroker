@@ -4,6 +4,8 @@ import dj_database_url
 
 DEBUG = True
 
+ALLOWED_HOSTS.append('auctionbroker.herokuapp.com')
+
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
