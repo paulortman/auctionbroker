@@ -2,7 +2,7 @@ from .base import *
 import dj_database_url
 
 
-DEBUG = False
+DEBUG = True
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
