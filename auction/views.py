@@ -22,7 +22,7 @@ from extra_views import FormSetView
 from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
-from .models import Item, Patron, Purchase, Booth, Payment, AuctionItem, USD, D, buyer_number_generator, \
+from .models import Item, Patron, Purchase, Booth, Payment, AuctionItem, USD, D, \
     round_scheduled_sale_time, Fee, PricedItem
 from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PatronPaymentForm, PurchaseForm, PatronCreateForm, \
@@ -315,18 +315,18 @@ class PatronCreate(PatronMixin, CreateView):
     form_class = PatronCreateForm
 
     def form_valid(self, form):
-        form.instance.buyer_num = buyer_number_generator()
 
         msg = "Patron '{name}' ({num}) created successfully.".format(name=form.instance.name, num=form.instance.buyer_num)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
 
+        response = super().form_valid(form)
+
         if 'save_and_add_another' in self.request.POST:
-            return redirect('patron_create')
+            response = redirect('patron_create')
         if 'save_and_return_to_list' in self.request.POST:
-            return redirect('buyder_list')
+            response = redirect('patron_list')
 
-        return super().form_valid(form)
-
+        return response
 
 class PatronUpdate(PatronMixin, UpdateView):
     form_class = PatronForm

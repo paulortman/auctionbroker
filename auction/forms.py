@@ -53,7 +53,6 @@ class PurchaseForm(forms.ModelForm):
 
 
 class PatronCreateForm(forms.ModelForm):
-    buyer_num = forms.CharField(max_length=8, required=False, widget=widgets.HiddenInput)
 
     class Meta:
         model = Patron
@@ -61,6 +60,7 @@ class PatronCreateForm(forms.ModelForm):
         widgets = {
             'first_name': widgets.TextInput(attrs={'autofocus': 'autofocus'})
         }
+
 
 class PatronForm(forms.ModelForm):
     class Meta:

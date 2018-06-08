@@ -5,6 +5,7 @@
 - autocomplete for buyer_numbers
 - admin dashboard/reports
 - add images to AuctionItems (https://github.com/alexsdutton/django-camera-imagefield ?)
+- manually enter buyer numbers
 
 ## Dashboard/Reports
 
