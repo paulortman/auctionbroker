@@ -1,13 +1,6 @@
 {% load static %}
 {% load money %}
 
-{% if not patron.account_is_settled %}
-    <h2 class="top-space-md text-warning">Balance Due: <b>{{ patron.outstanding_balance|money }}</b></h2>
-{% else %}
-    <h2 class="top-space-md">Account is <span class="text-success" >Paid in Full</span></h2>
-    <p>No payments are necessary, payments are equal to charges.</p>
-{% endif %}
-
 
 {% if patron.donations.all %}
     <h2>In-Kind Donations</h2>
@@ -16,7 +9,7 @@
         <tr>
             <th class="col-action">Action</th>
             <th scope="col">Description</th>
-            <th scope="col" class="col-price">FMV Donation</th>
+            <th scope="col" class="col-price">Sold Price</th>
         </tr>
         </thead>
         <tbody>
@@ -27,7 +20,7 @@
                 <td>
                     {% if donation.booth %}<em>{{ donation.booth.name }}</em>: {% endif %}{{ donation.name }}
                 </td>
-                <td class="col-price">{{ donation.fair_market_value|money }}</td>
+                <td class="col-price">{{ donation.purchase.amount|money }}</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -35,10 +28,13 @@
         <tr>
             <th class="col-action"></th>
             <th class="text-right" >Total In-Kind Donations</th>
-            <th class="col-price">{{ patron.in_kind_donations_total|money }}</th>
+            <th class="col-price">{{ patron.in_kind_donations_sales_total|money }}</th>
         </tr>
         </tfoot>
     </table>
+    <p style="font-style: italic;">The above items were donated to the SD MCC Relief sale and sold for the price(s)
+        listed.  No goods or services were received by the donor for their donation.  Please consult your tax adviser
+        for questions about tax implications.</p>
 {% else %}
     <h2>No In-Kind Donations</h2>
 {% endif %}
@@ -51,7 +47,7 @@
         <tr>
             <th class="col-action">Action</th>
             <th scope="col">Description</th>
-            <th scope="col" class="col-price">Donation</th>
+{#            <th scope="col" class="col-price">Donation</th>#}
             <th scope="col" class="col-price">Amount</th>
         </tr>
         </thead>
@@ -66,7 +62,7 @@
                 <td>
                     {% if purchase.item.booth %}<em>{{ purchase.item.booth.name }}</em>: {% endif %}{{ purchase.item.name }}
                 </td>
-                <td class="col-price"> {% if purchase.donation_amount %} {{ purchase.donation_amount|money }} {% else %} - {% endif %} </td>
+{#                <td class="col-price"> {% if purchase.donation_amount %} {{ purchase.donation_amount|money }} {% else %} - {% endif %} </td>#}
                 <td class="col-price">{{ purchase.amount|money }}</td>
             </tr>
         {% endfor %}
@@ -75,7 +71,7 @@
         <tr>
             <th class="col-action"></th>
             <th class="text-right" >Total Purchases</th>
-            <th class="col-price">{{ patron.purchase_donations_total|money }}</th>
+{#            <th class="col-price">{{ patron.purchase_donations_total|money }}</th>#}
             <th class="col-price">{{ patron.outstanding_purchases_total|money }}</th>
         </tr>
         </tfoot>
@@ -156,14 +152,22 @@
 <p class="hidden-print"><a href="{% url 'patron_pay' pk=patron.pk %}" class="btn btn-primary btn-sm" >Add Payment</a>
     <a href="{% url 'patron_cc_fee' pk=patron.pk %}" class="btn btn-primary btn-sm" title="Add Credit Card Processing Fee">Add CC Fee</a></p>
 
-{% if patron.donations_total %}
-    <h2>Donation Amount: {{ patron.donations_total|money }}</h2>
+{#{% if patron.donations_total %}#}
+{#    <h2>Donation Amount: {{ patron.donations_total|money }}</h2>#}
+{##}
+{#    <p style="font-style: italic;">The donation amount is the amount of the contribution that is deductible for federal#}
+{#    income tax purposes. This amount is the price difference from what the buyer paid over and above the <q>Fair Market#}
+{#    Value</q>.  Items that were purchased with a specific price at this sale are deemed to have a price equal to the#}
+{#    FMV.  Items sold at auction or with a negotiated price were assigned a FMV before the sale and are listed as#}
+{#    "in-kind" donations for the patron who donated the item.  Payments where no gift in kind was received are 100%#}
+{#    donations. This disclosure is provided in keeping with IRS section 170 directives.</p>#}
+{##}
+{#{% endif %}#}
 
-    <p style="font-style: italic;">The donation amount is the amount of the contribution that is deductible for federal
-    income tax purposes. This amount is the price difference from what the buyer paid over and above the <q>Fair Market
-    Value</q>.  Items that were purchased with a specific price at this sale are deemed to have a price equal to the
-    FMV.  Items sold at auction or with a negotiated price were assigned a FMV before the sale and are listed as
-    "in-kind" donations for the patron who donated the item.  Payments where no gift in kind was received are 100%
-    donations. This disclosure is provided in keeping with IRS section 170 directives.</p>
-
+{% if not patron.account_is_settled %}
+    <h2 class="top-space-md text-warning">Balance Due: <b>{{ patron.outstanding_balance|money }}</b></h2>
+{% else %}
+    <h2 class="top-space-md">Account is <span class="text-success" >Paid in Full</span></h2>
+    <p>No payments are necessary, payments are equal to charges.</p>
 {% endif %}
+

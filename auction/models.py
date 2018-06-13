@@ -192,6 +192,10 @@ class Patron(TrackedModel, models.Model):
         return sum([i.fair_market_value for i in self.donations.all()])
 
     @property
+    def in_kind_donations_sales_total(self):
+        return sum([i.purchase.amount for i in self.donations.all()])
+
+    @property
     def purchase_donations_total(self):
         return sum([p.donation_amount for p in self.purchases.all()])
 
