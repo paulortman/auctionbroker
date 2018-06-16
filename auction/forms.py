@@ -124,10 +124,12 @@ class DonateForm(forms.Form):
     buyer_num = forms.CharField(max_length=8, label='Buyer Number')
     donation = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Enter Dollar Amount, ex. $100.00",
                                   widget=widgets.TextInput(attrs={'autofocus': 'autofocu'}))
+    note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False)
 
 
 class PatronDonateForm(forms.Form):
     donation = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Enter Dollar Amount, ex. $100.00",
                                widget=widgets.TextInput(attrs={'autofocus': 'autofocu'}))
+    note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False)
 
 

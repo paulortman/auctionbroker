@@ -424,7 +424,8 @@ class PatronDonate(PatronMixin, FormView):
     def form_valid(self, form):
         patron = self.get_object()
         amount = form.cleaned_data['donation']
-        Purchase.create_donation(patron=patron, amount=amount, booth=None)
+        note = form.cleaned_data['note']
+        Purchase.create_donation(patron=patron, amount=amount, booth=None, note=note)
 
         msg = "Doncation of {amount} made by {name}".format(amount=USD(amount), name=patron.name)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
@@ -439,12 +440,13 @@ class Donate(HonorNextMixin, FormView):
     def form_valid(self, form):
         buyer_num = form.cleaned_data['buyer_num']
         amount = form.cleaned_data['donation']
+        note = form.cleaned_data['note']
         try:
             patron = Patron.objects.get(buyer_num=buyer_num)
         except Patron.DoesNotExist:
             raise ValidationError("Invalid Patron Number -- no patron exists")
 
-        Purchase.create_donation(patron=patron, amount=amount, booth=None)
+        Purchase.create_donation(patron=patron, amount=amount, booth=None, note=note)
 
         msg = "Doncation of {amount} made by {name}".format(amount=USD(amount), name=patron.name)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')

@@ -304,9 +304,10 @@ class Purchase(TrackedModel, models.Model):
         return self.item.fair_market_value
 
     @classmethod
-    def create_donation(cls, patron, amount, booth):
+    def create_donation(cls, patron, amount, booth, note=None):
         p = Purchase.objects.create(patron=patron, amount=D(amount))
-        i = PricedItem.objects.create(name='Donation', purchase=p, booth=booth)
+        name = 'Donation' + ': {}'.format(note) if note else ''
+        i = PricedItem.objects.create(name=name, purchase=p, booth=booth)
         i.commit_to_purchase(p)
         return p
 
