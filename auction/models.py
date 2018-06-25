@@ -153,7 +153,7 @@ def buyer_number_generator():
 
 class Patron(TrackedModel, models.Model):
 
-    buyer_num = models.CharField(max_length=8, unique=True, db_index=True, verbose_name="Buyer Number")
+    buyer_num = models.CharField(max_length=8, blank=True, null=True, unique=True, db_index=True, verbose_name="Buyer Number")
     first_name = models.CharField(max_length=30, verbose_name="First Name")
     last_name = models.CharField(max_length=30, verbose_name="Last Name")
     email = models.EmailField(blank=True, verbose_name="Email Address")
