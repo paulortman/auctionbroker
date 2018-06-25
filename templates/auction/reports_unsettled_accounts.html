@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load money %}
+
+
+{% block main %}
+    <h1>Unsettled Accounts</h1>
+    <p>This report lists all accounts who have a balance due.  Account without purchase or those who are paid in full are not listed.</p>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Buyer #</th>
+                <th>Patron</th>
+                <th>Purchase Count</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+    {% for p in patrons %}
+        <tr>
+            <td><a href="{% url 'patron_detail' pk=p.pk %}" >{{ p.buyer_num}}</a></td>
+            <td><a href="{% url 'patron_detail' pk=p.pk %}" >{{ p.name }}</a></td>
+            <td>{{ p.purchases.count }}</td>
+            <td>{{ p.outstanding_balance|money }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

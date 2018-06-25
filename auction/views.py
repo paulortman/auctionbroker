@@ -644,3 +644,19 @@ class SalesDashboard(TemplateView):
         context['total_sales'] = Purchase.objects.all().aggregate(Sum('amount'))['amount__sum']
 
         return context
+
+
+class Reports(TemplateView):
+    template_name = 'auction/reports.html'
+
+
+class UnsettledAccounts(TemplateView):
+    template_name = 'auction/reports_unsettled_accounts.html'
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['patrons'] = Patron.objects.exclude(purchases__isnull=True).order_by('last_name')
+
+        return context
+
