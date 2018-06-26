@@ -66,6 +66,8 @@ urlpatterns = [
 
     url(r'^ajax/patron_search/$', views.PatronSearch.as_view(), name='patron_search'),
     url(r'^ajax/item_search/$', views.AuctionItemSearch.as_view(), name='item_search'),
+    url(r'^ajax/search/$', views.Search.as_view(), name='search'),
+
 
     url(r'^reports/$', views.Reports.as_view(), name='reports'),
     url(r'^reports/unsettled_accounts/$', views.UnsettledAccounts.as_view(), name='report_unsettled_accounts')

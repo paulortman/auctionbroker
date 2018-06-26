@@ -629,6 +629,10 @@ class ModelSearch(View):
             return JsonResponse({})
 
 
+class Search(TemplateView):
+    template_name = 'auction/search.html'
+
+
 class PatronSearch(PatronSearchMixin, ModelSearch):
     model = Patron
 

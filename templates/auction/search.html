@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <h1>Search</h1>
+    <form method="get" action="{% url 'patron_search' %}">
+        <input id="search1" name="q" value="" />
+    </form>
+    <div id="results_panel">
+        <ul>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block script_footer %}
+    <script>
+
+    var thread = null;
+
+    function findMember(t) {
+        $.getJSON("{% url 'patron_search' %}", {q:t}, displayResults);
+    }
+
+    function displayResults(data){
+        $('#results_panel .result').remove();
+        $.each(data.results, function(i, item) {
+            // alert(item.first_name);
+            $('#results_panel ul').append("<li class='result'>" + item.first_name + ' ' + item.last_name + "</li>")
+        });
+    }
+
+    $('#search1').keyup(function() {
+        clearTimeout(thread);
+        var $this = $(this);
+        thread = setTimeout(function(){findMember($this.val())}, 500);
+    });
+
+    </script>
+{% endblock %}
+
