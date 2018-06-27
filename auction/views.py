@@ -303,6 +303,8 @@ class PatronLookupMixin:
                 if fields[field] != '':
                     f[field] = fields[field]
         query = Q()
+        if not any(f.values()):
+            return None
         if f['first_name']:
             query &= Q(first_name__icontains=f['first_name'])
         if f['last_name']:
@@ -666,6 +668,8 @@ class ModelLookup(View):
             fields[field] = self.request.GET.get(field)
         if fields:
             query = self._query_fields(fields)
+            if query is None:
+                return JsonResponse({})
             results = self._to_json(self.model.objects.filter(query))
             return JsonResponse({'results': results})
         else:

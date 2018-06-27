@@ -52,21 +52,26 @@
 
     function displayResults(data){
         console.log(data);
-        $('#results_panel').children().remove();
-        if(data.results.length > 25) {
-            $("#results_panel").append("<h2>Too Many Matches</h2>");
-            $("#results_panel").css('display','flex');
-        }
-        else if(data.results.length > 0) {
-            $("#results_panel").append("<h2>Matches (" + data.results.length + ")</h2>");
-            $("#results_panel").css('display','flex');
+        if(data.results) {
+            $('#results_panel').children().remove();
+            if (data.results.length > 25) {
+                $("#results_panel").append("<h2>Too Many Matches</h2>");
+                $("#results_panel").css('display', 'flex');
+            }
+            else if (data.results.length > 0) {
+                $("#results_panel").append("<h2>Matches (" + data.results.length + ")</h2>");
+                $("#results_panel").css('display', 'flex');
 
-            $.each(data.results, function(i, item) {
-                // alert(item.first_name);
-                var e = "<a class='result list-group-item-action' href='/auction/patron/" + item.id + "/edit/' >" + item.first_name +
+                $.each(data.results, function (i, item) {
+                    // alert(item.first_name);
+                    var e = "<a class='result list-group-item-action' href='/auction/patron/" + item.id + "/edit/' >" + item.first_name +
                         " " + item.last_name + " | " + item.address_line1 + ", " + item.address_line2 + ", " + item.address_line3 + "</a>";
-                $('#results_panel').append(e);
-            });
+                    $('#results_panel').append(e);
+                });
+            }
+        }
+        else {
+            $("#results_panel").css('display', 'none');
         }
     }
 
