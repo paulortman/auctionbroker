@@ -65,6 +65,7 @@ urlpatterns = [
     url(r'^(?P<booth_slug>[-\w]+)/checkout/(?P<buyer_num>\d+)/confirm/$', views.CheckoutConfirm.as_view(), name='checkout_confirm'),
 
     url(r'^ajax/patron_search/$', views.PatronSearch.as_view(), name='patron_search'),
+    url(r'^ajax/patron_lookup/$', views.PatronLookup.as_view(), name='patron_lookup'),
     url(r'^ajax/item_search/$', views.AuctionItemSearch.as_view(), name='item_search'),
     url(r'^ajax/search/$', views.Search.as_view(), name='search'),
 

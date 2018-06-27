@@ -294,6 +294,30 @@ class PatronSearchMixin:
         return context
 
 
+class PatronLookupMixin:
+    def _query_fields(self, fields):
+        f = {}
+        for field in self.lookup_fields:
+            f[field] = None
+            if field in fields:
+                if fields[field] != '':
+                    f[field] = fields[field]
+        query = Q()
+        if f['first_name']:
+            query &= Q(first_name__icontains=f['first_name'])
+        if f['last_name']:
+            query &= Q(last_name__icontains=f['last_name'])
+        if f['address_line1']:
+            query &= Q(address_line1__icontains=f['address_line1'])
+        if f['address_line2']:
+            query &= Q(address_line2__icontains=f['address_line2'])
+        if f['address_line3']:
+            query &= Q(address_line3__icontains=f['address_line3'])
+        print(query)
+        return query
+
+
+
 class PatronList(PatronSearchMixin, PatronMixin, ListView):
     def get_queryset(self):
         qs = super().get_queryset()
@@ -629,12 +653,37 @@ class ModelSearch(View):
             return JsonResponse({})
 
 
+class ModelLookup(View):
+    lookup_fields = []
+    def _query_fields(self, terms):
+        raise NotImplemented
+
+    def _to_json(self, query):
+        return list(query.values())
+
+    def get(self, *args, **kwargs):
+        fields = {}
+        for field in self.lookup_fields:
+            fields[field] = self.request.GET.get(field)
+        if fields:
+            query = self._query_fields(fields)
+            results = self._to_json(self.model.objects.filter(query))
+            return JsonResponse({'results': results})
+        else:
+            return JsonResponse({})
+
+
 class Search(TemplateView):
     template_name = 'auction/search.html'
 
 
 class PatronSearch(PatronSearchMixin, ModelSearch):
     model = Patron
+
+
+class PatronLookup(PatronLookupMixin, ModelLookup):
+    model = Patron
+    lookup_fields = ['first_name', 'last_name', 'address_line1', 'address_line2', 'address_line3']
 
 
 class AuctionItemSearch(AuctionItemSearchMixin, ModelSearch):

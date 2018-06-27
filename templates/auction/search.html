@@ -3,7 +3,8 @@
 {% block main %}
     <h1>Search</h1>
     <form method="get" action="{% url 'patron_search' %}">
-        <input id="search1" name="q" value="" />
+        <input id="search1" class="searchfield" name="first_name" value="" />
+        <input id="search2" class="searchfield" name="last_name" value="" />
     </form>
     <div id="results_panel">
         <ul>
@@ -17,21 +18,31 @@
     var thread = null;
 
     function findMember(t) {
-        $.getJSON("{% url 'patron_search' %}", {q:t}, displayResults);
+        $.getJSON("{% url 'patron_lookup' %}", t, displayResults);
     }
 
     function displayResults(data){
+        console.log(data);
         $('#results_panel .result').remove();
         $.each(data.results, function(i, item) {
             // alert(item.first_name);
-            $('#results_panel ul').append("<li class='result'>" + item.first_name + ' ' + item.last_name + "</li>")
+            var e = "<li class='result'><a href='/auction/patron/" + item.id + "/edit/' >" + item.first_name +
+                    " " + item.last_name + "</a></li>";
+            $('#results_panel ul').append(e);
         });
     }
 
-    $('#search1').keyup(function() {
+    $('.searchfield').keyup(function() {
         clearTimeout(thread);
         var $this = $(this);
-        thread = setTimeout(function(){findMember($this.val())}, 500);
+        thread = setTimeout(function(){
+            var terms = Object();
+            $.each($('.searchfield'), function(i, item) {
+                terms[item.name] = item.value;
+            });
+            console.log(terms);
+            findMember(terms)},
+            500);
     });
 
     </script>
