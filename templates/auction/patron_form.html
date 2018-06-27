@@ -10,20 +10,20 @@
         {% csrf_token %}
         <div class="form-row">
             <div class="col-md-5">
-                {% bootstrap_field form.first_name %}
+                {% bootstrap_field form.first_name field_class='searchable' %}
             </div>
             <div class="col-md-5">
-                {% bootstrap_field form.last_name %}
+                {% bootstrap_field form.last_name field_class='searchable' %}
             </div>
             <div class="col-md-2">
-                {% bootstrap_field form.buyer_num %}
+                {% bootstrap_field form.buyer_num field_class='searchable' %}
             </div>
         </div>
         <div class="row">
             <div class="col-md-6">
-                {% bootstrap_field form.address_line1 %}
-                {% bootstrap_field form.address_line2 layout='inline' %}
-                {% bootstrap_field form.address_line3 layout='inline' %}
+                {% bootstrap_field form.address_line1 field_class='searchable' %}
+                {% bootstrap_field form.address_line2 layout='inline' field_class='searchable' %}
+                {% bootstrap_field form.address_line3 layout='inline' field_class='searchable' %}
             </div>
             <div class="col-md-6">
                 {% bootstrap_field form.email %}
@@ -36,4 +36,51 @@
             <button type="submit" class="btn btn-secondary" name="save_and_return_to_list">Save and List All</button>
         {% endbuttons %}
     </form>
+    <div id="results_panel" class="list-group" style="display: none;">
+    </div>
+{% endblock %}
+
+
+{% block script_footer %}
+    <script>
+
+    var thread = null;
+
+    function patronLocate(t) {
+        $.getJSON("{% url 'patron_lookup' %}", t, displayResults);
+    }
+
+    function displayResults(data){
+        console.log(data);
+        $('#results_panel').children().remove();
+        if(data.results.length > 25) {
+            $("#results_panel").append("<h2>Too Many Matches</h2>");
+            $("#results_panel").css('display','flex');
+        }
+        else if(data.results.length > 0) {
+            $("#results_panel").append("<h2>Matches (" + data.results.length + ")</h2>");
+            $("#results_panel").css('display','flex');
+
+            $.each(data.results, function(i, item) {
+                // alert(item.first_name);
+                var e = "<a class='result list-group-item-action' href='/auction/patron/" + item.id + "/edit/' >" + item.first_name +
+                        " " + item.last_name + " | " + item.address_line1 + ", " + item.address_line2 + ", " + item.address_line3 + "</a>";
+                $('#results_panel').append(e);
+            });
+        }
+    }
+
+    $('.searchable input').keyup(function() {
+        clearTimeout(thread);
+        var $this = $(this);
+        thread = setTimeout(function(){
+            var terms = Object();
+            $.each($('.searchable input'), function(i, item) {
+                terms[item.name] = item.value;
+            });
+            patronLocate(terms)},
+            500);
+    });
+
+    </script>
 {% endblock %}

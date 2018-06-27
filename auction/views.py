@@ -313,7 +313,6 @@ class PatronLookupMixin:
             query &= Q(address_line2__icontains=f['address_line2'])
         if f['address_line3']:
             query &= Q(address_line3__icontains=f['address_line3'])
-        print(query)
         return query
 
 
@@ -671,10 +670,6 @@ class ModelLookup(View):
             return JsonResponse({'results': results})
         else:
             return JsonResponse({})
-
-
-class Search(TemplateView):
-    template_name = 'auction/search.html'
 
 
 class PatronSearch(PatronSearchMixin, ModelSearch):

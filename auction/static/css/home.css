@@ -58,3 +58,18 @@ input[type=number] {
 .tool-lg img.icon-lg {
   margin-right: 10px;
 }
+
+#results_panel {
+    background-color: #fcf8e3;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #eef4dd;
+}
+
+#results_panel .result {
+  margin: 2px;
+  padding: 5px;
+}
+#results_panel .result:hover {
+  border-left: 3px solid #f3f3f3;
+}
