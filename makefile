@@ -26,3 +26,7 @@ deploy:
 #	python manage.py populate_testdb && \
 #	python manage.py purchase_random_items
 
+# Use git to deploy code to Heroku
+heroku_deploy:
+	git push heroku master
+
