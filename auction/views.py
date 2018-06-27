@@ -297,14 +297,20 @@ class PatronSearchMixin:
 class PatronLookupMixin:
     def _query_fields(self, fields):
         f = {}
+
+        # provide default None values for all the configured fields
         for field in self.lookup_fields:
             f[field] = None
             if field in fields:
                 if fields[field] != '':
                     f[field] = fields[field]
-        query = Q()
+
+        # If everything in the lookup is None, we bail as that is simply all values, which isn't helpful
         if not any(f.values()):
             return None
+
+        # Start with an empty set of restrictions and then AND all field together to refine the lookup
+        query = Q()
         if f['first_name']:
             query &= Q(first_name__icontains=f['first_name'])
         if f['last_name']:
