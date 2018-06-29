@@ -342,12 +342,11 @@ class PatronDetail(PatronMixin, DetailView):
     pass
 
 
-class PatronCreate(PatronMixin, CreateView):
-    form_class = PatronCreateForm
+class PatronEdit(PatronMixin):
 
     def form_valid(self, form):
 
-        msg = "Patron '{name}' ({num}) created successfully.".format(name=form.instance.name, num=form.instance.buyer_num)
+        msg = "Patron '{name}' ({num}) edited successfully.".format(name=form.instance.name, num=form.instance.buyer_num)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
 
         response = super().form_valid(form)
@@ -359,7 +358,12 @@ class PatronCreate(PatronMixin, CreateView):
 
         return response
 
-class PatronUpdate(PatronMixin, UpdateView):
+
+class PatronCreate(PatronEdit, CreateView):
+    form_class = PatronCreateForm
+
+
+class PatronUpdate(PatronEdit, UpdateView):
     form_class = PatronForm
 
 
