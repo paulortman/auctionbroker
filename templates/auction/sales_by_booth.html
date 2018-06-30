@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load money %}
+
+
+{% block main %}
+    <h1>Sales by Booth</h1>
+    <p>This report shows all the purchases that have been made at various booths aggregated by booth.  This will show a
+    purchase even if that purchase has not yet been paid for.</p>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Booth</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+    {% for booth, amount in booth_sums.items %}
+        <tr>
+            <td>{{ booth }}</td>
+            <td>{{ amount|money }}</td>
+        </tr>
+    {% endfor %}
+    <tfoot>
+        <tr>
+            <th>Total</th>
+            <th>{{ total_sum|money }}</th>
+        </tr>
+    </tfoot>
+    </table>
+{% endblock %}

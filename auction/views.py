@@ -715,10 +715,35 @@ class Reports(TemplateView):
 class UnsettledAccounts(TemplateView):
     template_name = 'auction/reports_unsettled_accounts.html'
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['patrons'] = Patron.objects.exclude(purchases__isnull=True).order_by('last_name')
+
+        return context
+
+
+class SalesByBooth(TemplateView):
+    template_name = 'auction/sales_by_booth.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Summarize all the booth sales, except for the Auction booth, which we handle later
+        booth_sales = Booth.objects.exclude(name="Auction").annotate(Sum('priceditem__purchase__amount'))
+        booths = {}
+        for b in booth_sales:
+            booths[b.name] = b.priceditem__purchase__amount__sum
+
+        # Auction Sales we gather directly
+        auction_sales = AuctionItem.objects.filter(is_purchased=True).aggregate(Sum('purchase__amount'))['purchase__amount__sum']
+        booths['Auction'] = auction_sales
+
+        # Donations without a recorded booth need to be accounted for too
+        donations = PricedItem.objects.filter(booth__isnull=True).aggregate(Sum('purchase__amount'))['purchase__amount__sum']
+        booths['Generic Donations'] = donations
+
+        context['total_sum'] = Purchase.objects.all().aggregate(Sum('amount'))['amount__sum']
+        context['booth_sums'] = booths
 
         return context
 
