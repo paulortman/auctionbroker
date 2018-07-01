@@ -92,6 +92,13 @@ def round_scheduled_sale_time(dt):
 
 
 class AuctionItem(TrackedModel, Item):
+    MAIN = 'MAIN'
+    SILENT = 'SILENT'
+    CATEGORIES = (
+        (MAIN, 'Main'),
+        (SILENT, 'Silent')
+    )
+
     class Meta:
         pass
 
@@ -103,6 +110,7 @@ class AuctionItem(TrackedModel, Item):
                                      help_text="How the item's donor would be displayed to the public")
     donor = models.ForeignKey('Patron', null=True, blank=True, help_text="The patron/donor for tax receipt purposes.",
                               related_name="donations", on_delete=models.SET_NULL)
+    category = models.CharField(max_length=8, choices=CATEGORIES, default=MAIN, help_text='Category/Group/Ring')
 
     def get_absolute_url(self):
         return reverse('item_detail', kwargs={'item_number': self.item_number})
