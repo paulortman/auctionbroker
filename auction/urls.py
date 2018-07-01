@@ -55,6 +55,7 @@ urlpatterns = [
     url(r'^dashboard/$', views.SalesDashboard.as_view(template_name='dashboard.html'), name="dashboard"),
 
     url(r'^bidding/(?P<item_number>\d+)/$', views.BiddingRecorder.as_view(), name='bidding_recorder'),
+    url(r'^management/(?P<category>[-\w]+)/$', views.AuctionItemManagement.as_view(), name='item_management'),
     url(r'^management/$', views.AuctionItemManagement.as_view(), name='item_management'),
 
     url(r'^donate/$', views.Donate.as_view(), name="donate"),

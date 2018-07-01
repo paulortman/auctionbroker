@@ -38,7 +38,14 @@
                 <a class="nav-link" href="{% url 'home' %}">/ <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'item_management' %}">Auction Item Management</a>
+                <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true"
+                   aria-expanded="false">Auction Mangement</a>
+                <div class="dropdown-menu" aria-labelledby="dropdown01">
+                {% for c in auction_categories %}
+                    <a class="dropdown-item"
+                        href="{% url 'item_management' category=c %}">{{ c }}</a>
+                {% endfor %}
+                </div>
             </li>
             <li class="nav-item ">
                 <a class="nav-link" href="{% url 'patron_list' %}">Patron List</a>

@@ -21,8 +21,12 @@
                         <div class="card-header">Auction Management</div>
                         <div class="card-body">
                             <p class="card-text">Add and edit auction items and record auction item sales.</p>
-                            <a class="btn btn-primary btn-lg" href="{% url 'item_management' %}" role="button">Auction
-                                Management</a>
+                            <div class="list-group">
+                            {% for auction_category in auction_categories %}
+                                <a class="list-group-item list-group-item-action"
+                                   href="{% url 'item_management' category=auction_category %}">{{ auction_category|capfirst }}</a>
+                            {% endfor %}
+                            </div>
                         </div>
                     </div>
                 </div>

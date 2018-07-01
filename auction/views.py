@@ -87,6 +87,12 @@ class AuctionItemManagement(AuctionItemSearchMixin, AuctionItemMixin, ListView):
     def get_queryset(self):
         qs = super().get_queryset()
 
+        category_slug = self.kwargs.get('category', None)
+        if category_slug:
+            category = AuctionItem.category_from_slug(category_slug)
+            if category:
+                qs = qs.filter(category=category)
+
         filter = self.request.GET.get('q')
         if filter:
             terms = filter.split()
@@ -94,6 +100,11 @@ class AuctionItemManagement(AuctionItemSearchMixin, AuctionItemMixin, ListView):
             qs = qs.filter(query)
 
         return qs.select_related('purchase', 'purchase__patron')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['auction_category'] = self.kwargs.get('category', None)
+        return context
 
 
 class AuctionItemDetail(AuctionItemMixin, DetailView):
@@ -115,7 +126,7 @@ class AuctionItemCreate(AuctionItemMixin, CreateView):
         if 'save_and_add_another' in self.request.POST:
             return redirect('item_create')
         if 'save_and_return_to_list' in self.request.POST:
-            return redirect('item_management')
+            return redirect('item_management', category=i.category)
 
         return redirect('item_detail', item_number=i.item_number)
 
@@ -643,7 +654,7 @@ class BiddingRecorder(GroupRequiredMixin, FormView):
             b_num=patron.buyer_num, b_name=patron.name, i_name=self.item.name, i_num=self.item.item_number,
             amount=USD(amount))
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
-        return redirect('item_management')
+        return redirect('item_management', category=self.item.category)
 
 
 
@@ -732,17 +743,20 @@ class SalesByBooth(TemplateView):
         booth_sales = Booth.objects.exclude(name="Auction").annotate(Sum('priceditem__purchase__amount'))
         booths = {}
         for b in booth_sales:
-            booths[b.name] = b.priceditem__purchase__amount__sum
+            amount = b.priceditem__purchase__amount__sum
+            booths[b.name] = D(amount)
 
         # Auction Sales we gather directly
-        auction_sales = AuctionItem.objects.filter(is_purchased=True).aggregate(Sum('purchase__amount'))['purchase__amount__sum']
-        booths['Auction'] = auction_sales
+        for cat_name, cat_display in AuctionItem.CATEGORIES:
+            auction_sales = AuctionItem.objects.filter(is_purchased=True, category=cat_name).aggregate(Sum('purchase__amount'))['purchase__amount__sum']
+            booths['Auction: {}'.format(cat_display)] = D(auction_sales)
 
         # Donations without a recorded booth need to be accounted for too
         donations = PricedItem.objects.filter(booth__isnull=True).aggregate(Sum('purchase__amount'))['purchase__amount__sum']
-        booths['Generic Donations'] = donations
+        booths['Generic Donations'] = D(donations)
 
-        context['total_sum'] = Purchase.objects.all().aggregate(Sum('amount'))['amount__sum']
+        total = Purchase.objects.all().aggregate(Sum('amount'))['amount__sum']
+        context['total_sum'] = D(total)
         context['booth_sums'] = booths
 
         return context

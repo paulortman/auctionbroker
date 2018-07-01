@@ -102,6 +102,17 @@ class AuctionItem(TrackedModel, Item):
     class Meta:
         pass
 
+    @classmethod
+    def categories(cls):
+        return [item[0] for item in cls.CATEGORIES]
+
+    @classmethod
+    def category_from_slug(cls, slug):
+        for c in cls.categories():
+            if slugify(c) == slug:
+                return c
+        return None
+
     item_number = models.PositiveIntegerField(unique=True, db_index=True, default=item_number_generator,
                                               help_text="Leave blank to auto-generate.")
     scheduled_sale_time = models.DateTimeField(blank=True, null=True, verbose_name="Scheduled Sale Time",

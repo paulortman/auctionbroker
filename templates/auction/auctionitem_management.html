@@ -2,14 +2,14 @@
 {% load static %}
 {% load money %}
 
-{% block title %}Auction Management{% endblock %}
+{% block title %}{{ auction_category|capfirst }} Auction Management{% endblock %}
 
-{% block page-heading %}Auction Item Management{% endblock %}
+{% block page-heading %}{{ auction_category|capfirst }} Auction Management{% endblock %}
 
 {% block content %}
     <div class="toolbar hidden-print">
         <div class="float-right">
-            <form class="form form-inline" method="get" action="{% url 'item_management' %}">
+            <form class="form form-inline" method="get" action="{% url 'item_management' category=auction_category%}">
                 <div class="input-group">
                     <input class="form-control" type="search" placeholder="Search" aria-label="Search" name="q" value="{{ q }}"/>
                     <button class="input-group-append" type="submit"><img class="icon-lg" src="{% static 'svg/magnifying-glass.svg' %}" /></button>
