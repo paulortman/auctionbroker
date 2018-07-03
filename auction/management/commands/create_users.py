@@ -10,7 +10,6 @@ class Command(BaseCommand):
 
         # checkout
         baked, created = User.objects.get_or_create(username='baked', email='baked@example.com', first_name="Baked", last_name="Goods", is_staff=True)
-        silent, created = User.objects.get_or_create(username='silent', email='silent@example.com', first_name="Silent", last_name="Auction", is_staff=True)
         food, created = User.objects.get_or_create(username='food', email='food@example.com', first_name="Food", last_name="Court", is_staff=True)
         crafts, created = User.objects.get_or_create(username='crafts', email='crafts@example.com', first_name="Crafts", is_staff=True)
 
@@ -26,7 +25,7 @@ class Command(BaseCommand):
         accounts_g, created = Group.objects.get_or_create(name='account_managers')
         admin_g, created = Group.objects.get_or_create(name='admins')
 
-        for user in [baked, silent, food, crafts]:
+        for user in [baked, food, crafts]:
             user.groups.add(checkout_g)
 
         for user in [auction, bidding]:
@@ -39,7 +38,7 @@ class Command(BaseCommand):
 
         portman.groups.set([checkout_g, auction_g, accounts_g, admin_g])
 
-        all_users = [baked, silent, food, crafts, auction, bidding, accounts, portman]
+        all_users = [baked, food, crafts, auction, bidding, accounts, portman]
         for user in all_users:
             user.set_password(r'pass')
             user.save()
