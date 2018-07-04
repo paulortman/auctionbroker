@@ -8,6 +8,7 @@
 
 {% block content %}
     <h2 class="top-space-med">{{ patron.name }} has an outstanding balance of <b>{{ patron.outstanding_balance|money }}</b>.</h2>
+    <p>This is the subtotal amount we need to enter into the Square application when we swipe the card.  An additional fee of {{ payment_percentage }}% will be assessed.  This fee is simply passed on to the patron from the fees Square charges us.  In the next step we will record the fee.  Complete the transaction using Square now.</p>
     <form class="top-space-lg" action="" method="post">
         {% csrf_token %}
         {% bootstrap_form_errors form %}

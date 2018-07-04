@@ -239,16 +239,6 @@ class Patron(TrackedModel, models.Model):
         fees = self.fees.all().aggregate(models.Sum('amount'))['amount__sum']
         return D(fees)
 
-    def apply_cc_usage_fee(self):
-        cc_fee = self.get_cc_usage_fee()
-        percent = settings.CC_TRANSACTION_FEE_PERCENTAGE * 100
-        f = Fee.objects.create(patron=self, amount=cc_fee, description='Credit Card Fee ({}%)'.format(percent))
-        return f
-
-    def get_cc_usage_fee(self):
-        cc_fee = self.outstanding_balance_no_fees * decimal.Decimal(settings.CC_TRANSACTION_FEE_PERCENTAGE)
-        return cc_fee
-
 
 def buyer_number_validator(value):
     try:

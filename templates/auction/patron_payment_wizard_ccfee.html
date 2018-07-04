@@ -7,7 +7,11 @@
 {% block page-heading %}Record a credit card payment for {{ patron.name }}{% endblock %}
 
 {% block content %}
-    <h2 class="top-space-med">{{ patron.name }} has an outstanding balance of <b>{{ patron.outstanding_balance|money }}</b>.</h2>
+    <h2 class="top-space-med">Out of an outstanding balance of {{ patron.outstanding_balance|money }}, <b>{{ payment_amount|money }}</b> will be paid.</h2>
+    <p class="top-space-lg">An additional fee of <b>{{ payment_fee|money }}</b> ({{ payment_percentage }}%) will be
+        assessed for using a credit card to complete their purchases.  This fee is simply passed on to the patron from
+        the fees Square charges us to process the card.  Please verify that the amount listed here is the same as the
+        "tax" recorded by Square.  This transaction can be cancelled and instead paid with cash or check.</p>
     <form class="top-space-lg" action="" method="post">
         {% csrf_token %}
         {% bootstrap_form_errors form %}

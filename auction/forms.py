@@ -112,7 +112,8 @@ class PatronPaymentCashForm(forms.Form):
     amount = forms.DecimalField(max_digits=15, decimal_places=2,
                                 widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
     method = forms.ChoiceField(choices=((Payment.CASH, 'Cash'), (Payment.CHECK, 'Check')), widget=widgets.RadioSelect())
-    note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False)
+    note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False,
+                           help_text="Record check number or other details")
 
 
 class PatronPaymentCCForm(forms.Form):
@@ -121,9 +122,10 @@ class PatronPaymentCCForm(forms.Form):
 
 
 class PatronPaymentCCFeeForm(forms.Form):
-    ccfee = forms.DecimalField(max_digits=15, decimal_places=2,
-                               widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
-    note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False)
+    ccfee = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Credit Card Processing Fee",
+                               label="Credit Card Fee", widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
+    note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False,
+                           help_text="Record transaction ID or similar")
 
 
 class DonateForm(forms.Form):
