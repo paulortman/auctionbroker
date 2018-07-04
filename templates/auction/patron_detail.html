@@ -9,8 +9,10 @@
     <div class="toolbar hidden-print">
         <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_update' pk=patron.pk %}" >
             <img class="icon-lg" src="{% static 'svg/pencil.svg'%}" alt="pencil" /> Edit Patron</a>
-        <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_pay' pk=patron.pk %}" >
-            <img class="icon-lg" src="{% static 'svg/dollar.svg' %}" alt="dollar" />  Add Payment</a>
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'payment_wizard_cash' pk=patron.pk %}" >
+            <img class="icon-lg" src="{% static 'svg/dollar.svg' %}" alt="dollar" />  Add Cash Payment</a>
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'payment_wizard_cc' pk=patron.pk %}" >
+            <img class="icon-lg" src="{% static 'svg/dollar.svg' %}" alt="dollar" />  Add CC Payment</a>
         <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_donate' pk=patron.pk %}">
             <img class="icon-lg" src="{% static 'svg/dollar.svg' %}" alt="dollar" />  Add Donation</a>
         <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_receipt' pk=patron.pk %}" >

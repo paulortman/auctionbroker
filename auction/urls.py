@@ -35,8 +35,9 @@ urlpatterns = [
     url(r'^patron/(?P<pk>\d+)/edit/$', views.PatronUpdate.as_view(), name="patron_update"),
     url(r'^patron/(?P<pk>\d+)/delete/$', views.PatronDelete.as_view(), name="patron_delete"),
     url(r'^patron/(?P<pk>\d+)/receipt/$', views.PatronReceipt.as_view(), name="patron_receipt"),
-    url(r'^patron/(?P<pk>\d+)/pay/$', views.PatronPay.as_view(), name="patron_pay"),
-    url(r'^patron/(?P<pk>\d+)/cc_fee/$', views.PatronCCFee.as_view(), name="patron_cc_fee"),
+    url(r'^patron/(?P<pk>\d+)/payment/cc/$', views.PatronPaymentWizardCC.as_view(), {'step': 'cc'}, name="payment_wizard_cc"),
+    url(r'^patron/(?P<pk>\d+)/payment/cc/fee/$', views.PatronPaymentWizardCCFee.as_view(), {'step': 'ccfee'}, name="payment_wizard_ccfee"),
+    url(r'^patron/(?P<pk>\d+)/payment/cash/$', views.PatronPaymentWizardCash.as_view(), {'step': 'cash'}, name="payment_wizard_cash"),
 
     url(r'^payments/$', views.PaymentList.as_view(), name="payment_list"),
     url(r'^payment/create/$', views.PaymentCreate.as_view(), name="payment_create"),

@@ -25,8 +25,9 @@ from weasyprint.fonts import FontConfiguration
 from .models import Item, Patron, Purchase, Booth, Payment, AuctionItem, USD, D, \
     round_scheduled_sale_time, Fee, PricedItem
 from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
-    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PatronPaymentForm, PurchaseForm, PatronCreateForm, \
-    PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm, PatronCCFeeForm
+    PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PurchaseForm, PatronCreateForm, \
+    PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm, PatronPaymentCashForm, \
+    PatronPaymentCCForm, PatronPaymentCCFeeForm
 
 
 class HonorNextMixin:
@@ -415,47 +416,90 @@ class PatronReceipt(PatronMixin, DetailView):
         return response
 
 
-class PatronPay(PatronMixin, FormView):
-    form_class = PatronPaymentForm
-    template_name = 'auction/patron_payment.html'
-
+class PatronPaymentWizardMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['patron'] = self.get_object()
         return context
 
+    def get_initial(self):
+        initial = super().get_initial()
+        self.object = self.get_object()
+        initial['amount'] = self.object.outstanding_balance_no_fees
+        return initial
+
+    def dec_to_int(self, d):
+        return int(d * 100)
+
+    def int_to_dec(self, i):
+        return D(i) / D(100)
+
+
+class PatronPaymentWizardCash(PatronPaymentWizardMixin, PatronMixin, FormView):
+    form_class = PatronPaymentCashForm
+    template_name = "auction/patron_payment_wizard_cash.html"
+
+    def get_success_url(self):
+        return reverse('patron_detail', kwargs={'pk': self.object.pk})
+
     def form_valid(self, form):
-        patron = self.get_object()
+        patron = self.object
         amount = form.cleaned_data['amount']
-        Payment.objects.create(patron=patron, amount=amount,
-                               method=form.cleaned_data['method'],
-                               note=form.cleaned_data['note'])
-
+        method = form.cleaned_data['method']
+        note = form.cleaned_data['note']
+        Payment.objects.create(patron=patron, amount=amount, method=method, note=note)
         msg = "Payment of {amount} made by {name}".format(amount=USD(amount), name=patron.name)
+
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
+        return super().form_valid(form)
 
-        return redirect('patron_detail', pk=patron.pk)
+
+class PatronPaymentWizardCC(PatronPaymentWizardMixin, PatronMixin, FormView):
+    form_class = PatronPaymentCCForm
+    template_name = 'auction/patron_payment_wizard_cc.html'
+
+    def get_success_url(self):
+        return reverse('payment_wizard_ccfee', kwargs={'pk': self.object.pk})
+
+    def form_valid(self, form):
+        self.request.session['payment_amount'] = self.dec_to_int(form.cleaned_data['amount'])
+        return super().form_valid(form)
 
 
-class PatronCCFee(PatronMixin, FormView):
-    form_class = PatronCCFeeForm
-    template_name = 'auction/patron_cc_fee.html'
+class PatronPaymentWizardCCFee(PatronPaymentWizardMixin, PatronMixin, FormView):
+    form_class = PatronPaymentCCFeeForm
+    template_name = 'auction/patron_payment_wizard_ccfee.html'
+
+    def get_success_url(self):
+        return reverse('patron_detail', kwargs={'pk': self.object.pk})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['patron'] = self.get_object()
-        context['percent_fee'] = settings.CC_TRANSACTION_FEE_PERCENTAGE * 100
-
+        context['payment_amount'] = self.int_to_dec(self.request.session.get('payment_amount'))
+        context['payment_percentage'] = settings.CC_TRANSACTION_FEE_PERCENTAGE * 100
+        context['payment_fee'] = context['payment_amount'] * D(settings.CC_TRANSACTION_FEE_PERCENTAGE)
         return context
 
+    def get_initial(self):
+        initial = super().get_initial()
+        amount = self.int_to_dec(self.request.session.get('payment_amount'))
+        initial['ccfee'] = amount * decimal.Decimal(str(settings.CC_TRANSACTION_FEE_PERCENTAGE))
+        return initial
+
     def form_valid(self, form):
-        patron = self.get_object()
-        f = patron.apply_cc_usage_fee()
-
-        msg = "Credit Card Fee of {cc_fee} applied to {name}".format(cc_fee=USD(f.amount), name=patron.name)
-        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
-
-        return redirect('patron_detail', pk=patron.pk)
+        patron = self.object
+        amount = self.int_to_dec(self.request.session.get('payment_amount'))
+        percentage = settings.CC_TRANSACTION_FEE_PERCENTAGE * 100
+        ccfee = form.cleaned_data['ccfee']
+        total = amount + ccfee
+        note = form.cleaned_data['note']
+        Fee.objects.create(patron=patron, amount=ccfee, description='Credit Card Fee ({}%)'.format(percentage))
+        Payment.objects.create(patron=patron, amount=total, method=Payment.CARD, note=note)
+        msg = "Payment of {total} made by {name} (includes {fee} credit card fee)".format(total=USD(total),
+                                                                                          name=patron.name,
+                                                                                          fee=USD(ccfee))
+        del self.request.session['payment_amount']
+        return super().form_valid(form)
 
 
 class PatronDonate(PatronMixin, FormView):
@@ -755,7 +799,11 @@ class SalesByBooth(TemplateView):
         donations = PricedItem.objects.filter(booth__isnull=True).aggregate(Sum('purchase__amount'))['purchase__amount__sum']
         booths['Generic Donations'] = D(donations)
 
-        total = Purchase.objects.all().aggregate(Sum('amount'))['amount__sum']
+        # Fees
+        fees = Fee.objects.all().aggregate(Sum('amount'))['amount__sum']
+        booths['Fees'] = D(fees)
+
+        total = Purchase.objects.all().aggregate(Sum('amount'))['amount__sum'] + fees
         context['total_sum'] = D(total)
         context['booth_sums'] = booths
 

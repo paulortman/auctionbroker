@@ -84,7 +84,7 @@ class CheckoutPatronForm(forms.Form):
 
 class CheckoutPurchaseForm(forms.Form):
     price = forms.DecimalField(max_digits=15, decimal_places=2,
-                               widget=widgets.TextInput(attrs={'autofocus': 'autofocu'}))
+                               widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
     quantity = forms.IntegerField(min_value=0, required=False)
 
     @property
@@ -108,28 +108,34 @@ class CheckoutConfirmForm(forms.Form):
     pass
 
 
-class PatronPaymentForm(forms.ModelForm):
+class PatronPaymentCashForm(forms.Form):
+    amount = forms.DecimalField(max_digits=15, decimal_places=2,
+                                widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
+    method = forms.ChoiceField(choices=((Payment.CASH, 'Cash'), (Payment.CHECK, 'Check')), widget=widgets.RadioSelect())
+    note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False)
 
-    class Meta:
-        model = Payment
-        exclude = ['patron', 'transaction_time']
-        widgets = {'method': widgets.RadioSelect(),}
+
+class PatronPaymentCCForm(forms.Form):
+    amount = forms.DecimalField(max_digits=15, decimal_places=2,
+                                widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
 
 
-class PatronCCFeeForm(forms.Form):
-    pass
+class PatronPaymentCCFeeForm(forms.Form):
+    ccfee = forms.DecimalField(max_digits=15, decimal_places=2,
+                               widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
+    note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False)
 
 
 class DonateForm(forms.Form):
     buyer_num = forms.CharField(max_length=8, label='Buyer Number')
     donation = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Enter Dollar Amount, ex. $100.00",
-                                  widget=widgets.TextInput(attrs={'autofocus': 'autofocu'}))
+                                  widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
     note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False)
 
 
 class PatronDonateForm(forms.Form):
     donation = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Enter Dollar Amount, ex. $100.00",
-                               widget=widgets.TextInput(attrs={'autofocus': 'autofocu'}))
+                               widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
     note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False)
 
 

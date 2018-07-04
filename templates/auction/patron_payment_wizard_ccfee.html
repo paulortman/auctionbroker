@@ -4,7 +4,7 @@
 
 {% block title %}{{ patron.name }} Payment{% endblock %}
 
-{% block page-heading %}Record a Payment for {{ patron.name }}{% endblock %}
+{% block page-heading %}Record a credit card payment for {{ patron.name }}{% endblock %}
 
 {% block content %}
     <h2 class="top-space-med">{{ patron.name }} has an outstanding balance of <b>{{ patron.outstanding_balance|money }}</b>.</h2>
@@ -13,10 +13,7 @@
         {% bootstrap_form_errors form %}
         <div class="row">
             <div class="col-md-6">
-            {% bootstrap_field form.amount addon_before='<div class="input-group-prepend"><span class="input-group-text">$</span></div>' %}
-            </div>
-            <div class="col-md-6">
-            {% bootstrap_field form.method %}
+            {% bootstrap_field form.ccfee addon_before='<div class="input-group-prepend"><span class="input-group-text">$</span></div>' %}
             </div>
         </div>
         {% bootstrap_field form.note %}
