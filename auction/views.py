@@ -801,10 +801,10 @@ class SalesByBooth(TemplateView):
         booths['Generic Donations'] = D(donations)
 
         # Fees
-        fees = Fee.objects.all().aggregate(Sum('amount'))['amount__sum']
-        booths['Fees'] = D(fees)
+        fees = D(Fee.objects.all().aggregate(Sum('amount'))['amount__sum'])
+        booths['Fees'] = fees
 
-        total = Purchase.objects.all().aggregate(Sum('amount'))['amount__sum'] + fees
+        total = D(Purchase.objects.all().aggregate(Sum('amount'))['amount__sum']) + fees
         context['total_sum'] = D(total)
         context['booth_sums'] = booths
 
