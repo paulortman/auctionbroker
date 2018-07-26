@@ -17,7 +17,7 @@
                 {% bootstrap_form form %}
                 {% buttons %}
                     <button class="btn btn-primary" type="submit" >Select Buyer</button>
-                    <button class="btn btn-secondary" type="reset" >Clear</button>
+                    <button class="btn btn-secondary" type="reset" onclick="$('#id_buyer_num').value='';">Clear</button>
                 {% endbuttons %}
             </form>
         </div>
@@ -29,6 +29,11 @@
 
 {% block extra_header %}
     <link rel="stylesheet" href="{% static 'css/softkeys-0.0.1.css' %}">
+    <style>
+        #total {
+            font-weight: bold;
+        }
+    </style>
 {% endblock %}
 
 {% block script_footer %}

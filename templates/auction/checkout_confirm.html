@@ -2,6 +2,8 @@
 {% load bootstrap4 %}
 {% load money %}
 
+{% block title %}{{ booth.name }} Checkout{% endblock %}
+
 {% block page-heading %}{{ booth.name }} Checkout: {{ patron.name }} (#{{ patron.buyer_num }}){% endblock %}
 
 {% block content %}
