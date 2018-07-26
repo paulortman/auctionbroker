@@ -1,6 +1,7 @@
 {% extends 'action_page.html' %}
 {% load bootstrap4 %}
 {% load money %}
+{% load tz %}
 
 {% block title %}Record Bid for {{ item.name }}{% endblock %}
 
@@ -10,7 +11,7 @@
 
     <ul>
         <li>Item Number: {{ item.item_number }}</li>
-        <li>Auction Time: {{ item.scheduled_sale_time }}</li>
+        <li>Auction Time: {{ item.scheduled_sale_time|timezone:"US/Central" }}</li>
         <li>Fair Market Value: {{ item.fair_market_value|money }}</li>
         <li>Description: {{ item.long_desc }}</li>
     </ul>
