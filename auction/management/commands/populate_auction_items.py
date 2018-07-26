@@ -30,7 +30,7 @@ class Command(BaseCommand):
                 hour, minute = int(hour), int(minute)
                 if hour < 12:
                     hour = hour + 12
-                item_number = "{}{}".format(hour, minute)
+                item_number = "{:02d}{:02d}".format(hour, minute)
                 time = self.dt.replace(hour=hour, minute=minute)
                 print (time.strftime('%c %Z'))
                 AuctionItem.objects.create(booth=auction,
