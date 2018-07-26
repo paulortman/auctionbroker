@@ -1,5 +1,5 @@
 import csv
-import pytz
+from django.conf import settings
 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
@@ -11,7 +11,6 @@ from auction.models import AuctionItem, Booth
 class Command(BaseCommand):
     help = 'Populate the main auction items with the contents of a CSV files'
 
-    tz = tzinfo=pytz.timezone('US/Central')
     dt = timezone.datetime(year=2018, month=8, day=28, hour=12, minute=00)
 
     def handle(self, *args, **kwargs):
@@ -35,7 +34,7 @@ class Command(BaseCommand):
                 print (time.strftime('%c %Z'))
                 AuctionItem.objects.create(booth=auction,
                                            name=title,
-                                           scheduled_sale_time=timezone.make_aware(time, self.tz),
+                                           scheduled_sale_time=timezone.make_aware(time, settings.SALE_TZ),
                                            item_number=item_number,
                                            long_desc=description,
                                            category=AuctionItem.MAIN)

@@ -1,7 +1,6 @@
 {% extends 'action_page.html' %}
 {% load static %}
 {% load money %}
-{% load tz %}
 
 {% block title %}Auction Item{% endblock %}
 
@@ -25,7 +24,7 @@
         <li>Purchase Price: {{ item.purchase.amount|money }}</li>
         {% endif %}
         <li>Fair Market Value: {{ item.fair_market_value|money }}</li>
-        <li>Auction Time: {{ item.scheduled_sale_time|timezone:"US/Central" }}</li>
+        <li>Auction Time: {{ item.scheduled_sale_time }}</li>
         <li>Sale Time: {{ item.sale_time }}</li>
         <li>Desc: {{ item.long_desc }}</li>
     </ul>

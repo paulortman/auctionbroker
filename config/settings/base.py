@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import pytz
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
@@ -53,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'easy_timezones.middleware.EasyTimezoneMiddleware',
+    'auction.middleware.TimezoneMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -144,3 +147,4 @@ BASE_BUYER_NUMBER = 100
 BASE_AUCTION_NUMBER = 1000
 AUCTIONITEM_SCHEDULED_TIME_INCREMENT = 2  # minutes
 CC_TRANSACTION_FEE_PERCENTAGE = 0.03  # 3%
+SALE_TZ = pytz.timezone('US/Central')
