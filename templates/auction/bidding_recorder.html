@@ -14,6 +14,9 @@
         <li>Fair Market Value: {{ item.fair_market_value|money }}</li>
         <li>Description: {{ item.long_desc }}</li>
     </ul>
+    {% if item.is_purchased %}
+        <div class="alert alert-warning" role="alert"><strong>This item is already purchased by {{ item.purchase.patron.name }} ({{ item.purchase.patron.buyer_num}})!</strong>  Re-recording the winning bidder will void the previous purchase.</div>
+    {% endif %}
     <form action="{% url "bidding_recorder" item_number=item.item_number %}" method="post">
         {% csrf_token %}
         <div class="form-row">

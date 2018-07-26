@@ -25,7 +25,7 @@
         </div>
         <div class="form-row">
             <div class="col-md-4">
-                {% bootstrap_field form.fair_market_value %}
+                {% bootstrap_field form.donor %}
             </div>
             <div class="col-md-4">
                 {% if form.is_purchased %}
@@ -41,14 +41,14 @@
                 {% endif %}
             </div>
         </div>
-        <div class="form-row">
-            <div class="col-md-4">
-                {% bootstrap_field form.donor %}
-            </div>
-            <div class="col-md-8">
-                {% bootstrap_field form.donor_display %}
-            </div>
-        </div>
+{#        <div class="form-row">#}
+{#            <div class="col-md-4">#}
+{#                {% bootstrap_field form.fair_market_value %}#}
+{#            </div>#}
+{#            <div class="col-md-8">#}
+{#                {% bootstrap_field form.donor_display %}#}
+{#            </div>#}
+{#        </div>#}
         <div class="form-group">
             {% bootstrap_field form.long_desc %}
         </div>

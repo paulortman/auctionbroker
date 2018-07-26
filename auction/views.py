@@ -694,6 +694,8 @@ class BiddingRecorder(GroupRequiredMixin, FormView):
         buyer_num = form.cleaned_data['buyer_num']
         patron = get_object_or_404(Patron, buyer_num=buyer_num)
         amount = form.cleaned_data['amount']
+        if self.item.is_purchased:
+            self.item.void_purchase()
         purchase = Purchase.purchase_item(patron=patron, amount=amount, item=self.item)
         msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
             b_num=patron.buyer_num, b_name=patron.name, i_name=self.item.name, i_num=self.item.item_number,

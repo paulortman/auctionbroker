@@ -16,7 +16,7 @@ class AuctionItemEditForm(forms.ModelForm):
 
     class Meta:
         model = AuctionItem
-        exclude = ['purchase', 'booth']
+        exclude = ['purchase', 'booth', 'fair_market_value']
 
 
 class AuctionItemCreateForm(forms.ModelForm):
@@ -26,7 +26,7 @@ class AuctionItemCreateForm(forms.ModelForm):
 
     class Meta:
         model = AuctionItem
-        exclude = ['purchase', 'booth', 'is_purchased', 'sale_time']
+        exclude = ['purchase', 'booth', 'is_purchased', 'sale_time', 'fair_market_value']
 
 
 class ItemBiddingForm(forms.Form):
