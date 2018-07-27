@@ -1,11 +1,8 @@
 import decimal
-import json
 
 from braces.views import GroupRequiredMixin, UserPassesTestMixin
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView
 from django.contrib.staticfiles import finders
 from django.core.exceptions import ValidationError
 from django.db.models import Q, Sum
@@ -766,12 +763,14 @@ class SalesDashboard(TemplateView):
         return context
 
 
-class Reports(TemplateView):
+class Reports(GroupRequiredMixin, TemplateView):
     template_name = 'auction/reports.html'
+    group_required = ['admins', 'account_managers']
 
 
-class UnsettledAccounts(TemplateView):
+class UnsettledAccounts(GroupRequiredMixin, TemplateView):
     template_name = 'auction/reports_unsettled_accounts.html'
+    group_required = ['admins', 'account_managers']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -780,8 +779,9 @@ class UnsettledAccounts(TemplateView):
         return context
 
 
-class SalesByBooth(TemplateView):
+class SalesByBooth(GroupRequiredMixin, TemplateView):
     template_name = 'auction/sales_by_booth.html'
+    group_required = 'admins'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
