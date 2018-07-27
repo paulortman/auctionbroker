@@ -16,7 +16,8 @@ def D(val):
 
 
 def USD(d):
-    return "${}".format(d.quantize(decimal.Decimal('.01'), decimal.ROUND_HALF_UP))
+    quant = d.quantize(decimal.Decimal('.01'), decimal.ROUND_HALF_UP)
+    return "${}".format(quant)
 
 
 class TrackedModel(models.Model):
@@ -208,15 +209,15 @@ class Patron(TrackedModel, models.Model):
 
     @property
     def in_kind_donations_total(self):
-        return sum([i.fair_market_value for i in self.donations.all()])
+        return D(sum([i.fair_market_value for i in self.donations.all()]))
 
     @property
     def in_kind_donations_sales_total(self):
-        return sum([i.purchase.amount for i in self.donations.all()])
+        return D(sum([i.purchase.amount for i in self.donations.all() if i.purchase]))
 
     @property
     def purchase_donations_total(self):
-        return sum([p.donation_amount for p in self.purchases.all()])
+        return D(sum([p.donation_amount for p in self.purchases.all() if p.purchase]))
 
     @property
     def donations_total(self):

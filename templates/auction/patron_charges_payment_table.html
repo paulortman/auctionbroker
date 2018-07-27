@@ -20,7 +20,11 @@
                 <td>
                     {% if donation.booth %}<em>{{ donation.booth.name }}</em>: {% endif %}{{ donation.name }}
                 </td>
+                {% if donation.purchase %}
                 <td class="col-price">{{ donation.purchase.amount|money }}</td>
+                {% else %}
+                <td class="col-price">Not Purchased</td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>
