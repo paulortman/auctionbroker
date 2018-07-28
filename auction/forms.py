@@ -78,13 +78,17 @@ class CheckoutPatronForm(forms.Form):
                                 validators=[buyer_number_validator],
                                 label="Enter Buyer Number",
                                 help_text="Enter the Patron's Buyer number to start the checkout.",
-                                widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
+                                widget=widgets.TextInput(attrs={'autofocus': 'autofocus',
+                                                                'type': 'number',
+                                                                'pattern': '[0-9]*'}))
 
 
 
 class CheckoutPurchaseForm(forms.Form):
     price = forms.DecimalField(max_digits=15, decimal_places=2,
-                               widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
+                               widget=widgets.TextInput(attrs={'autofocus': 'autofocus',
+                                                               'type': 'number',
+                                                               'pattern': '[0-9]*'}))
     quantity = forms.IntegerField(min_value=0, required=False)
 
     @property
