@@ -31,7 +31,6 @@
         <tr>
             <th scope="col">ID</th>
             <th scope="col">Name</th>
-{#            <th>Description</th>#}
             <th scope="col">Scheduled Time</th>
             <th scope="col">Sold?</th>
         </tr>
@@ -40,8 +39,7 @@
     {% for item in object_list %}
         <tr>
             <td scope="row"><a class="pk" href="{% url 'item_detail' item_number=item.item_number %}" >{{ item.item_number }}</a></td>
-            <td><a href="{% url 'item_detail' item_number=item.item_number %}" >{{ item.name }}</a></td>
-{#            <td>{{ item.long_desc|truncatewords:10 }}</td>#}
+            <td><a href="{% url 'item_detail' item_number=item.item_number %}" >{{ item.name }}</a> {% if item.donor %} &ndash; donated by {{ item.donor.name }} {% endif %}</td>
             <td>{{ item.scheduled_sale_time|date:"P" }}</td>
             {% if item.purchase_id %}
             <td>(<a href="{% url 'patron_detail' pk=item.purchase.patron_id %}" >{{ item.purchase.patron.buyer_num}}</a>) {{ item.purchase.amount|money }}</td>

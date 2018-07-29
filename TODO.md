@@ -18,7 +18,6 @@
 - Order Patron list by last name, first name
 - Order donor selection for auction items by last name, first_name
 - Configure Papertrail logging to save production data logs
-- Add donor info to Auction Item List
 - Login form is screwy at small screen sizes
 
 
@@ -50,3 +49,4 @@
 - Unsettled accounts shows people with balance of $0.00, annoying
 - Allow eding descriptions of transactions when editing during checkout
 - Fix rounding error for CC payemnts (too many decimal places become invalid form entry)
+- Add donor info to Auction Item List
