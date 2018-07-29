@@ -19,6 +19,9 @@
 - Green link text on white for Patron names (and others) is pretty hard to read
 - Order Patron list by last name, first name
 - Order donor selection for auction items by last name, first_name
+- Configure Papertrail logging to save production data logs
+- Add donor info to Auction Item List
+- Login form is screwy at small screen sizes
 
 
 
