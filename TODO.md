@@ -3,7 +3,6 @@
 ## 2019 Todo
 
 - Fix rounding error for CC payemnts (too many decimal places become invalid form entry)
-- Unsettled accounts shows people with balance of $0.00, annoying
 - Move In-Kind Donations on the Patron screen to much lower -- very confusing for those checking out
 - Add patron search to toolbar/menubar so you don't need to list all patrons
 - Paginate patron list and/or auction lists
@@ -47,3 +46,4 @@
 - add fee model to record CC purchase fees paid
 - the widget for amounts/money should have a $ tied to the form-field
 - All messages about successfully donating need to include buyer number
+- Unsettled accounts shows people with balance of $0.00, annoying

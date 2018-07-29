@@ -776,7 +776,9 @@ class UnsettledAccounts(GroupRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['patrons'] = Patron.objects.exclude(purchases__isnull=True).order_by('last_name')
+        patrons_with_purchases = Patron.objects.exclude(purchases__isnull=True).order_by('last_name')
+        patrons_not_settled = [p for p in patrons_with_purchases if not p.account_is_settled]
+        context['patrons'] = patrons_not_settled
 
         return context
 
