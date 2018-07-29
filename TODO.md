@@ -1,5 +1,27 @@
 # Todo
 
+## 2019 Todo
+Fix rounding error for CC payemnts (too many decimal places become invalid form entry)
+Unsettled accounts shows people with balance of $0.00, annoying
+Move In-Kind Donations on the Patron screen to much lower -- very confusing for those checking out
+Add patron search to toolbar/menubar so you don't need to list all patrons
+Paginate patron list and/or auction lists
+Lots of bugs with Auction categories when adding/editing auction items 
+    - returns to wrong page on save
+    - save and add another does not work
+    - save and return to list does not work
+Make interface to bulk add blessing bids
+    - something to enter bid amount categories with multiple bidders per
+      category
+Allow eding descriptions of transactions when editing during checkout
+Allow combining tow buyer numbers into one payment
+Seems to be bug when checking out a booth and getting spaces? in the buyer number field -- generated "500" errors numerous times
+All messages about successfully donating need to include buyer number
+Green link text on white for Patron names (and others) is pretty hard to read
+
+
+
+## Other
 - in-kind donation recording for goods and services
     - donor field search/autocomplete
 - add images to AuctionItems (https://github.com/alexsdutton/django-camera-imagefield ?)
