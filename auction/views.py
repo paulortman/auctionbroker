@@ -515,7 +515,8 @@ class PatronDonate(PatronMixin, FormView):
         note = form.cleaned_data['note']
         Purchase.create_donation(patron=patron, amount=amount, booth=None, note=note)
 
-        msg = "Doncation of {amount} made by {name}".format(amount=USD(amount), name=patron.name)
+        msg = "Donation of {amount} made by {name} ({num})".format(
+            amount=USD(amount), name=patron.name, num=patron.buyer_num)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
         return redirect('patron_detail', pk=patron.pk)
 
@@ -536,7 +537,8 @@ class Donate(HonorNextMixin, FormView):
 
         Purchase.create_donation(patron=patron, amount=amount, booth=None, note=note)
 
-        msg = "Doncation of {amount} made by {name}".format(amount=USD(amount), name=patron.name)
+        msg = "Donation of {amount} made by {name} ({num})".format(
+            amount=USD(amount), name=patron.name, num=patron.buyer_num)
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
 
         return super().form_valid(form)
