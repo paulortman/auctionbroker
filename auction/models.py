@@ -1,5 +1,3 @@
-import decimal
-
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Max
@@ -8,16 +6,7 @@ from django.utils import timezone
 from django.shortcuts import reverse
 from django.utils.text import slugify
 
-
-def D(val):
-    if val is None:
-        return decimal.Decimal(0)
-    return decimal.Decimal(val)
-
-
-def USD(d):
-    quant = d.quantize(decimal.Decimal('.01'), decimal.ROUND_HALF_UP)
-    return "${}".format(quant)
+from auction.utils import D, USD
 
 
 class TrackedModel(models.Model):

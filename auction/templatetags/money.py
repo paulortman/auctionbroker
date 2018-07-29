@@ -1,6 +1,5 @@
 from django import template
-from auction.models import USD
-
+from auction.utils import USD
 
 register = template.Library()
 

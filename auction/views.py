@@ -19,8 +19,8 @@ from extra_views import FormSetView
 from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
-from .models import Item, Patron, Purchase, Booth, Payment, AuctionItem, USD, D, \
-    round_scheduled_sale_time, Fee, PricedItem
+from .models import Item, Patron, Purchase, Booth, Payment, AuctionItem, round_scheduled_sale_time, Fee, PricedItem
+from auction.utils import D, USD
 from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PurchaseForm, PatronCreateForm, \
     PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm, PatronPaymentCashForm, \
