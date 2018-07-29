@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from auction.forms import AuctionItemEditForm
 from auction.templatetags.money import money
+from auction.utils import calc_cc_fee_amount, D
 from .models import Purchase, Payment, round_scheduled_sale_time, AuctionItem
 from .modelfactory import AuctionItemFactory, PatronFactory, BoothFactory
 
@@ -165,3 +166,14 @@ class ScheduledTimeTestCase(TestCase):
         dt = timezone.datetime(year=2018, month=2, day=28, hour=12, minute=7, second=29)
         rounded = round_scheduled_sale_time(dt)
         assert rounded == timezone.datetime(year=2018, month=2, day=28, hour=12, minute=5, second=0)
+
+
+class UtilityTestCase(TestCase):
+
+    def test_fee_rounding_down(self):
+        assert D('0.09') == calc_cc_fee_amount(D('3.12'))
+
+    def test_fee_rounding_up(self):
+        assert D('0.10') == calc_cc_fee_amount(D('3.17'))
+
+

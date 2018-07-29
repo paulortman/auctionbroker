@@ -1,5 +1,7 @@
 import decimal
 
+from django.conf import settings
+
 
 def D(val):
     if val is None:
@@ -7,6 +9,13 @@ def D(val):
     return decimal.Decimal(val)
 
 
-def USD(d):
-    quant = d.quantize(decimal.Decimal('.01'), decimal.ROUND_HALF_UP)
-    return "${}".format(quant)
+def money_quant(amount):
+    return amount.quantize(decimal.Decimal('.01'), decimal.ROUND_HALF_UP)
+
+
+def USD(amount):
+    return "${}".format(money_quant(amount))
+
+
+def calc_cc_fee_amount(amount):
+    return money_quant(amount * D(settings.CC_TRANSACTION_FEE_PERCENTAGE))

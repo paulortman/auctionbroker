@@ -20,7 +20,7 @@ from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
 from .models import Item, Patron, Purchase, Booth, Payment, AuctionItem, round_scheduled_sale_time, Fee, PricedItem
-from auction.utils import D, USD
+from auction.utils import D, USD, calc_cc_fee_amount
 from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PurchaseForm, PatronCreateForm, \
     PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm, PatronPaymentCashForm, \
@@ -494,13 +494,13 @@ class PatronPaymentWizardCCFee(PatronPaymentWizardMixin, PatronMixin, FormView):
         context = super().get_context_data(**kwargs)
         context['payment_amount'] = self.int_to_dec(self.request.session.get('payment_amount'))
         context['payment_percentage'] = settings.CC_TRANSACTION_FEE_PERCENTAGE * 100
-        context['payment_fee'] = context['payment_amount'] * D(settings.CC_TRANSACTION_FEE_PERCENTAGE)
+        context['payment_fee'] = calc_cc_fee_amount(context['payment_amount'])
         return context
 
     def get_initial(self):
         initial = super().get_initial()
         amount = self.int_to_dec(self.request.session.get('payment_amount'))
-        initial['ccfee'] = amount * decimal.Decimal(str(settings.CC_TRANSACTION_FEE_PERCENTAGE))
+        initial['ccfee'] = calc_cc_fee_amount(amount)
         return initial
 
     def form_valid(self, form):

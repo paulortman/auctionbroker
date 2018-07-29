@@ -2,7 +2,6 @@
 
 ## 2019 Todo
 
-- Fix rounding error for CC payemnts (too many decimal places become invalid form entry)
 - Move In-Kind Donations on the Patron screen to much lower -- very confusing for those checking out
 - Add patron search to toolbar/menubar so you don't need to list all patrons
 - Paginate patron list and/or auction lists
@@ -50,3 +49,4 @@
 - All messages about successfully donating need to include buyer number
 - Unsettled accounts shows people with balance of $0.00, annoying
 - Allow eding descriptions of transactions when editing during checkout
+- Fix rounding error for CC payemnts (too many decimal places become invalid form entry)
