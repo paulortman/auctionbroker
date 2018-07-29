@@ -46,6 +46,11 @@ class PaymentForm(forms.ModelForm):
         exclude = []
 
 
+class PurchaseEditForm(forms.Form):
+    description = forms.CharField(max_length=50, required=False)
+    amount = forms.DecimalField(max_digits=15, decimal_places=2)
+
+
 class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase

@@ -13,7 +13,6 @@
 - Make interface to bulk add blessing bids
     - something to enter bid amount categories with multiple bidders per
       category
-- Allow eding descriptions of transactions when editing during checkout
 - Allow combining tow buyer numbers into one payment
 - Seems to be bug when checking out a booth and getting spaces? in the buyer number field -- generated "500" errors numerous times
 - Green link text on white for Patron names (and others) is pretty hard to read
@@ -50,3 +49,4 @@
 - the widget for amounts/money should have a $ tied to the form-field
 - All messages about successfully donating need to include buyer number
 - Unsettled accounts shows people with balance of $0.00, annoying
+- Allow eding descriptions of transactions when editing during checkout

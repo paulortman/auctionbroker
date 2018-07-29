@@ -24,7 +24,7 @@ from .models import Item, Patron, Purchase, Booth, Payment, AuctionItem, USD, D,
 from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PurchaseForm, PatronCreateForm, \
     PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm, PatronPaymentCashForm, \
-    PatronPaymentCCForm, PatronPaymentCCFeeForm
+    PatronPaymentCCForm, PatronPaymentCCFeeForm, PurchaseEditForm
 
 
 class HonorNextMixin:
@@ -204,18 +204,37 @@ class PurchaseCreate(CreateView):
     raise_exception = True
 
 
-class PurchaseUpdate(HonorNextMixin, UpdateView):
+class PurchaseUpdate(HonorNextMixin, FormView):
     model = Purchase
-    form_class = PurchaseForm
+    form_class = PurchaseEditForm
     group_required = u'account_managers'
     raise_exception = True
+    template_name = 'auction/payment_form.html'
+
+    def get_initial(self):
+        self.object = self.get_object()
+        initial = {}
+        initial['description'] = self.object.item.name
+        initial['amount'] = self.object.amount
+        return initial
+
+    def get_object(self):
+        return Purchase.objects.get(pk=self.kwargs.get('pk'))
+
+    def form_invalid(self, form):
+        print('x')
+        return super().form_invalid()
 
     def form_valid(self, form):
         # Priced items are an unuusal case, we ned to adjust the FMV so that editing a price paid doesn't end up
         # creating a donation or negative donations.
-        if 'amount' in form.changed_data and hasattr(form.instance, 'priceditem'):
-            form.instance.priceditem.fair_market_value = form.cleaned_data['amount']
-            form.instance.priceditem.save()
+        if 'amount' in form.changed_data and hasattr(self.object, 'priceditem'):
+            self.object.priceditem.fair_market_value = form.cleaned_data['amount']
+            self.object.priceditem.save()
+        self.object.item.name = form.cleaned_data['description']
+        self.object.item.save()
+        self.object.amount = form.cleaned_data['amount']
+        self.object.save()
         return super().form_valid(form)
 
 

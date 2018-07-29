@@ -5,7 +5,7 @@
 {% block main %}
     <form action="" method="post">
         {% csrf_token %}
-        {% bootstrap_field form.patron %}
+        {% bootstrap_field form.description %}
         {% bootstrap_field form.amount addon_before='<div class="input-group-prepend"><span class="input-group-text">$</span></div>' %}
         {% buttons %}
         <input type="submit" class="btn btn-primary" value="Submit" />
