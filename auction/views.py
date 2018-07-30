@@ -97,7 +97,7 @@ class AuctionItemManagement(AuctionItemSearchMixin, AuctionItemMixin, ListView):
             query = self._query_fields(terms)
             qs = qs.filter(query)
 
-        return qs.select_related('purchase', 'purchase__patron')
+        return qs.select_related('purchase', 'purchase__patron', 'donor')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
