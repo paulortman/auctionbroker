@@ -352,6 +352,24 @@ class PatronLookupMixin:
         return query
 
 
+class PatronJump(View):
+    def get(self, *arg, **kwargs):
+        try:
+            lookup_num = self.request.GET['buyer_num']
+        except KeyError:
+            lookup_num = None
+
+        if lookup_num:
+            try:
+                p = Patron.objects.get(buyer_num=lookup_num)
+            except Patron.DoesNotExist:
+                return redirect('patron_list')
+
+            return redirect('patron_detail', pk=p.pk)
+
+        else:
+            return redirect('patron_list')
+
 
 class PatronList(PatronSearchMixin, PatronMixin, ListView):
     def get_queryset(self):

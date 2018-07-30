@@ -38,6 +38,7 @@ urlpatterns = [
     url(r'^patron/(?P<pk>\d+)/payment/cc/$', views.PatronPaymentWizardCC.as_view(), {'step': 'cc'}, name="payment_wizard_cc"),
     url(r'^patron/(?P<pk>\d+)/payment/cc/fee/$', views.PatronPaymentWizardCCFee.as_view(), {'step': 'ccfee'}, name="payment_wizard_ccfee"),
     url(r'^patron/(?P<pk>\d+)/payment/cash/$', views.PatronPaymentWizardCash.as_view(), {'step': 'cash'}, name="payment_wizard_cash"),
+    url(r'^patron/jump/$', views.PatronJump.as_view(), name="patron_jump"),
 
     url(r'^payments/$', views.PaymentList.as_view(), name="payment_list"),
     url(r'^payment/create/$', views.PaymentCreate.as_view(), name="payment_create"),

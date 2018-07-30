@@ -3,7 +3,6 @@
 ## 2019 Todo
 
 - Move In-Kind Donations on the Patron screen to much lower -- very confusing for those checking out
-- Add patron search to toolbar/menubar so you don't need to list all patrons
 - Paginate patron list and/or auction lists
 - Lots of bugs with Auction categories when adding/editing auction items
     - returns to wrong page on save
@@ -50,3 +49,4 @@
 - Order Patron list by last name, first name
 - Order donor selection for auction items by last name, first_name
 - Green link text on white for Patron names (and others) is pretty hard to read
+- Add patron search to toolbar/menubar so you don't need to list all patrons
