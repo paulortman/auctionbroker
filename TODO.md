@@ -14,7 +14,6 @@
       category
 - Allow combining two buyer numbers into one payment
 - Seems to be bug when checking out a booth and getting spaces? in the buyer number field -- generated "500" errors numerous times
-- Green link text on white for Patron names (and others) is pretty hard to read
 - Configure Papertrail logging to save production data logs
 - Login form is screwy at small screen sizes
 
@@ -50,3 +49,4 @@
 - Add donor info to Auction Item List
 - Order Patron list by last name, first name
 - Order donor selection for auction items by last name, first_name
+- Green link text on white for Patron names (and others) is pretty hard to read
