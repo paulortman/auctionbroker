@@ -4,7 +4,7 @@
 
 {% block main %}
     <div class="row">
-        <div class="col-md-5 offset-3">
+        <div class="col-md-6 offset-md-3">
             <div class="card bg-light">
                 <div class="card-header bg-primary text-white">Login</div>
                 <div class="card-body">
@@ -35,9 +35,12 @@
                         {% endif %}
 
                         <form class="form" action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
-{#                            {% bootstrap_form_errors form %}#}
-                            {% bootstrap_field form.username layout='horizontal' %}
-                            {% bootstrap_field form.password layout='horizontal' %}
+                            <div class="form-group row">
+                                <input type="text" name="username" autofocus="" maxlength="254" class="form-control" placeholder="Username" title="" required="" id="id_username">
+                            </div>
+                            <div class="form-group row">
+                                <input type="password" name="password" class="form-control" placeholder="Password" title="" required="" id="id_password">
+                            </div>
                             <input type="hidden" name="next" value="{{ next }}"/>
                             {% url 'admin_password_reset' as password_reset_url %}
                             {% if password_reset_url %}
