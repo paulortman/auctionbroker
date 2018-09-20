@@ -73,5 +73,6 @@ urlpatterns = [
 
     url(r'^reports/$', views.Reports.as_view(), name='reports'),
     url(r'^reports/unsettled_accounts/$', views.UnsettledAccounts.as_view(), name='report_unsettled_accounts'),
-    url(r'^reports/sales_by_booth/$', views.SalesByBooth.as_view(), name='sales_by_booth')
+    url(r'^reports/sales_by_booth/$', views.SalesByBooth.as_view(), name='sales_by_booth'),
+    url(r'^reports/all_sales/$', views.AllSales.as_view(), name='all_sales')
 ]

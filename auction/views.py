@@ -1,11 +1,13 @@
 import decimal
+import io
 
+import xlsxwriter
 from braces.views import GroupRequiredMixin, UserPassesTestMixin
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles import finders
 from django.core.exceptions import ValidationError
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Min
 from django.forms import formset_factory
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -853,3 +855,63 @@ class SalesByBooth(GroupRequiredMixin, TemplateView):
 
         return context
 
+
+class AllSales(GroupRequiredMixin, View):
+    group_required = 'admins'
+
+    def get(self, *args, **kwargs):
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'remove_timezone': True})
+        worksheet = workbook.add_worksheet()
+        row = 0
+        col = 0
+
+        date_format = workbook.add_format({'num_format': 0x16})
+        money_format = workbook.add_format({'num_format': 0x08})
+
+        purchases = Purchase.objects.all().select_related('patron').order_by('mtime')
+        # purchases = purchases.filter(Q(auctionitem__isnull=False) |
+        #                             (Q(priceditem__isnull=False) & Q(priceditem__booth__isnull=True)))
+
+        # write header
+        worksheet.write(row, col+0, 'Last Name')
+        worksheet.write(row, col+1, 'First Name')
+        worksheet.write(row, col+2, 'Buyer Number')
+        worksheet.write(row, col+3, 'Amount')
+        worksheet.write(row, col+4, 'Transaction Time')
+        worksheet.write(row, col+5, 'DB Time')
+        worksheet.write(row, col+6, 'Item Name')
+        worksheet.write(row, col+7, 'Booth')
+        row = row + 1
+
+
+        # data
+        for purchase in purchases:
+            worksheet.write(row, col+0, purchase.patron.last_name)
+            worksheet.write(row, col+1, purchase.patron.first_name)
+            worksheet.write(row, col+2, purchase.patron.buyer_num)
+            worksheet.write(row, col+3, purchase.amount, money_format)
+            worksheet.write(row, col+4, purchase.transaction_time, date_format)
+            worksheet.write(row, col+5, purchase.ctime, date_format)
+            worksheet.write(row, col+6, purchase.item.name)
+            worksheet.write(row, col+7, self._booth_name(purchase.item.booth))
+            row = row + 1
+
+        # Set colunn width
+        worksheet.set_column(0, 1, 16)
+        worksheet.set_column(2, 2, 4)
+        worksheet.set_column(3, 5, 14)
+        worksheet.set_column(6, 7, 30)
+
+        workbook.close()
+
+        response = HttpResponse(output.getvalue(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=All_Sales_Report.xlsx'
+
+        return response
+
+    def _booth_name(self, booth):
+        if booth:
+            return booth.name
+        else:
+            return None

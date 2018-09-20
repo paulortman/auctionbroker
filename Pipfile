@@ -23,6 +23,7 @@ weasyprint = "*"
 whitenoise = "*"
 gunicorn = "*"
 django-heroku = "*"
+xlsxwriter = "*"
 
 [dev-packages]
 
