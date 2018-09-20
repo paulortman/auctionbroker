@@ -880,8 +880,9 @@ class AllSales(GroupRequiredMixin, View):
         worksheet.write(row, col+3, 'Amount')
         worksheet.write(row, col+4, 'Transaction Time')
         worksheet.write(row, col+5, 'DB Time')
-        worksheet.write(row, col+6, 'Item Name')
-        worksheet.write(row, col+7, 'Booth')
+        worksheet.write(row, col+6, 'Item Number')
+        worksheet.write(row, col+7, 'Item Name')
+        worksheet.write(row, col+8, 'Booth')
         row = row + 1
 
 
@@ -893,15 +894,17 @@ class AllSales(GroupRequiredMixin, View):
             worksheet.write(row, col+3, purchase.amount, money_format)
             worksheet.write(row, col+4, purchase.transaction_time, date_format)
             worksheet.write(row, col+5, purchase.ctime, date_format)
-            worksheet.write(row, col+6, purchase.item.name)
-            worksheet.write(row, col+7, self._booth_name(purchase.item.booth))
+            worksheet.write(row, col+6, self._item_number(purchase.item))
+            worksheet.write(row, col+7, purchase.item.name)
+            worksheet.write(row, col+8, self._booth_name(purchase.item.booth))
             row = row + 1
 
         # Set colunn width
         worksheet.set_column(0, 1, 16)
         worksheet.set_column(2, 2, 4)
         worksheet.set_column(3, 5, 14)
-        worksheet.set_column(6, 7, 30)
+        worksheet.set_column(6, 6, 4)
+        worksheet.set_column(7, 8, 30)
 
         workbook.close()
 
@@ -913,5 +916,11 @@ class AllSales(GroupRequiredMixin, View):
     def _booth_name(self, booth):
         if booth:
             return booth.name
+        else:
+            return None
+
+    def _item_number(self, item):
+        if hasattr(item, 'item_number'):
+            return item.item_number
         else:
             return None
