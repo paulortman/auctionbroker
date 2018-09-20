@@ -9,7 +9,6 @@ fresh:
 	sleep 5 && \
 	docker-compose exec -T app python manage.py create_users && \
 	docker-compose exec -T app python manage.py populate_auction_items && \
-	docker-compose exec -T app python manage.py populate_previous_attendies
 #	docker-compose exec -T app python manage.py populate_testdb && \
 #	docker-compose exec -T app python manage.py purchase_random_items && \
 
@@ -30,7 +29,6 @@ down:
 deploy:
 	python manage.py collectstatic --no-input && \
 	python manage.py migrate
-#	python manage.py populate_previous_attendies && \
 #	python manage.py create_users && \
 #	python manage.py populate_testdb && \
 #	python manage.py purchase_random_items
@@ -47,5 +45,4 @@ local_new:
 	python manage.py create_users && \
 	python manage.py create_booths && \
 	python manage.py populate_auction_items && \
-	python manage.py populate_previous_attendies
 

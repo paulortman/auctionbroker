@@ -148,3 +148,6 @@ class PatronDonateForm(forms.Form):
     note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False)
 
 
+
+class CSVUploadForm(forms.Form):
+    csvfile = forms.FileField(label='CSV file')

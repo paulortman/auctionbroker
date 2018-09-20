@@ -1,3 +1,4 @@
+import csv
 import decimal
 import io
 
@@ -26,7 +27,7 @@ from auction.utils import D, USD, calc_cc_fee_amount
 from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PurchaseForm, PatronCreateForm, \
     PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm, PatronPaymentCashForm, \
-    PatronPaymentCCForm, PatronPaymentCCFeeForm, PurchaseEditForm
+    PatronPaymentCCForm, PatronPaymentCCFeeForm, PurchaseEditForm, CSVUploadForm
 
 
 class HonorNextMixin:
@@ -924,3 +925,29 @@ class AllSales(GroupRequiredMixin, View):
             return item.item_number
         else:
             return None
+
+
+class PopulateAttendees(GroupRequiredMixin, FormView):
+    group_required = 'admins'
+    form_class = CSVUploadForm
+    template_name = 'setup/populate_attendees.html'
+    success_url = reverse_lazy('setup_success')
+
+    def _decode_utf8(self, input_iterator):
+        for l in input_iterator:
+            yield l.decode('utf-8')
+
+    def form_valid(self, form):
+        csvfile = self.request.FILES['csvfile']
+        reader = csv.DictReader(self._decode_utf8(csvfile))
+        for row in reader:
+            Patron.objects.create(first_name = row['First_Name'],
+                                  last_name = row['Last_Name'],
+                                  email = row['Email'],
+                                  address_line1 = row['Address1'],
+                                  address_line2 = row['Address2'],
+                                  address_line3 = row['Address3'],
+                                  phone1 = row['Phone'])
+
+        return super().form_valid(form)
+

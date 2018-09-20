@@ -8,3 +8,4 @@
 .cache
 /static
 .pytest_cache
+my_*
