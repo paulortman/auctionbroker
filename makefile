@@ -8,7 +8,6 @@ fresh:
 	docker-compose up -d --build && \
 	sleep 5 && \
 	docker-compose exec -T app python manage.py create_users && \
-	docker-compose exec -T app python manage.py populate_auction_items && \
 #	docker-compose exec -T app python manage.py populate_testdb && \
 #	docker-compose exec -T app python manage.py purchase_random_items && \
 
@@ -44,5 +43,4 @@ local_new:
 	python manage.py migrate && \
 	python manage.py create_users && \
 	python manage.py create_booths && \
-	python manage.py populate_auction_items && \
 

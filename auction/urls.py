@@ -79,5 +79,6 @@ urlpatterns = [
     url(r'^reports/all_sales/$', views.AllSales.as_view(), name='all_sales'),
 
     url(r'^setup/populate_attendees/$', views.PopulateAttendees.as_view(), name='populate_attendees'),
+    url(r'^setup/populate_auctionitems/$', views.PopulateAuctionItems.as_view(), name='populate_auctionitems'),
     url(r'^setup/success/$', TemplateView.as_view(template_name='setup/success.html'), name='setup_success')
 ]

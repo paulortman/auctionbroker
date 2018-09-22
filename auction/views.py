@@ -951,3 +951,41 @@ class PopulateAttendees(GroupRequiredMixin, FormView):
 
         return super().form_valid(form)
 
+
+class PopulateAuctionItems(GroupRequiredMixin, FormView):
+    group_required = 'admins'
+    form_class = CSVUploadForm
+    template_name = 'setup/populate_auctionitems.html'
+    success_url = reverse_lazy('setup_success')
+
+    def _decode_utf8(self, input_iterator):
+        for l in input_iterator:
+            yield l.decode('utf-8')
+
+    def form_valid(self, form):
+        csvfile = self.request.FILES['csvfile']
+        # with open('sale_items.csv', newline='', encoding='utf-8-sig') as csvfile:
+        csv.register_dialect('our_tsv', delimiter='\t', skipinitialspace=True)
+        reader = csv.reader(self._decode_utf8(csvfile), dialect='our_tsv')
+
+        for i in AuctionItem.objects.filter(category=AuctionItem.MAIN):
+            i.delete()
+
+        auction = Booth.objects.get(name='Auction')
+        for row in reader:
+            rawtime, title, description = row[0], row[1], row[2]
+            hour, minute = rawtime.split(':')
+            hour, minute = int(hour), int(minute)
+            if hour < 12:
+                hour = hour + 12
+            item_number = "{:02d}{:02d}".format(hour, minute)
+            time = self.dt.replace(hour=hour, minute=minute)
+            print (time.strftime('%c %Z'))
+            AuctionItem.objects.create(booth=auction,
+                                       name=title,
+                                       scheduled_sale_time=timezone.make_aware(time, settings.SALE_TZ),
+                                       item_number=item_number,
+                                       long_desc=description,
+                                       category=AuctionItem.MAIN)
+
+        return super().form_valid(form)
