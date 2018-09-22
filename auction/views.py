@@ -22,7 +22,7 @@ from extra_views import FormSetView
 from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
-from .models import Item, Patron, Purchase, Booth, Payment, AuctionItem, round_scheduled_sale_time, Fee, PricedItem
+from .models import Patron, Purchase, Booth, Payment, AuctionItem, round_scheduled_sale_time, Fee
 from auction.utils import D, USD, calc_cc_fee_amount
 from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PurchaseForm, PatronCreateForm, \
@@ -151,7 +151,8 @@ class AuctionItemUpdate(AuctionItemMixin, UpdateView):
 
     def form_valid(self, form):
         if 'is_purchased' in form.changed_data and form.cleaned_data['is_purchased'] is False:
-            form.instance.void_purchase()
+            raise Exception("Fix this")
+            #form.instance.void_purchase()
         return super().form_valid(form)
 
 
@@ -714,33 +715,34 @@ class CheckoutConfirm(CheckoutAuthMixin, FormView):
 
 
 class BiddingRecorder(GroupRequiredMixin, FormView):
-    model = Item
-    form_class = ItemBiddingForm
-    template_name = 'auction/bidding_recorder.html'
-    group_required = 'auction_managers'
-
-    def dispatch(self, request, *args, **kwargs):
-        item_number = self.kwargs.get('item_number')
-        self.item = get_object_or_404(AuctionItem, item_number=item_number)
-        return super(BiddingRecorder, self).dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(BiddingRecorder, self).get_context_data(**kwargs)
-        context['item'] = self.item
-        return context
-
-    def form_valid(self, form):
-        buyer_num = form.cleaned_data['buyer_num']
-        patron = get_object_or_404(Patron, buyer_num=buyer_num)
-        amount = form.cleaned_data['amount']
-        if self.item.is_purchased:
-            self.item.void_purchase()
-        purchase = Purchase.purchase_item(patron=patron, amount=amount, item=self.item)
-        msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
-            b_num=patron.buyer_num, b_name=patron.name, i_name=self.item.name, i_num=self.item.item_number,
-            amount=USD(amount))
-        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
-        return redirect('item_management', category=self.item.category)
+    pass
+    # model = Item
+    # form_class = ItemBiddingForm
+    # template_name = 'auction/bidding_recorder.html'
+    # group_required = 'auction_managers'
+    #
+    # def dispatch(self, request, *args, **kwargs):
+    #     item_number = self.kwargs.get('item_number')
+    #     self.item = get_object_or_404(AuctionItem, item_number=item_number)
+    #     return super(BiddingRecorder, self).dispatch(request, *args, **kwargs)
+    #
+    # def get_context_data(self, **kwargs):
+    #     context = super(BiddingRecorder, self).get_context_data(**kwargs)
+    #     context['item'] = self.item
+    #     return context
+    #
+    # def form_valid(self, form):
+    #     buyer_num = form.cleaned_data['buyer_num']
+    #     patron = get_object_or_404(Patron, buyer_num=buyer_num)
+    #     amount = form.cleaned_data['amount']
+    #     if self.item.is_purchased:
+    #         self.item.void_purchase()
+    #     purchase = Purchase.purchase_item(patron=patron, amount=amount, item=self.item)
+    #     msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
+    #         b_num=patron.buyer_num, b_name=patron.name, i_name=self.item.name, i_num=self.item.item_number,
+    #         amount=USD(amount))
+    #     messages.add_message(self.request, messages.INFO, msg, 'alert-success')
+    #     return redirect('item_management', category=self.item.category)
 
 
 
@@ -843,8 +845,9 @@ class SalesByBooth(GroupRequiredMixin, TemplateView):
             booths['Auction: {}'.format(cat_display)] = D(auction_sales)
 
         # Donations without a recorded booth need to be accounted for too
-        donations = PricedItem.objects.filter(booth__isnull=True).aggregate(Sum('purchase__amount'))['purchase__amount__sum']
-        booths['Generic Donations'] = D(donations)
+        raise Exception("This Needs Fixed")
+        # donations = PricedItem.objects.filter(booth__isnull=True).aggregate(Sum('purchase__amount'))['purchase__amount__sum']
+        # booths['Generic Donations'] = D(donations)
 
         # Fees
         fees = D(Fee.objects.all().aggregate(Sum('amount'))['amount__sum'])

@@ -17,50 +17,6 @@ class TrackedModel(models.Model):
     mtime = models.DateTimeField(auto_now=True)
 
 
-class Item(models.Model):
-    class Meta:
-        abstract = True
-
-    name = models.CharField(max_length=50, blank=False, help_text="Short but descriptive name of item.")
-    long_desc = models.TextField(blank=True, verbose_name="Long Description",
-                                 help_text="Enter a description, donor information, etc.")
-    purchase = models.OneToOneField('Purchase', blank=True, null=True, on_delete=models.SET_NULL)
-    booth = models.ForeignKey('Booth', blank=True, null=True, on_delete=models.SET_NULL)
-    sale_time = models.DateTimeField(blank=True, null=True, verbose_name="Sale Time",
-                                     help_text="When the item sold. Leave blank when creating")
-    fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=D(0),
-                                            verbose_name="Fair Market Value (FMV)", help_text="Dollars, e.g. 10.00")
-    is_purchased = models.BooleanField(default=False,
-                                       help_text="Un-checking this item will delete and void the purchase")
-
-    def __str__(self):
-        return "({}) {}{}".format(self.id, self.name, "*" if self.purchase else "")
-
-    def commit_to_purchase(self, purchase):
-        self.purchase = purchase
-        self.sale_time = timezone.now()
-        self.is_purchased = True
-        self.save()
-
-    def void_purchase(self):
-        if self.purchase:
-            self.purchase.delete()
-            self.purchase = None
-        self.sale_time = None
-        self.is_purchased = False
-        self.save()
-
-    @property
-    def donation_amount(self):
-        if self.purchase:
-            return self.purchase.donation_amount
-        return None
-
-
-class PricedItem(TrackedModel, Item):
-    pass
-
-
 def item_number_generator():
     try:
         value = AuctionItem.objects.all().aggregate(Max('item_number'))['item_number__max']
@@ -81,16 +37,37 @@ def round_scheduled_sale_time(dt):
     return dt
 
 
-class AuctionItem(TrackedModel, Item):
-    MAIN = 'MAIN'
-    SILENT = 'SILENT'
-    CATEGORIES = (
-        (MAIN, 'Main'),
-        (SILENT, 'Silent')
-    )
-
+class AuctionItem(TrackedModel):
     class Meta:
         pass
+
+    name = models.CharField(max_length=50, blank=False, help_text="Short but descriptive name of item.")
+    long_desc = models.TextField(blank=True, verbose_name="Long Description",
+                                 help_text="Enter a description, donor information, etc.")
+    fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=D(0),
+                                            verbose_name="Fair Market Value (FMV)", help_text="Dollars, e.g. 10.00")
+    quantity = models.CharField(max_length=50, blank=True, null=True, verbose_name="Quantity",
+                                     help_text="2 dozen, 3 gallons, etc.")
+    item_number = models.PositiveIntegerField(unique=True, db_index=True, default=item_number_generator,
+                                              help_text="Leave blank to auto-generate.")
+    scheduled_sale_time = models.DateTimeField(blank=True, null=True, verbose_name="Scheduled Sale Time",
+                                               help_text="The time when the item is scheduled during the auction.")
+    sale_time = models.DateTimeField(blank=True, null=True, verbose_name="Sale Time",
+                                     help_text="When the item sold. Leave blank when creating")
+    donor_display = models.CharField(max_length=50, blank=True, null=True, verbose_name="Displayed Donor Name",
+                                     help_text="How the item's donor would be displayed to the public")
+    donor = models.ForeignKey('Patron', null=True, blank=True, help_text="The patron/donor for tax receipt purposes.",
+                              related_name="donations", on_delete=models.SET_NULL)
+    booth = models.ForeignKey('Booth', blank=True, null=True, on_delete=models.SET_NULL)
+
+    @property
+    def is_purchased(self):
+        if self.purchase_set.count() > 0:
+            return True
+        return False
+
+    def get_absolute_url(self):
+        return reverse('item_detail', kwargs={'item_number': self.item_number})
 
     @classmethod
     def categories(cls):
@@ -102,19 +79,6 @@ class AuctionItem(TrackedModel, Item):
             if slugify(c) == slug:
                 return c
         return None
-
-    item_number = models.PositiveIntegerField(unique=True, db_index=True, default=item_number_generator,
-                                              help_text="Leave blank to auto-generate.")
-    scheduled_sale_time = models.DateTimeField(blank=True, null=True, verbose_name="Scheduled Sale Time",
-                                               help_text="The time when the item is scheduled during the auction.")
-    donor_display = models.CharField(max_length=50, blank=True, null=True, verbose_name="Displayed Donor Name",
-                                     help_text="How the item's donor would be displayed to the public")
-    donor = models.ForeignKey('Patron', null=True, blank=True, help_text="The patron/donor for tax receipt purposes.",
-                              related_name="donations", on_delete=models.SET_NULL)
-    category = models.CharField(max_length=8, choices=CATEGORIES, default=MAIN, help_text='Category/Group/Ring')
-
-    def get_absolute_url(self):
-        return reverse('item_detail', kwargs={'item_number': self.item_number})
 
 
 class AuctionItemImage(models.Model):
@@ -185,11 +149,6 @@ class Patron(TrackedModel, models.Model):
         return "{} {}".format(self.first_name, self.last_name)
 
     @property
-    def outstanding_purchases_total(self):
-        s = self.purchases.aggregate(models.Sum('amount'))['amount__sum']
-        return D(s)
-
-    @property
     def purchases_total(self):
         purchases = self.purchases.all().aggregate(models.Sum('amount'))['amount__sum']
         return D(purchases)
@@ -200,20 +159,14 @@ class Patron(TrackedModel, models.Model):
         return D(payments)
 
     @property
-    def in_kind_donations_total(self):
-        return D(sum([i.fair_market_value for i in self.donations.all()]))
-
-    @property
-    def in_kind_donations_sales_total(self):
-        return D(sum([i.purchase.amount for i in self.donations.all() if i.purchase]))
+    def fees_total(self):
+        fees = self.fees.all().aggregate(models.Sum('amount'))['amount__sum']
+        return D(fees)
 
     @property
     def purchase_donations_total(self):
-        return D(sum([p.donation_amount for p in self.purchases.all() if p.purchase]))
-
-    @property
-    def donations_total(self):
-        return self.purchase_donations_total + self.in_kind_donations_total
+        donations = self.purchases.filter(is_donation=True).aggregate(models.Sum('amount'))['amount__sum']
+        return D(donations)
 
     @property
     def outstanding_balance(self):
@@ -228,9 +181,16 @@ class Patron(TrackedModel, models.Model):
         return self.outstanding_balance == D(0)
 
     @property
-    def fees_total(self):
-        fees = self.fees.all().aggregate(models.Sum('amount'))['amount__sum']
-        return D(fees)
+    def in_kind_donations_total(self):
+        return D(sum([i.fair_market_value for i in self.donations.all()]))
+
+    @property
+    def in_kind_donations_sales_total(self):
+        return D(sum([i.purchase.amount for i in self.donations.all() if i.purchase]))
+
+    @property
+    def donations_total(self):
+        return self.purchase_donations_total + self.in_kind_donations_total
 
 
 def buyer_number_validator(value):
@@ -281,6 +241,17 @@ class Purchase(TrackedModel, models.Model):
     patron = models.ForeignKey(Patron, related_name='purchases', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    booth = models.ForeignKey('Booth', blank=True, null=True, on_delete=models.SET_NULL)
+    quantity = models.CharField(max_length=50, blank=True, verbose_name="Quantity",
+                                help_text="2 dozen, 3 gallons, etc.")
+    is_donation = models.BooleanField(default=False,
+                                      help_text="True only when the full amount was a donation "
+                                                "with nothing received by the Patron")
+    description = models.TextField(blank=True, verbose_name="Description",
+                                   help_text="A description of the purchase")
+    auction_item = models.ForeignKey('AuctionItem', null=True, blank=True, on_delete=models.CASCADE)
+    fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, help_text="Fair Market Value",
+                                            default=D(0))
 
     def __str__(self):
         return "{amount} purchase by {patron}".format(amount=USD(self.amount), patron=self.patron.name)
@@ -289,47 +260,48 @@ class Purchase(TrackedModel, models.Model):
         return reverse('purchase_detail', kwargs={'pk': self.pk})
 
     @property
-    def item(self):
-        if hasattr(self, 'priceditem'):
-            return self.priceditem
-        if hasattr(self, 'auctionitem'):
-            return self.auctionitem
-
-        raise AttributeError('Purchase object has no valid \'item\' attribute')
-
-    @property
     def donation_amount(self):
-        return D(max(self.amount - self.item.fair_market_value, 0))
-
-    @property
-    def fair_market_value(self):
-        return self.item.fair_market_value
+        if self.is_donation:
+            return D(self.amount)
+        return D(0)
 
     @classmethod
     def create_donation(cls, patron, amount, booth, note=None):
-        p = Purchase.objects.create(patron=patron, amount=D(amount))
-        name = 'Donation' + ': {}'.format(note) if note else ''
-        i = PricedItem.objects.create(name=name, purchase=p, booth=booth)
-        i.commit_to_purchase(p)
+        desc = 'Donation' + ': {}'.format(note) if note else ''
+        p = Purchase.objects.create(patron=patron, amount=D(amount), description=desc, booth=booth, is_donation=True,
+                                    fair_market_value=D(0))
         return p
 
     @classmethod
-    def create_priced_item(cls, patron, amount, booth):
-        p = Purchase.objects.create(patron=patron, amount=D(amount))
-        i = PricedItem.objects.create(name='Priced Item(s)', fair_market_value=D(amount), purchase=p, booth=booth)
-        i.commit_to_purchase(p)
+    def create_priced_purchase(cls, patron, amount, booth):
+        desc = 'Priced Item(s)'
+        p = Purchase.objects.create(patron=patron, amount=D(amount), description=desc, booth=booth,
+                                    fair_market_value=D(amount))
         return p
 
     @classmethod
-    def purchase_item(cls, patron, amount, item):
-        p = Purchase.objects.create(patron=patron, amount=D(amount))
-        item.commit_to_purchase(p)
+    def create_auction_item_purchase(cls, patron, amount, auction_item, quantity):
+        desc = 'Auction Item "{}", Quantity: {}'.format(auction_item.name, quantity)
+        p = Purchase.objects.create(patron=patron, amount=D(amount), auction_item=auction_item, description=desc,
+                                    booth=auction_item.booth, fair_market_value=auction_item.fair_market_value,
+                                    quantity=quantity)
+        auction_item.sale_time = p.transaction_time
+        auction_item.save()
+
         return p
 
 
 class Booth(models.Model):
+    AUCTION = 'AUCTION'
+    PRICED = 'PRICED'
+    CATEGORIES = (
+        (AUCTION, 'Auction'),
+        (PRICED, 'Priced')
+    )
+
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, blank=True, editable=False)
+    category = models.CharField(max_length=8, choices=CATEGORIES, default=PRICED)
 
     def __str__(self):
         return self.name
