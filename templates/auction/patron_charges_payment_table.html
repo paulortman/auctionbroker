@@ -72,9 +72,8 @@
                     <a class="btn btn-sm btn-secondary" href="{% url 'purchase_delete' pk=purchase.pk %}?next={% url 'patron_detail' pk=patron.pk %}" title="Delete">
                         <img class="icon-sm" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
                 <td>
-                    {% if purchase.item.booth %}<em>{{ purchase.item.booth.name }}</em>: {% endif %}{{ purchase.item.name }}
+                    {% if purchase.booth %}<em>{{ purchase.booth.name }}</em>: {% endif %}{{ purchase.description }}
                 </td>
-{#                <td class="col-price"> {% if purchase.donation_amount %} {{ purchase.donation_amount|money }} {% else %} - {% endif %} </td>#}
                 <td class="col-price">{{ purchase.amount|money }}</td>
             </tr>
         {% endfor %}
@@ -83,8 +82,7 @@
         <tr>
             <th class="col-action"></th>
             <th class="text-right" >Total Purchases</th>
-{#            <th class="col-price">{{ patron.purchase_donations_total|money }}</th>#}
-            <th class="col-price">{{ patron.outstanding_purchases_total|money }}</th>
+            <th class="col-price">{{ patron.purchases_total|money }}</th>
         </tr>
         </tfoot>
     </table>

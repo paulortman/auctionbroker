@@ -69,17 +69,6 @@ class AuctionItem(TrackedModel):
     def get_absolute_url(self):
         return reverse('item_detail', kwargs={'item_number': self.item_number})
 
-    @classmethod
-    def categories(cls):
-        return [item[0] for item in cls.CATEGORIES]
-
-    @classmethod
-    def category_from_slug(cls, slug):
-        for c in cls.categories():
-            if slugify(c) == slug:
-                return c
-        return None
-
 
 class AuctionItemImage(models.Model):
     class Meta:
@@ -281,7 +270,8 @@ class Purchase(TrackedModel, models.Model):
 
     @classmethod
     def create_auction_item_purchase(cls, patron, amount, auction_item, quantity):
-        desc = 'Auction Item "{}", Quantity: {}'.format(auction_item.name, quantity)
+        desc = 'Auction Item "{}"'.format(auction_item.name)
+        desc = desc + ': Quantity: {}'.format( quantity) if quantity else desc
         p = Purchase.objects.create(patron=patron, amount=D(amount), auction_item=auction_item, description=desc,
                                     booth=auction_item.booth, fair_market_value=auction_item.fair_market_value,
                                     quantity=quantity)

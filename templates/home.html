@@ -22,9 +22,9 @@
                         <div class="card-body">
                             <p class="card-text">Add and edit auction items and record auction item sales.</p>
                             <div class="list-group">
-                            {% for auction_category in auction_categories %}
+                            {% for auction_booth in auction_booths %}
                                 <a class="list-group-item list-group-item-action"
-                                   href="{% url 'item_management' category=auction_category %}">{{ auction_category|capfirst }}</a>
+                                   href="{% url 'item_management' booth_slug=auction_booth.slug %}">{{ auction_booth }}</a>
                             {% endfor %}
                             </div>
                         </div>
@@ -46,7 +46,7 @@
                             <p class="card-text">Provide cashier services at the various booths to allow patrons to
                                 purchase priced items using just their buyer number.</p>
                             <div class="list-group">
-                                {% for booth in booths %}
+                                {% for booth in priced_booths %}
                                     <a class="list-group-item list-group-item-action"
                                        href="{% url 'checkout_patron' booth_slug=booth.slug %}">{{ booth.name }}</a>
                                 {% endfor %}

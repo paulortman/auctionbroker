@@ -21,6 +21,7 @@ from . import views
 urlpatterns = [
     url(r'^items/$', views.AuctionItemList.as_view(), name="item_list"),
     url(r'^item/create/$', views.AuctionItemCreate.as_view(), name="item_create"),
+    url(r'^item/create/(?P<booth_slug>[-\w]+)/$', views.AuctionItemCreate.as_view(), name="item_create"),
     url(r'^item/(?P<item_number>\d+)/$', views.AuctionItemDetail.as_view(), name="item_detail"),
     url(r'^item/(?P<item_number>\d+)/edit/$', views.AuctionItemUpdate.as_view(), name="item_update"),
     url(r'^item/(?P<item_number>\d+)/delete/$', views.AuctionItemDelete.as_view(), name="item_delete"),
@@ -59,8 +60,8 @@ urlpatterns = [
     url(r'^dashboard/$', views.SalesDashboard.as_view(template_name='dashboard.html'), name="dashboard"),
 
     url(r'^bidding/(?P<item_number>\d+)/$', views.BiddingRecorder.as_view(), name='bidding_recorder'),
-    url(r'^management/(?P<category>[-\w]+)/$', views.AuctionItemManagement.as_view(), name='item_management'),
-    url(r'^management/$', views.AuctionItemManagement.as_view(), name='item_management'),
+    url(r'^management/(?P<booth_slug>[-\w]+)/$', views.AuctionItemManagement.as_view(), name='item_management'),
+    # url(r'^management/$', views.AuctionItemManagement.as_view(), name='item_management'),
 
     url(r'^donate/$', views.Donate.as_view(), name="donate"),
     url(r'^donate/(?P<pk>\d+)/$', views.PatronDonate.as_view(), name="patron_donate"),

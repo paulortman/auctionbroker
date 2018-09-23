@@ -26,7 +26,7 @@ class Command(BaseCommand):
             for purchase in range(priced_purchases):
                 booth = random.choice(booths)
                 price = Decimal(random.choice(prices))
-                p = Purchase.create_priced_item(patron=patron, amount=price, booth=booth)
+                p = Purchase.create_priced_purchase(patron=patron, amount=price, booth=booth)
                 minutes = random.randint(1, 8 * 60)  # spread purchases over 8 hours
                 p.transaction_time = base_time + timezone.timedelta(minutes=minutes)
                 p.save()

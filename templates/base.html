@@ -41,9 +41,9 @@
                 <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true"
                    aria-expanded="false">Auction Mangement</a>
                 <div class="dropdown-menu" aria-labelledby="dropdown01">
-                {% for c in auction_categories %}
+                {% for booth in auction_booths %}
                     <a class="dropdown-item"
-                        href="{% url 'item_management' category=c %}">{{ c }}</a>
+                        href="{% url 'item_management' booth_slug=booth.slug %}">{{ booth }}</a>
                 {% endfor %}
                 </div>
             </li>
@@ -54,7 +54,7 @@
                 <a class="nav-link dropdown-toggle" href="#" id="dropdown02" data-toggle="dropdown" aria-haspopup="true"
                    aria-expanded="false">Booth Checkout</a>
                 <div class="dropdown-menu" aria-labelledby="dropdown02">
-                    {% for booth in booths %}
+                    {% for booth in priced_booths %}
                         <a class="dropdown-item"
                            href="{% url 'checkout_patron' booth_slug=booth.slug %}">{{ booth.name }}</a>
                     {% endfor %}

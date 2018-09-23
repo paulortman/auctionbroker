@@ -1,12 +1,11 @@
-from django.utils.text import slugify
-from auction.models import Booth, AuctionItem
+from auction.models import Booth
 
 
 def site_vars(request):
-    booths = Booth.objects.exclude(name__iexact='auction')
-    auction_categories = list(map(slugify, AuctionItem.categories()))
+    priced_booths = Booth.objects.filter(category=Booth.PRICED)
+    auction_booths = Booth.objects.filter(category=Booth.AUCTION)
     context = {
-        'booths': booths,
-        'auction_categories': auction_categories
+        'priced_booths': priced_booths,
+        'auction_booths': auction_booths
     }
     return context

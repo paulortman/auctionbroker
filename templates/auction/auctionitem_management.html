@@ -10,16 +10,16 @@
 {% block content %}
     <div class="toolbar hidden-print">
         <div class="float-right">
-            <form class="form form-inline" method="get" action="{% url 'item_management' category=auction_category%}">
+            <form class="form form-inline" method="get" action="{% url 'item_management' booth_slug=auction_booth.slug %}">
                 <div class="input-group">
                     <input class="form-control" type="search" placeholder="Search" aria-label="Search" name="q" value="{{ q }}"/>
                     <button class="input-group-append" type="submit"><img class="icon-lg" src="{% static 'svg/magnifying-glass.svg' %}" /></button>
                 </div>
             </form>
         </div>
-        <a class="tool tool-lg btn btn-secondary" href="{% url 'item_create' %}" >
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'item_create' booth_slug=auction_booth.slug %}" >
             <img class="icon-lg" src="{% static 'svg/plus.svg'%}" alt="plus" /> Add Auction Item</a>
-        <a class="tool tool-lg btn btn-secondary" href="{% url 'donate' %}?next={% url 'item_management' %}" >
+        <a class="tool tool-lg btn btn-secondary" href="{% url 'donate' %}?next={% url 'item_management' booth_slug=auction_booth.slug%}" >
             <img class="icon-lg" src="{% static 'svg/dollar.svg' %}" alt="dollar" /> Add Donation</a>
     </div>
 
@@ -41,8 +41,14 @@
             <td scope="row"><a class="pk" href="{% url 'item_detail' item_number=item.item_number %}" >{{ item.item_number }}</a></td>
             <td><a href="{% url 'item_detail' item_number=item.item_number %}" >{{ item.name }}</a> {% if item.donor %} &ndash; donated by {{ item.donor.name }} {% endif %}</td>
             <td>{{ item.scheduled_sale_time|date:"P" }}</td>
-            {% if item.purchase_id %}
-            <td>(<a href="{% url 'patron_detail' pk=item.purchase.patron_id %}" >{{ item.purchase.patron.buyer_num}}</a>) {{ item.purchase.amount|money }}</td>
+            {% if item.purchase_set.count > 0 %}
+                <td>
+                {% for purchase in item.purchase_set.all %}
+                (<a href="{% url 'patron_detail' pk=purchase.patron_id %}" >{{ purchase.patron.buyer_num}}</a>)
+                    {{ purchase.amount|money }}
+                    {% if purchase.quantity %} | {{ purchase.quantity }} of {{ item.quantity }} {% endif %} <br/>
+                {% endfor %}
+                </td>
             {% else %}
                 <td><a class="btn btn-primary btn-sm" href="{% url 'bidding_recorder' item_number=item.item_number %}">Record Bid</a></td>
             {% endif %}

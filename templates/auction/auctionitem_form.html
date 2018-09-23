@@ -17,7 +17,7 @@
             </div>
             <div class="col-md-2">
                 {% bootstrap_field form.item_number %}
-                {% bootstrap_field form.category %}
+                {% bootstrap_field form.booth %}
             </div>
             <div class="col-md-4">
                 {% bootstrap_field form.scheduled_sale_time %}
@@ -33,6 +33,7 @@
                 {% if form.instance.is_purchased %}
                     Winning Bidder: {{ form.instance.purchase.patron.name }} ({{ form.instance.purchase.amount|money }})
                 {% endif %}
+                    Is already purchased. -- FIXME
                 {% endif %}
             </div>
             <div class="col-md-4">
@@ -41,14 +42,14 @@
                 {% endif %}
             </div>
         </div>
-{#        <div class="form-row">#}
-{#            <div class="col-md-4">#}
-{#                {% bootstrap_field form.fair_market_value %}#}
-{#            </div>#}
-{#            <div class="col-md-8">#}
-{#                {% bootstrap_field form.donor_display %}#}
-{#            </div>#}
-{#        </div>#}
+        <div class="form-row">
+            <div class="col-md-4">
+                {% bootstrap_field form.fair_market_value %}
+            </div>
+            <div class="col-md-8">
+                {% bootstrap_field form.donor_display %}
+            </div>
+        </div>
         <div class="form-group">
             {% bootstrap_field form.long_desc %}
         </div>

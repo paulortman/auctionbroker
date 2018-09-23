@@ -16,7 +16,7 @@ class AuctionItemEditForm(forms.ModelForm):
 
     class Meta:
         model = AuctionItem
-        exclude = ['purchase', 'booth', 'fair_market_value']
+        exclude = ['sale_time',]
 
 
 class AuctionItemCreateForm(forms.ModelForm):
@@ -26,12 +26,13 @@ class AuctionItemCreateForm(forms.ModelForm):
 
     class Meta:
         model = AuctionItem
-        exclude = ['purchase', 'booth', 'is_purchased', 'sale_time', 'fair_market_value']
+        exclude = ['is_purchased', 'sale_time', 'fair_market_value']
 
 
 class ItemBiddingForm(forms.Form):
     amount = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Dollar amount, e.g. 10.00")
     buyer_num = forms.CharField(max_length=10, label="Buyer Number")
+    quantity = forms.CharField(max_length=10, label="Quantity", required=False)
 
 
 class BoothForm(forms.ModelForm):

@@ -88,11 +88,9 @@ class AuctionItemManagement(AuctionItemSearchMixin, AuctionItemMixin, ListView):
     def get_queryset(self):
         qs = super().get_queryset()
 
-        category_slug = self.kwargs.get('category', None)
-        if category_slug:
-            category = AuctionItem.category_from_slug(category_slug)
-            if category:
-                qs = qs.filter(category=category)
+        booth_slug = self.kwargs.get('booth_slug', None)
+        if booth_slug:
+            qs = qs.filter(booth__slug=booth_slug)
 
         filter = self.request.GET.get('q')
         if filter:
@@ -100,11 +98,14 @@ class AuctionItemManagement(AuctionItemSearchMixin, AuctionItemMixin, ListView):
             query = self._query_fields(terms)
             qs = qs.filter(query)
 
-        return qs.select_related('purchase', 'purchase__patron', 'donor')
+        return qs.select_related('donor')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['auction_category'] = self.kwargs.get('category', None)
+        booth_slug = self.kwargs.get('booth_slug', None)
+        if booth_slug:
+            context['auction_booth'] = Booth.objects.get(slug=booth_slug)
+
         return context
 
 
@@ -117,7 +118,9 @@ class AuctionItemCreate(AuctionItemMixin, CreateView):
     form_class = AuctionItemCreateForm
 
     def form_valid(self, form):
-        form.instance.booth = Booth.objects.get(name__iexact='auction')
+        booth_slug = self.kwargs.get('booth_slug', None)
+        if booth_slug:
+            form.instance.booth = Booth.objects.get(booth_slug=booth_slug)
 
         form.instance.save()
         i = form.instance
@@ -127,7 +130,7 @@ class AuctionItemCreate(AuctionItemMixin, CreateView):
         if 'save_and_add_another' in self.request.POST:
             return redirect('item_create')
         if 'save_and_return_to_list' in self.request.POST:
-            return redirect('item_management', category=i.category)
+            return redirect('item_management', booth_slug=i.booth.slug)
 
         return redirect('item_detail', item_number=i.item_number)
 
@@ -141,6 +144,10 @@ class AuctionItemCreate(AuctionItemMixin, CreateView):
             mra_scheduled_sale_time = timezone.now()
         mra_scheduled_sale_time += timezone.timedelta(minutes=settings.AUCTIONITEM_SCHEDULED_TIME_INCREMENT)
         initial['scheduled_sale_time'] = round_scheduled_sale_time(mra_scheduled_sale_time)
+
+        booth_slug = self.kwargs.get('booth_slug', None)
+        if booth_slug:
+            initial['booth'] = Booth.objects.get(booth_slug=booth_slug)
 
         return initial
 
@@ -701,7 +708,7 @@ class CheckoutConfirm(CheckoutAuthMixin, FormView):
         purchase_total = D(self.request.session['purchase_total'])
 
         # Save the purchase for the patron
-        p = Purchase.create_priced_item(patron=self.patron, amount=purchase_total, booth=self.booth)
+        p = Purchase.create_priced_purchase(patron=self.patron, amount=purchase_total, booth=self.booth)
 
         # Clear the session state
         del(self.request.session['purchase_total'])
@@ -716,33 +723,38 @@ class CheckoutConfirm(CheckoutAuthMixin, FormView):
 
 class BiddingRecorder(GroupRequiredMixin, FormView):
     pass
-    # model = Item
-    # form_class = ItemBiddingForm
-    # template_name = 'auction/bidding_recorder.html'
-    # group_required = 'auction_managers'
-    #
-    # def dispatch(self, request, *args, **kwargs):
-    #     item_number = self.kwargs.get('item_number')
-    #     self.item = get_object_or_404(AuctionItem, item_number=item_number)
-    #     return super(BiddingRecorder, self).dispatch(request, *args, **kwargs)
-    #
-    # def get_context_data(self, **kwargs):
-    #     context = super(BiddingRecorder, self).get_context_data(**kwargs)
-    #     context['item'] = self.item
-    #     return context
-    #
-    # def form_valid(self, form):
-    #     buyer_num = form.cleaned_data['buyer_num']
-    #     patron = get_object_or_404(Patron, buyer_num=buyer_num)
-    #     amount = form.cleaned_data['amount']
-    #     if self.item.is_purchased:
-    #         self.item.void_purchase()
-    #     purchase = Purchase.purchase_item(patron=patron, amount=amount, item=self.item)
-    #     msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
-    #         b_num=patron.buyer_num, b_name=patron.name, i_name=self.item.name, i_num=self.item.item_number,
-    #         amount=USD(amount))
-    #     messages.add_message(self.request, messages.INFO, msg, 'alert-success')
-    #     return redirect('item_management', category=self.item.category)
+    model = AuctionItem
+    form_class = ItemBiddingForm
+    template_name = 'auction/bidding_recorder.html'
+    group_required = 'auction_managers'
+
+    def dispatch(self, request, *args, **kwargs):
+        item_number = self.kwargs.get('item_number')
+        self.item = get_object_or_404(AuctionItem, item_number=item_number)
+        return super(BiddingRecorder, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(BiddingRecorder, self).get_context_data(**kwargs)
+        context['item'] = self.item
+        return context
+
+    def form_valid(self, form):
+        buyer_num = form.cleaned_data['buyer_num']
+        patron = get_object_or_404(Patron, buyer_num=buyer_num)
+        amount = form.cleaned_data['amount']
+        quantity = form.cleaned_data['quantity']
+        if self.item.is_purchased:
+            pass
+            # FIXME:
+            # raise Exception('Fix Me')
+            # self.item.void_purchase()
+        purchase = Purchase.create_auction_item_purchase(patron=patron, amount=amount,
+                                                         auction_item=self.item, quantity=quantity)
+        msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
+            b_num=patron.buyer_num, b_name=patron.name, i_name=self.item.name, i_num=self.item.item_number,
+            amount=USD(amount))
+        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
+        return redirect('item_management', booth_slug=self.item.booth.slug)
 
 
 
