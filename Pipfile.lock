@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ac0054459a29a3d886798ad25bdc853a4e7d3742e430c4b44be2bf40dc952812"
+            "sha256": "d739c64e5c02b80eb44d655052948e388b0bc633d0b0c5af650cb54242d04a35"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -169,6 +169,14 @@
             ],
             "index": "pypi",
             "version": "==1.13.0"
+        },
+        "django-crispy-forms": {
+            "hashes": [
+                "sha256:5952bab971110d0b86c278132dae0aa095beee8f723e625c3d3fa28888f1675f",
+                "sha256:705ededc554ad8736157c666681165fe22ead2dec0d5446d65fc9dd976a5a876"
+            ],
+            "index": "pypi",
+            "version": "==1.7.2"
         },
         "django-easy-timezones": {
             "hashes": [
@@ -513,11 +521,11 @@
         },
         "xlsxwriter": {
             "hashes": [
-                "sha256:18716ac3d8cd1f8c73af2a674df954bf4c1ae7a8b5944e1d6ca66815ece9518e",
-                "sha256:b2c7cbe246d1e1d113b4d014a71d1d9bb258f28625512f8df290352d1685be13"
+                "sha256:9db09ab93f462aa8b7559073ac58dcb4c18dc4321f8c04fb9eed0941c81ca0b5",
+                "sha256:b9d45a55c4ca976264f592fb8ceafba52cafe4e381050ade74abf11efa92d097"
             ],
             "index": "pypi",
-            "version": "==1.1.0"
+            "version": "==1.1.1"
         },
         "zope.interface": {
             "hashes": [
@@ -728,10 +736,10 @@
         },
         "pytest": {
             "hashes": [
-                "sha256:453cbbbe5ce6db38717d282b758b917de84802af4288910c12442984bde7b823",
-                "sha256:a8a07f84e680482eb51e244370aaf2caa6301ef265f37c2bdefb3dd3b663f99d"
+                "sha256:0a72d8a9f559c006ba153e0c9b4838efd7b656cf1f993747ba7128770d6eb12c",
+                "sha256:95529588ff4e85114a0b0ad8e9cf0131ca47d46b28230e25366c5aba66b1d854"
             ],
-            "version": "==3.8.0"
+            "version": "==3.8.1"
         },
         "pytest-django": {
             "hashes": [

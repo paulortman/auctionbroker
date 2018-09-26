@@ -43,6 +43,7 @@
             <td>{{ item.scheduled_sale_time|date:"P" }}</td>
             {% if item.purchase_set.count > 0 %}
                 <td>
+                    <a class="btn btn-primary btn-sm" href="{% url 'bidding_recorder' item_number=item.item_number %}">Edit Bid</a><br/>
                 {% for purchase in item.purchase_set.all %}
                 (<a href="{% url 'patron_detail' pk=purchase.patron_id %}" >{{ purchase.patron.buyer_num}}</a>)
                     {{ purchase.amount|money }}

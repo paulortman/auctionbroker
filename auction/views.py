@@ -4,6 +4,9 @@ import io
 
 import xlsxwriter
 from braces.views import GroupRequiredMixin, UserPassesTestMixin
+from crispy_forms.bootstrap import PrependedText, AppendedText
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Submit
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles import finders
@@ -721,41 +724,67 @@ class CheckoutConfirm(CheckoutAuthMixin, FormView):
         return redirect('checkout_patron', booth_slug=self.booth.slug)
 
 
-class BiddingRecorder(GroupRequiredMixin, FormView):
-    pass
-    model = AuctionItem
-    form_class = ItemBiddingForm
-    template_name = 'auction/bidding_recorder.html'
-    group_required = 'auction_managers'
+class BiddingRecorderFormHelper(FormHelper):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.form_method = 'post'
+        self.layout = Layout(
+            PrependedText('amount', '$'),
+            'buyer_num',
+            'quantity',
+            'delete',
+        )
+        self.render_required_fields = True
+        self.template = 'bootstrap4/table_inline_formset.html'
+        self.add_input(Submit("submit", "Record Bid"))
+        self.add_input(Submit("cancel", "Cancel", css_class='btn-secondary'))
 
-    def dispatch(self, request, *args, **kwargs):
+
+class BiddingRecorder(GroupRequiredMixin, FormSetView):
+    group_required = 'auction_managers'
+    template_name = 'auction/bidding_recorder.html'
+    form_class = ItemBiddingForm
+    factory_kwargs = {
+        'extra': 2,
+        'can_delete': True,
+    }
+
+    def get_initial(self):
+        item = self.get_item()
+        initial = [{'buyer_num': p.patron.buyer_num,
+                    'amount': p.amount,
+                    'quantity': p.quantity} for p in item.purchase_set.all()]
+        return initial
+
+    def get_item(self):
         item_number = self.kwargs.get('item_number')
-        self.item = get_object_or_404(AuctionItem, item_number=item_number)
-        return super(BiddingRecorder, self).dispatch(request, *args, **kwargs)
+        return get_object_or_404(AuctionItem, item_number=item_number)
 
     def get_context_data(self, **kwargs):
         context = super(BiddingRecorder, self).get_context_data(**kwargs)
-        context['item'] = self.item
+        context['item'] = self.get_item()
+        context['helper'] = BiddingRecorderFormHelper()
         return context
 
-    def form_valid(self, form):
-        buyer_num = form.cleaned_data['buyer_num']
-        patron = get_object_or_404(Patron, buyer_num=buyer_num)
-        amount = form.cleaned_data['amount']
-        quantity = form.cleaned_data['quantity']
-        if self.item.is_purchased:
-            pass
-            # FIXME:
-            # raise Exception('Fix Me')
-            # self.item.void_purchase()
-        purchase = Purchase.create_auction_item_purchase(patron=patron, amount=amount,
-                                                         auction_item=self.item, quantity=quantity)
-        msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
-            b_num=patron.buyer_num, b_name=patron.name, i_name=self.item.name, i_num=self.item.item_number,
-            amount=USD(amount))
-        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
-        return redirect('item_management', booth_slug=self.item.booth.slug)
-
+    def formset_valid(self, formset):
+        # This simplest thing to do is delete all the bids previously recorded and then create new bids with the bids
+        # given here.  We assume this list is authoritative.
+        item = self.get_item()
+        item.purchase_set.all().delete()
+        for form in formset.forms:
+            if form.is_valid() and form.cleaned_data:
+                buyer_num = form.cleaned_data['buyer_num']
+                patron = get_object_or_404(Patron, buyer_num=buyer_num)
+                amount = form.cleaned_data['amount']
+                quantity = form.cleaned_data['quantity']
+                if not form.cleaned_data['DELETE']:  # we've already deleted it, so we just don't add it back
+                    Purchase.create_auction_item_purchase(patron=patron, amount=amount,
+                                                          auction_item=item, quantity=quantity)
+                    msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
+                        b_num=patron.buyer_num, b_name=patron.name, i_name=item.name, i_num=item.item_number,
+                        amount=USD(amount))
+                    messages.add_message(self.request, messages.INFO, msg, 'alert-success')
+        return redirect('item_management', booth_slug=item.booth.slug)
 
 
 class ModelSearch(View):

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     'easy_timezones',
     'bootstrap4',
+    'crispy_forms',
     'auction',
 ]
 
@@ -148,3 +149,6 @@ BASE_AUCTION_NUMBER = 1000
 AUCTIONITEM_SCHEDULED_TIME_INCREMENT = 2  # minutes
 CC_TRANSACTION_FEE_PERCENTAGE = 0.03  # 3%
 SALE_TZ = pytz.timezone('US/Central')
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_FAIL_SILENTLY = not DEBUG

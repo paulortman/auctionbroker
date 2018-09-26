@@ -30,7 +30,7 @@ class AuctionItemCreateForm(forms.ModelForm):
 
 
 class ItemBiddingForm(forms.Form):
-    amount = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Dollar amount, e.g. 10.00")
+    amount = forms.DecimalField(max_digits=15, decimal_places=2)
     buyer_num = forms.CharField(max_length=10, label="Buyer Number")
     quantity = forms.CharField(max_length=10, label="Quantity", required=False)
 

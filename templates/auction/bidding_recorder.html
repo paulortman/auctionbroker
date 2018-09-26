@@ -1,5 +1,5 @@
 {% extends 'action_page.html' %}
-{% load bootstrap4 %}
+{% load crispy_forms_tags %}
 {% load money %}
 
 {% block title %}Record Bid for {{ item.name }}{% endblock %}
@@ -15,28 +15,9 @@
         <li>Description: {{ item.long_desc }}</li>
     </ul>
     {% if item.is_purchased %}
-        <div class="alert alert-warning" role="alert"><strong>This item is already purchased by {{ item.purchase.patron.name }} ({{ item.purchase.patron.buyer_num}})!</strong>  Re-recording the winning bidder will void the previous purchase.</div>
+        <div class="alert alert-warning" role="alert"><strong>This item is already purchased!</strong>  Re-recording the winning bids will void the previous purchases.</div>
     {% endif %}
     <form action="{% url "bidding_recorder" item_number=item.item_number %}" method="post">
-        {% csrf_token %}
-        <div class="form-row">
-            <div class="col-md-3">
-                {% bootstrap_field form.amount addon_before='<div class="input-group-prepend"><span class="input-group-text">$</span></div>' %}
-            </div>
-            <div class="col-md-3">
-                {% bootstrap_field form.buyer_num %}
-            </div>
-            <div class="col-md-3">
-                {% bootstrap_field form.quantity %}
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="col-md-6">
-                {% buttons %}
-                    <button class="btn btn-primary" type="submit" >Record Winning Bid</button>
-                    <button class="btn" type="reset" >Cancel</button>
-                {% endbuttons %}
-            </div>
-        </div>
+        {% crispy formset helper %}
     </form>
 {% endblock %}
