@@ -17,7 +17,13 @@
     {% if item.is_purchased %}
         <div class="alert alert-warning" role="alert"><strong>This item is already purchased!</strong>  Re-recording the winning bids will void the previous purchases.</div>
     {% endif %}
-    <form action="{% url "bidding_recorder" item_number=item.item_number %}" method="post">
+    <form action="{% url "bidding_recorder" item_number=item.item_number %}" method="post" id="bidrecordingform">
         {% crispy formset helper %}
     </form>
+{% endblock %}
+
+{% block script_footer %}
+    <script>
+        var form = $('#bidrecordingform');
+    </script>
 {% endblock %}
