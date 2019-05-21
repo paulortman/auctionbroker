@@ -3,9 +3,9 @@
 {% load money %}
 {% load tz %}
 
-{% block title %}{{ auction_category|capfirst }} Auction Management{% endblock %}
+{% block title %}{{ auction_booth.name|capfirst }} Management{% endblock %}
 
-{% block page-heading %}{{ auction_category|capfirst }} Auction Management{% endblock %}
+{% block page-heading %}{{ auction_booth.name|capfirst }} Management{% endblock %}
 
 {% block content %}
     <div class="toolbar hidden-print">

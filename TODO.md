@@ -2,12 +2,10 @@
 
 ## 2019 Todo
 
-- Move In-Kind Donations on the Patron screen to much lower -- very confusing for those checking out
+- Better Auction Management Screen
+- "Record Bid and Next Item ...." button when recording bids
+
 - Paginate patron list and/or auction lists
-- Lots of bugs with Auction categories when adding/editing auction items
-    - returns to wrong page on save
-    - save and add another does not work
-    - save and return to list does not work
 - Allow combining two buyer numbers into one payment
 - Seems to be bug when checking out a booth and getting spaces? in the buyer number field -- generated "500" errors numerous times
 - Configure Papertrail logging to save production data logs
@@ -29,6 +27,11 @@
 - 
 
 # Done
+- Lots of bugs with Auction categories when adding/editing auction items
+    - returns to wrong page on save
+    - save and add another does not work
+    - save and return to list does not work
+- Move In-Kind Donations on the Patron screen to much lower -- very confusing for those checking out
 - manually enter buyer numbers
 - admin dashboard/reports
 - payments with CC need multiple steps to correctly calculate fees (must fix)

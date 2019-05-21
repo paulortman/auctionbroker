@@ -131,7 +131,7 @@ class AuctionItemCreate(AuctionItemMixin, CreateView):
         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
 
         if 'save_and_add_another' in self.request.POST:
-            return redirect('item_create')
+            return redirect('item_create', booth_slug=i.booth.slug)
         if 'save_and_return_to_list' in self.request.POST:
             return redirect('item_management', booth_slug=i.booth.slug)
 
