@@ -28,6 +28,7 @@ h2 {
 
 .table .col-price {
     width: 9em;
+    text-align: right;
 }
 
 .table .col-action {

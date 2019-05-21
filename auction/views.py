@@ -123,7 +123,7 @@ class AuctionItemCreate(AuctionItemMixin, CreateView):
     def form_valid(self, form):
         booth_slug = self.kwargs.get('booth_slug', None)
         if booth_slug:
-            form.instance.booth = Booth.objects.get(booth_slug=booth_slug)
+            form.instance.booth = Booth.objects.get(slug=booth_slug)
 
         form.instance.save()
         i = form.instance
@@ -150,7 +150,7 @@ class AuctionItemCreate(AuctionItemMixin, CreateView):
 
         booth_slug = self.kwargs.get('booth_slug', None)
         if booth_slug:
-            initial['booth'] = Booth.objects.get(booth_slug=booth_slug)
+            initial['booth'] = Booth.objects.get(slug=booth_slug)
 
         return initial
 

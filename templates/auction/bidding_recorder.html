@@ -13,6 +13,7 @@
         <li>Auction Time: {{ item.scheduled_sale_time }}</li>
         <li>Fair Market Value: {{ item.fair_market_value|money }}</li>
         <li>Description: {{ item.long_desc }}</li>
+        {% if item.donor %}<li> Donated By: {{ item.donor.name }}</li> {% endif %}
     </ul>
     {% if item.is_purchased %}
         <div class="alert alert-warning" role="alert"><strong>This item is already purchased!</strong>  Re-recording the winning bids will void the previous purchases (the bids recorded below are the complete set, not bids that are added to the set).</div>

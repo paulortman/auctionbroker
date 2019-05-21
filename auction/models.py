@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Max
+from django.db.models import Max, Sum
 from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import reverse
@@ -65,6 +65,9 @@ class AuctionItem(TrackedModel):
         if self.purchase_set.count() > 0:
             return True
         return False
+
+    def purchase_sum(self):
+        return self.purchase_set.aggregate(Sum('amount'))['amount__sum']
 
     def get_absolute_url(self):
         return reverse('item_detail', kwargs={'item_number': self.item_number})
@@ -175,7 +178,7 @@ class Patron(TrackedModel, models.Model):
 
     @property
     def in_kind_donations_sales_total(self):
-        return D(sum([i.purchase.amount for i in self.donations.all() if i.purchase]))
+        return D(sum([i.purchase_sum() for i in self.donations.all()]))
 
     @property
     def donations_total(self):

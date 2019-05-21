@@ -34,6 +34,7 @@ h2 {
 
 .table .col-price {
     width: 7em;
+    text-align: right;
 }
 .table thead th {
     border-bottom: 1px solid gray;
