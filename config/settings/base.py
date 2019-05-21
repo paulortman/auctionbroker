@@ -14,14 +14,20 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import pytz
 
+# This warning gets really old fast
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module='psycopg2')
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+ENV = os.environ['ENV']
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'y@90(^f(t9unm*%8r1#t(1g_91ca&qnno#(o^360k!pj8v^#kz'
+SECRET_KEY = os.environ['SECRET_KEY']
+# SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
