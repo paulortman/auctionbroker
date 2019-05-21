@@ -1,4 +1,6 @@
 from decimal import Decimal
+
+from django.db.models import Sum
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
@@ -196,3 +198,29 @@ class UtilityTestCase(TestCase):
         assert D('0.10') == calc_cc_fee_amount(D('3.17'))
 
 
+class BlessingBidTestCase(TestCase):
+
+    def setUp(self) -> None:
+        # we have a single auction item that more than one bidder "buys"
+        self.ai = AuctionItemFactory()
+
+        self.buyer1 = PatronFactory()
+        self.buyer2 = PatronFactory()
+
+    def test_more_than_one_bidder(self):
+        purchase1 = Purchase.create_auction_item_purchase(patron=self.buyer1, amount='10.00',
+                                                          auction_item=self.ai, quantity=1)
+        purchase2 = Purchase.create_auction_item_purchase(patron=self.buyer2, amount='10.00',
+                                                          auction_item=self.ai, quantity=1)
+
+        assert self.ai.purchase_set.count() == 2
+        assert self.ai.purchase_set.aggregate(Sum('amount'))['amount__sum'] == 20
+
+    def test_multiple_diverse_amounts(self):
+        purchase1 = Purchase.create_auction_item_purchase(patron=self.buyer1, amount='500.00',
+                                                          auction_item=self.ai, quantity=1)
+        purchase2 = Purchase.create_auction_item_purchase(patron=self.buyer2, amount='111.00',
+                                                          auction_item=self.ai, quantity=1)
+
+        assert self.ai.purchase_set.count() == 2
+        assert self.ai.purchase_set.aggregate(Sum('amount'))['amount__sum'] == 611

@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import widgets, ModelChoiceField
+from django.forms import widgets, ModelChoiceField, formset_factory
 
 from .models import Booth, Patron, Payment, buyer_number_validator, AuctionItem, Purchase
 
@@ -33,6 +33,24 @@ class ItemBiddingForm(forms.Form):
     amount = forms.DecimalField(max_digits=15, decimal_places=2)
     buyer_num = forms.CharField(max_length=10, label="Buyer Number")
     quantity = forms.CharField(max_length=10, label="Quantity", required=False)
+
+class ItemMultiBiddingForm(forms.Form):
+    amount = forms.DecimalField(max_digits=15, decimal_places=2)
+    buyer_numbers = forms.CharField(label="Buyer Numbers (comma separated)")
+    quantity = forms.CharField(max_length=10, label="Quantity", required=False)
+    DELETE = forms.BooleanField(label="Delete?", required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.validated_buyer_numbers = []
+
+    def clean(self):
+        cleaned_data = super().clean()
+        buyer_numbers = [x.strip() for x in cleaned_data.get('buyer_numbers', '').split(',')]
+        for num in buyer_numbers:
+            if not Patron.objects.filter(buyer_num=num).exists():
+                raise forms.ValidationError("Buyer number {} is not a valid number".format(num))
+            self.validated_buyer_numbers.append(num)
 
 
 class BoothForm(forms.ModelForm):

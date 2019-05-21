@@ -15,15 +15,24 @@
         <li>Description: {{ item.long_desc }}</li>
     </ul>
     {% if item.is_purchased %}
-        <div class="alert alert-warning" role="alert"><strong>This item is already purchased!</strong>  Re-recording the winning bids will void the previous purchases.</div>
+        <div class="alert alert-warning" role="alert"><strong>This item is already purchased!</strong>  Re-recording the winning bids will void the previous purchases (the bids recorded below are the complete set, not bids that are added to the set).</div>
     {% endif %}
     <form action="{% url "bidding_recorder" item_number=item.item_number %}" method="post" id="bidrecordingform">
         {% crispy formset helper %}
     </form>
+    {# This is added here for a better template to add entries using JS #}
+    <div id="empty_form" style="display:none">
+        {% crispy formset.empty_form helper %}
+    </div>
 {% endblock %}
 
 {% block script_footer %}
     <script>
-        var form = $('#bidrecordingform');
+        $('#add_more').click(function() {
+            var total_forms = $('#id_form-TOTAL_FORMS');
+            var form_idx = total_forms.val();
+            $('#bidrecordingform > .form-row').last().append($('#empty_form .form-row').last().html().replace(/__prefix__/g, form_idx));
+            total_forms.val(parseInt(form_idx) + 1);
+        });
     </script>
 {% endblock %}

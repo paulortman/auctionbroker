@@ -4,9 +4,9 @@ import io
 
 import xlsxwriter
 from braces.views import GroupRequiredMixin, UserPassesTestMixin
-from crispy_forms.bootstrap import PrependedText, AppendedText
+from crispy_forms.bootstrap import PrependedText, AppendedText, StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit
+from crispy_forms.layout import Layout, Submit, Field, Column, Row, Button
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles import finders
@@ -30,7 +30,7 @@ from auction.utils import D, USD, calc_cc_fee_amount
 from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PurchaseForm, PatronCreateForm, \
     PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm, PatronPaymentCashForm, \
-    PatronPaymentCCForm, PatronPaymentCCFeeForm, PurchaseEditForm, CSVUploadForm
+    PatronPaymentCCForm, PatronPaymentCCFeeForm, PurchaseEditForm, CSVUploadForm, ItemMultiBiddingForm
 
 
 class HonorNextMixin:
@@ -729,13 +729,17 @@ class BiddingRecorderFormHelper(FormHelper):
         super().__init__(*args, **kwargs)
         self.form_method = 'post'
         self.layout = Layout(
-            PrependedText('amount', '$'),
-            'buyer_num',
-            'quantity',
-            'delete',
+            Row(
+                Column(PrependedText('amount', '$'), css_class="form-group col-md-2 mb-0"),
+                Column('buyer_numbers', css_class="form-group col-md-8 mb-0"),
+                Column('quantity', css_class="form-group col-md-1 mb-0"),
+                Column('DELETE', css_class="form-group col-md-1 mb-0"),
+                css_class='form-row'
+            ),
         )
         self.render_required_fields = True
-        self.template = 'bootstrap4/table_inline_formset.html'
+
+        self.add_input(Button("add", value="Add Another Entry", css_id="add_more", css_class='btn-outline-primary'))
         self.add_input(Submit("submit", "Record Bid"))
         self.add_input(Submit("cancel", "Cancel", css_class='btn-secondary'))
 
@@ -743,17 +747,18 @@ class BiddingRecorderFormHelper(FormHelper):
 class BiddingRecorder(GroupRequiredMixin, FormSetView):
     group_required = 'auction_managers'
     template_name = 'auction/bidding_recorder.html'
-    form_class = ItemBiddingForm
+    form_class = ItemMultiBiddingForm
     factory_kwargs = {
         'extra': 2,
         'can_delete': True,
     }
 
     def get_initial(self):
+        # We could use StingAgg() and grouping by amount and quantity to condense this back into CSV bidder numbers
         item = self.get_item()
-        initial = [{'buyer_num': p.patron.buyer_num,
+        initial = [{'buyer_numbers': p.patron.buyer_num,
                     'amount': p.amount,
-                    'quantity': p.quantity} for p in item.purchase_set.all()]
+                    'quantity': p.quantity} for p in item.purchase_set.all().order_by('amount')]
         return initial
 
     def get_item(self):
@@ -773,17 +778,18 @@ class BiddingRecorder(GroupRequiredMixin, FormSetView):
         item.purchase_set.all().delete()
         for form in formset.forms:
             if form.is_valid() and form.cleaned_data:
-                buyer_num = form.cleaned_data['buyer_num']
-                patron = get_object_or_404(Patron, buyer_num=buyer_num)
-                amount = form.cleaned_data['amount']
-                quantity = form.cleaned_data['quantity']
-                if not form.cleaned_data['DELETE']:  # we've already deleted it, so we just don't add it back
-                    Purchase.create_auction_item_purchase(patron=patron, amount=amount,
-                                                          auction_item=item, quantity=quantity)
-                    msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
-                        b_num=patron.buyer_num, b_name=patron.name, i_name=item.name, i_num=item.item_number,
-                        amount=USD(amount))
-                    messages.add_message(self.request, messages.INFO, msg, 'alert-success')
+                buyer_numbers = [x.strip() for x in form.cleaned_data['buyer_numbers'].split(',')]
+                for buyer_num in buyer_numbers:
+                    patron = get_object_or_404(Patron, buyer_num=buyer_num)
+                    amount = form.cleaned_data['amount']
+                    quantity = form.cleaned_data['quantity']
+                    if not form.cleaned_data['DELETE']:  # we've already deleted it, so we just don't add it back
+                        Purchase.create_auction_item_purchase(patron=patron, amount=amount,
+                                                              auction_item=item, quantity=quantity)
+                        msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
+                            b_num=patron.buyer_num, b_name=patron.name, i_name=item.name, i_num=item.item_number,
+                            amount=USD(amount))
+                        messages.add_message(self.request, messages.INFO, msg, 'alert-success')
         return redirect('item_management', booth_slug=item.booth.slug)
 
 

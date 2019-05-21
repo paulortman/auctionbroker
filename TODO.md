@@ -8,9 +8,6 @@
     - returns to wrong page on save
     - save and add another does not work
     - save and return to list does not work
-- Make interface to bulk add blessing bids
-    - something to enter bid amount categories with multiple bidders per
-      category
 - Allow combining two buyer numbers into one payment
 - Seems to be bug when checking out a booth and getting spaces? in the buyer number field -- generated "500" errors numerous times
 - Configure Papertrail logging to save production data logs
@@ -50,3 +47,6 @@
 - Green link text on white for Patron names (and others) is pretty hard to read
 - Add patron search to toolbar/menubar so you don't need to list all patrons
 - Login form is screwy at small screen sizes
+- Make interface to bulk add blessing bids
+    - something to enter bid amount categories with multiple bidders per
+      category
