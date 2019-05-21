@@ -879,22 +879,16 @@ class SalesByBooth(GroupRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Summarize all the booth sales, except for the Auction booth, which we handle later
-        booth_sales = Booth.objects.exclude(name="Auction").annotate(Sum('priceditem__purchase__amount'))
+        # Summarize all the booth sales
+        booth_sales = Booth.objects.annotate(Sum('purchase__amount')).order_by('category', 'name')
         booths = {}
         for b in booth_sales:
-            amount = b.priceditem__purchase__amount__sum
+            amount = b.purchase__amount__sum
             booths[b.name] = D(amount)
 
-        # Auction Sales we gather directly
-        for cat_name, cat_display in AuctionItem.CATEGORIES:
-            auction_sales = AuctionItem.objects.filter(is_purchased=True, category=cat_name).aggregate(Sum('purchase__amount'))['purchase__amount__sum']
-            booths['Auction: {}'.format(cat_display)] = D(auction_sales)
-
         # Donations without a recorded booth need to be accounted for too
-        raise Exception("This Needs Fixed")
-        # donations = PricedItem.objects.filter(booth__isnull=True).aggregate(Sum('purchase__amount'))['purchase__amount__sum']
-        # booths['Generic Donations'] = D(donations)
+        donations = Purchase.objects.filter(booth__isnull=True).aggregate(Sum('amount'))['amount__sum']
+        booths['Generic Donations'] = D(donations)
 
         # Fees
         fees = D(Fee.objects.all().aggregate(Sum('amount'))['amount__sum'])
@@ -945,9 +939,9 @@ class AllSales(GroupRequiredMixin, View):
             worksheet.write(row, col+3, purchase.amount, money_format)
             worksheet.write(row, col+4, purchase.transaction_time, date_format)
             worksheet.write(row, col+5, purchase.ctime, date_format)
-            worksheet.write(row, col+6, self._item_number(purchase.item))
-            worksheet.write(row, col+7, purchase.item.name)
-            worksheet.write(row, col+8, self._booth_name(purchase.item.booth))
+            worksheet.write(row, col+6, purchase.auction_item.item_number if purchase.auction_item else '')
+            worksheet.write(row, col+7, purchase.auction_item.name if purchase.auction_item else '')
+            worksheet.write(row, col+8, purchase.booth.name if purchase.booth else '')
             row = row + 1
 
         # Set colunn width
@@ -963,18 +957,6 @@ class AllSales(GroupRequiredMixin, View):
         response['Content-Disposition'] = 'attachment; filename=All_Sales_Report.xlsx'
 
         return response
-
-    def _booth_name(self, booth):
-        if booth:
-            return booth.name
-        else:
-            return None
-
-    def _item_number(self, item):
-        if hasattr(item, 'item_number'):
-            return item.item_number
-        else:
-            return None
 
 
 class PopulateAttendees(GroupRequiredMixin, FormView):

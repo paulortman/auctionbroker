@@ -38,9 +38,11 @@ heroku_deploy:
 
 
 local_new:
-	rm -f db.sqlite3 && \
 	python manage.py collectstatic --no-input && \
 	python manage.py migrate && \
 	python manage.py create_users && \
 	python manage.py create_booths && \
+	python manage.py create_patrons && \
+	python manage.py populate_testdb && \
+	python manage.py purchase_random_items
 

@@ -32,6 +32,7 @@ class BoothFactory(factory.django.DjangoModelFactory):
         model = Booth
 
     name = factory.Sequence(lambda n: 'booth %d' % n)
+    category = Booth.PRICED
 
 
 class AuctionItemFactory(factory.django.DjangoModelFactory):

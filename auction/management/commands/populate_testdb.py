@@ -3,7 +3,7 @@ import random
 from django.core.management.base import BaseCommand, CommandError
 
 from auction.modelfactory import BoothFactory, PatronFactory, AuctionItemFactory
-from auction.models import AuctionItem
+from auction.models import AuctionItem, Booth
 
 items = [
     "1945 Massey Harris",
@@ -44,18 +44,19 @@ class Command(BaseCommand):
     help = 'Create a bunch of test stuff in the DB'
 
     def handle(self, *args, **kwargs):
-        BoothFactory.create(name='Baked Goods')
-        BoothFactory.create(name='Food Court')
-        BoothFactory.create(name='Crafts')
-        auction = BoothFactory.create(name='Auction')
+        # BoothFactory.objects.get_or_create(name='Baked Goods')
+        # BoothFactory.get_or_create(name='Food Court')
+        # BoothFactory.get_or_create(name='Crafts')
+        auction = Booth.objects.get(name='Auction')
+        silent_auction = Booth.objects.get(name='Silent Auction')
 
         random.shuffle(items)
         for i in items:
             if random.randrange(1,10,1) < 9:
-                AuctionItemFactory.create(booth=auction, name=i, category=AuctionItem.MAIN)
+                AuctionItemFactory.create(booth=auction, name=i)
                 print('M', end='')
             else:
-                AuctionItemFactory.create(booth=auction, name=i, category=AuctionItem.SILENT)
+                AuctionItemFactory.create(booth=silent_auction, name=i)
                 print('S', end='')
 
         print("\nPopulation Done")

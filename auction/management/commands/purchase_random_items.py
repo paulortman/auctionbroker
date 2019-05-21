@@ -14,11 +14,13 @@ class Command(BaseCommand):
 
         # Half the registered patrons buy priced item
         patron_cnt = Patron.objects.all().count()
+        print('{} Patrons'.format(patron_cnt))
         patron_sample = random.sample(list(Patron.objects.all()), int(patron_cnt * 0.5))  # 50% sample
+        print('{} Patrons buy priced items'.format(len(patron_sample)))
 
         base_time = timezone.now()
 
-        booths = list(Booth.objects.exclude(name="Auction"))
+        booths = list(Booth.objects.exclude(category=Booth.AUCTION))
         prices = ['1', '1.5', '2', '2', '2.5', '2.5', '2.5', '4', '5', '10']
 
         for patron in patron_sample:
@@ -37,11 +39,12 @@ class Command(BaseCommand):
         items = AuctionItem.objects.all()[0:int(items_cnt * 0.9)]
 
         patron_sample = random.sample(list(Patron.objects.all()), int(patron_cnt * 0.3))  # 30% sample
+        print('{} Patrons buy auction items'.format(len(patron_sample)))
         for item in items:
             # amount is between 100 - 115 % of the fmv
             amount = item.fair_market_value * Decimal(random.randint(100, 115) / 100.0)
             patron = random.choice(patron_sample)
-            p = Purchase.purchase_item(patron=patron, amount=amount, item=item)
+            p = Purchase.create_auction_item_purchase(patron=patron, amount=amount, auction_item=item, quantity=1)
             minutes = 4 * 60 + random.randint(1, 4 * 60)  # spread purchases over 4 hours, later
             p.transaction_time = base_time + timezone.timedelta(minutes=minutes)
             p.save()
