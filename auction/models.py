@@ -125,7 +125,7 @@ class Patron(TrackedModel, models.Model):
     address_line1 = models.CharField(max_length=50, verbose_name="Address")
     address_line2 = models.CharField(blank=True, max_length=50, verbose_name="Address Line 2, e.g. Marion, SD")
     address_line3 = models.CharField(blank=True, max_length=50, verbose_name="Address Line 3, e.g. 57043")
-    phone1 = models.CharField(blank=True, max_length=20)
+    phone1 = models.CharField(blank=True, max_length=30)
 
     def __str__(self):
         return "Patron {name} ({number})".format(name=self.name, number=self.buyer_num)
