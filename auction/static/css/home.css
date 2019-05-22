@@ -108,3 +108,13 @@ input[type=number] {
         font-size: 1.75rem;
     }
 }
+
+.item_number {
+    background-color: #2d2e2b;
+    color: #f3f3f3;
+    padding: 0.15em 0.5em;
+    display: inline-block;
+    font-size: 65%;
+    vertical-align: top;
+    border-radius: 5em;
+}

@@ -4,7 +4,6 @@
 
 - Better Auction Management Screen
 - "Record Bid and Next Item ...." button when recording bids
-
 - Paginate patron list and/or auction lists
 - Allow combining two buyer numbers into one payment
 - Seems to be bug when checking out a booth and getting spaces? in the buyer number field -- generated "500" errors numerous times
