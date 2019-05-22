@@ -741,6 +741,7 @@ class BiddingRecorderFormHelper(FormHelper):
 
         self.add_input(Button("add", value="Add Another Entry", css_id="add_more", css_class='btn-outline-primary'))
         self.add_input(Submit("submit", "Record Bid"))
+        self.add_input(Submit("save_and_next_item", "Record Bid and Next"))
         self.add_input(Submit("cancel", "Cancel", css_class='btn-secondary'))
 
 
@@ -790,6 +791,12 @@ class BiddingRecorder(GroupRequiredMixin, FormSetView):
                             b_num=patron.buyer_num, b_name=patron.name, i_name=item.name, i_num=item.item_number,
                             amount=USD(amount))
                         messages.add_message(self.request, messages.INFO, msg, 'alert-success')
+        if 'save_and_next_item' in self.request.POST:
+            try:
+                next = AuctionItem.objects.filter(scheduled_sale_time__gt=item.scheduled_sale_time)[0]
+            except IndexError:
+                return redirect('item_management', booth_slug=item.booth.slug)
+            return redirect('bidding_recorder', item_number=next.item_number)
         return redirect('item_management', booth_slug=item.booth.slug)
 
 
