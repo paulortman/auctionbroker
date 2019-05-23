@@ -4,20 +4,13 @@
 
 {% block title %}Record Bid for {{ item.name }}{% endblock %}
 
-{% block page-heading %}Record Bid for {{ item.name }}{% endblock %}
+{% block page-heading %}Record Bid for <div class="item_number">#{{ item.item_number }}</div>
+    {{ item.name }}{% endblock %}
 
 {% block content %}
 
-    <ul>
-        <li>Item Number: {{ item.item_number }}</li>
-        <li>Auction Time: {{ item.scheduled_sale_time }}</li>
-        <li>Fair Market Value: {{ item.fair_market_value|money }}</li>
-        <li>Description: {{ item.long_desc }}</li>
-        {% if item.donor %}<li> Donated By: {{ item.donor.name }}</li> {% endif %}
-    </ul>
-    {% if item.is_purchased %}
-        <div class="alert alert-warning" role="alert"><strong>This item is already purchased!</strong>  Re-recording the winning bids will void the previous purchases (the bids recorded below are the complete set, not bids that are added to the set).</div>
-    {% endif %}
+    {% include 'auction/auctionitem_detail_snippet.html' %}
+
     <form action="{% url "bidding_recorder" item_number=item.item_number %}" method="post" id="bidrecordingform">
         {% crispy formset helper %}
     </form>

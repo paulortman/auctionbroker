@@ -1,0 +1,43 @@
+{% load money %}
+
+<div class="row">
+    {% if item.is_purchased %}
+        <div class="col-sm">
+            <div class="card">
+                <h2 class="card-header bg-danger text-light" style="font-weight: bold;">Sold!</h2>
+                <div class="card-body">
+                    <ul class="card-text">
+                        <li>Sale Time: {{ item.sale_time }}</li>
+                        <li>Total Purchase Price: <b>{{ item.purchase_sum|money }}</b></li>
+                        <li>Winner{{ item.purchase_set.all.count|pluralize }}:
+                            <ul>
+                                {% for purchase in item.purchase_set.all %}
+                                    <li>{{ purchase.patron.name}} ({{ purchase.patron.buyer_num }}) &mdash;
+                                        {% if purchase.quantity %}
+                                            {{ purchase.quantity }} for
+                                        {% endif %}
+                                        {{ purchase.amount|money }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <div class="col-sm">
+        <div class="card">
+            <h2 class="card-header">Item Information</h2>
+            <div class="card-body">
+                <ul class="card-text">
+                    <li>Fair Market Value: {{ item.fair_market_value|money }}</li>
+                    <li>Scheduled Auction Time: {{ item.scheduled_sale_time }}</li>
+                    <li>Donor: {{ item.donor.name }}</li>
+                    <li>Quantity: {{ item.quantity }}</li>
+                </ul>
+                <p class="card-text">{{ item.long_desc }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
