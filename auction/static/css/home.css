@@ -141,3 +141,7 @@ input[type=number] {
     transform:rotate(300deg);
     -webkit-transform:rotate(300deg);
 }
+
+tr.separator {
+    border-top: 7px solid lightgrey;
+}

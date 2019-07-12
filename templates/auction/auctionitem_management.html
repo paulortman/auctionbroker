@@ -36,7 +36,11 @@
     </thead>
     <tbody>
     {% for item in object_list %}
+        {% ifchanged item.is_purchased %}
+        <tr class="separator">
+        {% else %}
         <tr>
+        {% endifchanged %}
             <td scope="row"><a class="pk" href="{% url 'item_detail' item_number=item.item_number %}" >{{ item.item_number }}</a>
                 {% if item.purchase_set.count > 0 %}<span class="badge badge-success">Sold!</span>{% endif %}
                 <br/>

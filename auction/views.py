@@ -71,7 +71,7 @@ class AuctionItemMixin(GroupRequiredMixin, HonorNextMixin):
     raise_exception = True
 
     def get_queryset(self):
-        return self.model.objects.all().order_by('sale_time','scheduled_sale_time')
+        return self.model.objects.all().order_by('-sale_time','scheduled_sale_time')
 
     def get_object(self):
         item_number = self.kwargs.get('item_number', None)
