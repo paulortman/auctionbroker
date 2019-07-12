@@ -40,9 +40,11 @@ heroku_deploy:
 local_new:
 	python manage.py collectstatic --no-input && \
 	python manage.py migrate && \
-	python manage.py create_users && \
 	python manage.py create_booths && \
-	python manage.py create_patrons && \
-	python manage.py populate_testdb && \
-	python manage.py purchase_random_items
+	python manage.py loaddata --app auction.patron 2018_patron_dump.json && \
+	python manage.py create_users && \
+	python manage.py import_auction_items
+#	python manage.py create_patrons && \
+#	python manage.py populate_testdb && \
+#	python manage.py purchase_random_items
 

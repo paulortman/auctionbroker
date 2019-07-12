@@ -41,7 +41,7 @@ class AuctionItem(TrackedModel):
     class Meta:
         pass
 
-    name = models.CharField(max_length=50, blank=False, help_text="Short but descriptive name of item.")
+    name = models.CharField(max_length=100, blank=False, help_text="Short but descriptive name of item.")
     long_desc = models.TextField(blank=True, verbose_name="Long Description",
                                  help_text="Enter a description, donor information, etc.")
     fair_market_value = models.DecimalField(max_digits=15, decimal_places=2, default=D(0),
