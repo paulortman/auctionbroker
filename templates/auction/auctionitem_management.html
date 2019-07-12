@@ -29,26 +29,25 @@
     <table class="table table-bordered table-hover">
     <thead class="thead-dark">
         <tr>
-            <th scope="col">ID</th>
+            <th scope="col">ID/Time</th>
             <th scope="col">Name</th>
-            <th scope="col">Scheduled Time</th>
-            <th scope="col">Sold?</th>
+            <th scope="col">Action</th>
         </tr>
     </thead>
     <tbody>
     {% for item in object_list %}
         <tr>
-            <td scope="row"><a class="pk" href="{% url 'item_detail' item_number=item.item_number %}" >{{ item.item_number }}</a></td>
-            <td><a href="{% url 'item_detail' item_number=item.item_number %}" >{{ item.name }}</a> {% if item.donor %} &ndash; donated by {{ item.donor.name }} {% endif %}</td>
-            <td>{{ item.scheduled_sale_time|date:"P" }}</td>
+            <td scope="row"><a class="pk" href="{% url 'item_detail' item_number=item.item_number %}" >{{ item.item_number }}</a>
+                {% if item.purchase_set.count > 0 %}<span class="badge badge-success">Sold!</span>{% endif %}
+                <br/>
+                {{ item.scheduled_sale_time|date:"P" }}</td>
+            <td><a href="{% url 'item_detail' item_number=item.item_number %}" >{{ item.name }}</a>
+                {% if item.donor %} &ndash; donated by {{ item.donor.name }} {% endif %}
+                {% if item.long_desc %}<br/>{{ item.long_desc|truncatewords_html:10 }}{% endif %}</td>
             {% if item.purchase_set.count > 0 %}
                 <td>
                     <a class="btn btn-primary btn-sm" href="{% url 'bidding_recorder' item_number=item.item_number %}">Edit Bid</a><br/>
-                {% for purchase in item.purchase_set.all %}
-                (<a href="{% url 'patron_detail' pk=purchase.patron_id %}" >{{ purchase.patron.buyer_num}}</a>)
-                    {{ purchase.amount|money }}
-                    {% if purchase.quantity %} | {{ purchase.quantity }} of {{ item.quantity }} {% endif %} <br/>
-                {% endfor %}
+                    {{ item.purchaser_count }} Buyer{{ item.purchaser_count|pluralize }} &middot; {{ item.purchase_sum|money }}
                 </td>
             {% else %}
                 <td><a class="btn btn-primary btn-sm" href="{% url 'bidding_recorder' item_number=item.item_number %}">Record Bid</a></td>

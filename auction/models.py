@@ -69,6 +69,9 @@ class AuctionItem(TrackedModel):
     def purchase_sum(self):
         return self.purchase_set.aggregate(Sum('amount'))['amount__sum']
 
+    def purchaser_count(self):
+        return self.purchase_set.count()
+
     def get_absolute_url(self):
         return reverse('item_detail', kwargs={'item_number': self.item_number})
 

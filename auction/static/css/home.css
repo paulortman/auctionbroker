@@ -118,3 +118,26 @@ input[type=number] {
     vertical-align: top;
     border-radius: 5em;
 }
+
+.watermarked{
+    position:absolute;
+    z-index:0;
+    background:white;
+    display:block;
+    min-height:50%;
+    min-width:50%;
+    color:yellow;
+}
+
+/*#content{*/
+/*    position:absolute;*/
+/*    z-index:1;*/
+/*}*/
+
+.watermarked .bg-text
+{
+    color:lightgrey;
+    font-size:115%;
+    transform:rotate(300deg);
+    -webkit-transform:rotate(300deg);
+}
