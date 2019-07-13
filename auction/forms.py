@@ -159,12 +159,14 @@ class DonateForm(forms.Form):
     donation = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Enter Dollar Amount, ex. $100.00",
                                   widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
     note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False)
+    booth = forms.ModelChoiceField(queryset=Booth.objects.all(), required=False)
 
 
 class PatronDonateForm(forms.Form):
     donation = forms.DecimalField(max_digits=15, decimal_places=2, help_text="Enter Dollar Amount, ex. $100.00",
                                widget=widgets.TextInput(attrs={'autofocus': 'autofocus'}))
     note = forms.CharField(max_length=50, label='Optional Descriptive Note', required=False)
+    booth = forms.ModelChoiceField(queryset=Booth.objects.all(), required=False)
 
 
 

@@ -14,7 +14,7 @@ class Command(BaseCommand):
         crafts, created = User.objects.get_or_create(username='crafts', email='crafts@example.com', first_name="Crafts", is_staff=True)
         produce, created = User.objects.get_or_create(username='produce', email='produce@example.com', first_name="Produce", is_staff=True)
         etc, created = User.objects.get_or_create(username='etc', email='etc@example.com', first_name="Etc", is_staff=True)
-        tickets, created = User.objects.get_or_create(username='tickets', email='tickets@example.com', first_name="Tickets", is_staff=True)
+        schoolkits, created = User.objects.get_or_create(username='schoolkits', email='schoolkits@example.com', first_name="Schoolkits", is_staff=True)
 
         # auction related
         auction, created = User.objects.get_or_create(username='auction', email='auction@example.com', first_name="Auction", is_staff=True)
@@ -28,7 +28,7 @@ class Command(BaseCommand):
         accounts_g, created = Group.objects.get_or_create(name='account_managers')
         admin_g, created = Group.objects.get_or_create(name='admins')
 
-        for user in [baked, food, crafts, produce, etc, tickets]:
+        for user in [baked, food, crafts, produce, etc, schoolkits]:
             user.groups.add(checkout_g)
 
         for user in [auction, bidding]:
@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
         portman.groups.set([checkout_g, auction_g, accounts_g, admin_g])
 
-        all_users = [baked, food, crafts, produce, auction, bidding, accounts, portman, etc, tickets]
+        all_users = [baked, food, crafts, produce, auction, bidding, accounts, portman, etc, schoolkits]
         for user in all_users:
             user.set_password(r'pass')
             user.save()

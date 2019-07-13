@@ -8,16 +8,26 @@ from auction.models import AuctionItem, Booth
 
 
 class Command(BaseCommand):
-    help = 'Import Action items listing from tab seperated file (TSV)'
+    help = 'Import Action items listing from tab separated file (TSV)'
 
-    file = '2019_auction_items.tsv'
-    time_year = 2019
-    time_month = 7
-    time_day = 13
-    time_zone = ''
+    def add_arguments(self, parser):
+        # Positional arguments
+        parser.add_argument('auction_name', action='store', type=str)
+        parser.add_argument('file', action='store', type=str)
+
+        # Named (optional) arguments
+        parser.add_argument('--year', action='store', type=int, default=timezone.now().year)
+        parser.add_argument('--month', action='store', type=int, default=timezone.now().month)
+        parser.add_argument('--day', action='store', type=int, default=timezone.now().day)
 
     def handle(self, *args, **kwargs):
-        auction = Booth.objects.get(name='Auction')
+        self.auction_name = kwargs['auction_name']
+        self.file = kwargs['file']
+        self.year = kwargs['year']
+        self.month = kwargs['month']
+        self.day = kwargs['day']
+
+        auction = Booth.objects.get(name=self.auction_name)
 
         for item in self.get_item():
             AuctionItem.objects.create(
@@ -32,7 +42,11 @@ class Command(BaseCommand):
             reader = csv.reader(tsvfile, delimiter='\t')
             for row in reader:
                 name = row[1]
-                description = row[2]
+
+                try:
+                    description = row[2]
+                except IndexError:
+                    description = ''
 
                 # interpret the short time into a real time
                 time = row[0]
@@ -43,9 +57,9 @@ class Command(BaseCommand):
                     hour = hour + 12
 
                 datetime = timezone.datetime(
-                    year = self.time_year,
-                    month = self.time_month,
-                    day = self.time_day,
+                    year = self.year,
+                    month = self.month,
+                    day = self.day,
                     hour = hour,
                     minute = min)
 

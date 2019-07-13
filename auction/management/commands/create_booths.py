@@ -12,7 +12,9 @@ class Command(BaseCommand):
         BoothFactory.create(name='Produce', category=Booth.PRICED)
         BoothFactory.create(name='Crafts', category=Booth.PRICED)
         BoothFactory.create(name='Etc Shoppe', category=Booth.PRICED)
-        BoothFactory.create(name='Tickets', category=Booth.PRICED)
+        BoothFactory.create(name='Noon Food', category=Booth.PRICED)
+        BoothFactory.create(name='Breakfast Food', category=Booth.PRICED)
+        BoothFactory.create(name='Schoolkits', category=Booth.PRICED)
 
         BoothFactory.create(name='Auction', category=Booth.AUCTION)
         BoothFactory.create(name='Silent Auction', category=Booth.AUCTION)

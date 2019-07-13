@@ -564,7 +564,8 @@ class PatronDonate(PatronMixin, FormView):
         patron = self.get_object()
         amount = form.cleaned_data['donation']
         note = form.cleaned_data['note']
-        Purchase.create_donation(patron=patron, amount=amount, booth=None, note=note)
+        booth = form.cleaned_data['booth']
+        Purchase.create_donation(patron=patron, amount=amount, booth=booth, note=note)
 
         msg = "Donation of {amount} made by {name} ({num})".format(
             amount=USD(amount), name=patron.name, num=patron.buyer_num)
@@ -581,12 +582,13 @@ class Donate(HonorNextMixin, FormView):
         buyer_num = form.cleaned_data['buyer_num']
         amount = form.cleaned_data['donation']
         note = form.cleaned_data['note']
+        booth = form.cleaned_data['booth']
         try:
             patron = Patron.objects.get(buyer_num=buyer_num)
         except Patron.DoesNotExist:
             raise ValidationError("Invalid Patron Number -- no patron exists")
 
-        Purchase.create_donation(patron=patron, amount=amount, booth=None, note=note)
+        Purchase.create_donation(patron=patron, amount=amount, booth=booth, note=note)
 
         msg = "Donation of {amount} made by {name} ({num})".format(
             amount=USD(amount), name=patron.name, num=patron.buyer_num)
@@ -1023,8 +1025,6 @@ class PopulateAuctionItems(GroupRequiredMixin, FormView):
             AuctionItem.objects.create(booth=auction,
                                        name=title,
                                        scheduled_sale_time=timezone.make_aware(time, settings.SALE_TZ),
-                                       item_number=item_number,
-                                       long_desc=description,
-                                       category=AuctionItem.MAIN)
+                                       long_desc=description)
 
         return super().form_valid(form)

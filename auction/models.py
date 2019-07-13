@@ -67,7 +67,8 @@ class AuctionItem(TrackedModel):
         return False
 
     def purchase_sum(self):
-        return self.purchase_set.aggregate(Sum('amount'))['amount__sum']
+        amount = self.purchase_set.aggregate(Sum('amount'))['amount__sum']
+        return amount if amount else 0
 
     def purchaser_count(self):
         return self.purchase_set.count()

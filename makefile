@@ -1,28 +1,3 @@
-start:
-	docker-compose start
-
-
-# delete all data, build containers, start them
-fresh:
-	docker-compose down && \
-	docker-compose up -d --build && \
-	sleep 5 && \
-	docker-compose exec -T app python manage.py create_users && \
-#	docker-compose exec -T app python manage.py populate_testdb && \
-#	docker-compose exec -T app python manage.py purchase_random_items && \
-
-up:
-	docker-compose up
-
-down:
-	docker-compose down
-
-# push the app image to the FHD image repository
-#push:
-#	eval $$(aws ecr get-login --no-include-email --region us-east-1) && \
-#	docker build -t auctionbroker . && \
-#	docker tag auctionbroker:latest 594645421903.dkr.ecr.us-east-1.amazonaws.com/paulortman/auctionbroker:latest && \
-#	docker push 594645421903.dkr.ecr.us-east-1.amazonaws.com/paulortman/auctionbroker:latest
 
 # heroku deploy steps
 deploy:
@@ -43,7 +18,9 @@ local_new:
 	python manage.py create_booths && \
 	python manage.py loaddata --app auction.patron 2018_patron_dump.json && \
 	python manage.py create_users && \
-	python manage.py import_auction_items
+	python manage.py import_auction_items "Auction" 2019_auction_items.tsv --year 2019 --month 7 --day 13 && \
+	python manage.py import_auction_items "Silent Auction" 2019_silent_auction_items.tsv --year 2019 --month 7 --day 13 && \
+	python manage.py reset_all_buyer_numbers
 #	python manage.py create_patrons && \
 #	python manage.py populate_testdb && \
 #	python manage.py purchase_random_items
