@@ -35,7 +35,7 @@ class Command(BaseCommand):
                 long_desc=item['description'],
                 booth=auction,
                 scheduled_sale_time=item['time'])
-            print ("{} > {}".format(item['time'].strftime("%H:%m"), item['name']))
+            print ("{} > {}".format(item['time'].strftime("%H:%M"), item['name']))
 
     def get_item(self):
         with open(self.file, 'r', encoding='utf-8-sig') as tsvfile:

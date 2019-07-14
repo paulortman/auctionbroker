@@ -1,5 +1,40 @@
 # Todo
 
+## 2020 Todo
+- had problems with clerks not saving buyer numbers to patrons when they searched for them.  This then led to issues 
+  when the buyer number was recorded at an auction item and it therefore was not a valid buyer number.
+- need better feedback when attempting to record a buyer number for a purchase and the buyer number is not assigned yet.
+- it would be nice to be able to re-order the list of patrons by buyer number to potentially find a missing number that 
+   hasn't been assigned.
+- should have a buyer number ajax validation as they are typed in to make for better experience of the clerk.
+- could have text analysis of the auction item to suggest possible donors
+- the invoices should be prettier
+
+
+### Notes
+To prepare for the sale i made my development copy pristine and then
+1) I did a selective data dump from the previous years to pull in all the patrons
+
+    `` heroku run -a auctionbroker -- python manage.py dumpdata auction.patron --indent 2 | tee -a 2018_patron_dump.json``
+    
+2) used the management command to reset the bidder numbers
+
+    `` ./manage.py reset_all_buyer_numbers ``
+
+3) used management commands to load TSV files containing the current year's auction items
+
+    `` python manage.py import_auction_items "Auction" 2019_auction_items.tsv --year 2019 --month 7 --day 13 &&
+       python manage.py import_auction_items "Silent Auction" 2019_silent_auction_items.tsv --year 2019 --month 7 --day 13
+	``
+	
+4) dumped all this data locally to json file
+    
+    ``  ./manage.py dumpdata > /tmp/data.json ``
+    
+5) loaded all the data into a pristine remote database on heroku
+
+    `` cat /tmp/data.json | heroku run --no-tty -a auctionbroker -- python manage.py loaddata --format=json -``
+    
 ## 2019 Todo
 
 - Better Auction Management Screen
