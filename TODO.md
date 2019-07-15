@@ -9,6 +9,8 @@
 - should have a buyer number ajax validation as they are typed in to make for better experience of the clerk.
 - could have text analysis of the auction item to suggest possible donors
 - the invoices should be prettier
+- in 2019 I upgrade to the smallest paid tier for the database and web worker.  Was very worth the total $1.50 cost 
+    for 1 day of usage -- it seemed more responsive and I wasn't worried about database size.
 
 
 ### Notes
@@ -34,6 +36,11 @@ To prepare for the sale i made my development copy pristine and then
 5) loaded all the data into a pristine remote database on heroku
 
     `` cat /tmp/data.json | heroku run --no-tty -a auctionbroker -- python manage.py loaddata --format=json -``
+    
+    
+This could also all be done with heroku's native push/pull commands for the postgres database I learned after the fact.
+
+Database dumps were taken after the 2019 event and stored in Paul's MCC digital folder.
     
 ## 2019 Todo
 
