@@ -397,6 +397,64 @@ class PatronList(PatronSearchMixin, PatronMixin, ListView):
 
         return qs.prefetch_related('payments', 'purchases')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['patron_count'] = self.get_queryset().count()
+        context['buyer_numbers_count'] = self.get_queryset().exclude(buyer_num__isnull=True).count()
+
+        return context
+
+
+class PatronListXLSX(PatronList):
+
+    def get(self, *args, **kwargs):
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'remove_timezone': True})
+        worksheet = workbook.add_worksheet()
+        row = 0
+        col = 0
+
+        date_format = workbook.add_format({'num_format': 0x16})
+        money_format = workbook.add_format({'num_format': 0x08})
+
+        patrons = self.get_queryset()
+
+        # write header
+        worksheet.write(row, col+0, 'Last Name')
+        worksheet.write(row, col+1, 'First Name')
+        worksheet.write(row, col+2, 'Buyer Number')
+        worksheet.write(row, col+3, 'Email')
+        worksheet.write(row, col+4, 'Address Line 1')
+        worksheet.write(row, col+5, 'Address Line 2')
+        worksheet.write(row, col+6, 'Address Line 3')
+        worksheet.write(row, col+7, 'Phone')
+        row = row + 1
+
+
+        # data
+        for patron in patrons:
+            worksheet.write(row, col+0, patron.last_name)
+            worksheet.write(row, col+1, patron.first_name)
+            worksheet.write(row, col+2, patron.buyer_num)
+            worksheet.write(row, col+3, patron.email)
+            worksheet.write(row, col+4, patron.address_line1)
+            worksheet.write(row, col+5, patron.address_line2)
+            worksheet.write(row, col+6, patron.address_line3)
+            worksheet.write(row, col+7, patron.phone1)
+            row = row + 1
+
+        # Set colunn width
+        worksheet.set_column(0, 1, 16)
+        worksheet.set_column(2, 2, 4)
+        worksheet.set_column(3, 7, 20)
+
+        workbook.close()
+
+        response = HttpResponse(output.getvalue(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=Patron_List.xlsx'
+
+        return response
+
 
 class PatronDetail(PatronMixin, DetailView):
     pass

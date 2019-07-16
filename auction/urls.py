@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'^booth/(?P<pk>\d+)/delete/$', views.BoothDelete.as_view(), name="booth_delete"),
 
     url(r'^patrons/$', views.PatronList.as_view(), name="patron_list"),
+    url(r'^patrons/xlsx/$', views.PatronListXLSX.as_view(), name="patron_list_xlsx"),
     url(r'^patron/create/$', views.PatronCreate.as_view(), name="patron_create"),
     url(r'^patron/(?P<pk>\d+)/$', views.PatronDetail.as_view(), name="patron_detail"),
     url(r'^patron/(?P<pk>\d+)/edit/$', views.PatronUpdate.as_view(), name="patron_update"),
