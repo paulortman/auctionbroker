@@ -17,8 +17,6 @@
         </div>
         <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_create' %}" >
             <img class="icon-lg" src="{% static 'svg/plus.svg'%}" alt="plus" /> Add Patron</a>
-        <a class="tool tool-lg btn btn-secondary" href="{% url 'patron_list_xlsx' %}" >
-            <img class="icon-lg" src="{% static 'svg/plus.svg'%}" alt="bullet" /> Download Patron List</a>
     </div>
 
     {% if not object_list %}
