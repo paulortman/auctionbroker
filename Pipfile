@@ -1,5 +1,4 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
@@ -8,11 +7,10 @@ name = "pypi"
 python_full_version = ">=3.7.*"
 
 [packages]
-
 "django-bootstrap4" = "*"
 channels = "*"
 dj-database-url = "*"
-django = "<2.3.0"
+django = "<4.0.0"
 django-braces = "*"
 django-crispy-forms = "*"
 django-easy-timezones = "*"
@@ -27,7 +25,6 @@ django-heroku = "*"
 xlsxwriter = "*"
 
 [dev-packages]
-
 django-debug-toolbar = "*"
 pytest-django = "*"
 coverage = "*"
