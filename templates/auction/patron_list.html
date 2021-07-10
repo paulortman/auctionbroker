@@ -23,7 +23,7 @@
         <p>No Patrons are registered {% if q %} that match the query: {{ q }}{% endif %}</p>
     {% else %}
         {% if not q %}
-        <p>{{ patron_count }} Patron{{ patron_count|pluralize:"s" }} listed, {{ buyer_numbers_count }} assigned buyer number{{ buyer_number_count|pluralize:"s" }}.</p>
+        <p>{{ patron_count }} Patron{{ patron_count|pluralize:"s" }} listed, {{ buyer_numbers_count }} assigned buyer number{{ buyer_numbers_count|pluralize:"s" }}.</p>
         {% endif %}
     <table class="table table-bordered table-hover">
     <thead class="thead-dark">
