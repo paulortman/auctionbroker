@@ -26,7 +26,7 @@ from weasyprint import HTML, CSS
 from weasyprint.fonts import FontConfiguration
 
 from .models import Patron, Purchase, Booth, Payment, AuctionItem, round_scheduled_sale_time, Fee
-from auction.utils import D, USD, calc_cc_fee_amount
+from auction.utils import D, USD, calc_cc_fee_amount, multiple_buyer_number_parser
 from .forms import PatronForm, PricedItemPurchaseForm, CheckoutPatronForm, CheckoutPurchaseForm, BoothForm, \
     PaymentForm, ItemBiddingForm, CheckoutConfirmForm, PurchaseForm, PatronCreateForm, \
     PatronDonateForm, AuctionItemEditForm, AuctionItemCreateForm, DonateForm, PatronPaymentCashForm, \
@@ -832,6 +832,7 @@ class BiddingRecorder(GroupRequiredMixin, FormSetView):
         context['helper'] = BiddingRecorderFormHelper()
         return context
 
+
     def formset_valid(self, formset):
         # This simplest thing to do is delete all the bids previously recorded and then create new bids with the bids
         # given here.  We assume this list is authoritative.
@@ -839,7 +840,7 @@ class BiddingRecorder(GroupRequiredMixin, FormSetView):
         item.purchase_set.all().delete()
         for form in formset.forms:
             if form.is_valid() and form.cleaned_data:
-                buyer_numbers = [x.strip() for x in form.cleaned_data['buyer_numbers'].split(',')]
+                buyer_numbers = multiple_buyer_number_parser(form.cleaned_data['buyer_numbers'])
                 for buyer_num in buyer_numbers:
                     patron = get_object_or_404(Patron, buyer_num=buyer_num)
                     amount = form.cleaned_data['amount']

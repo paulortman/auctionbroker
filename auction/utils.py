@@ -19,3 +19,12 @@ def USD(amount):
 
 def calc_cc_fee_amount(amount):
     return money_quant(amount * D(settings.CC_TRANSACTION_FEE_PERCENTAGE))
+
+def multiple_buyer_number_parser(s):
+    # convert a comma or space seperated string list of numbers into a list of numbers
+    space_deliminated = s.split(' ')
+    delim = []
+    for i in space_deliminated:
+        delim.extend([x.strip() for x in i.split(',')])
+
+    return [x for x in delim if x is not None and x != '']

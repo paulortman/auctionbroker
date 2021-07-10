@@ -2,6 +2,7 @@ from django import forms
 from django.forms import widgets, ModelChoiceField, formset_factory
 
 from .models import Booth, Patron, Payment, buyer_number_validator, AuctionItem, Purchase
+from .utils import multiple_buyer_number_parser
 
 
 class PatronChoiceField(ModelChoiceField):
@@ -36,7 +37,7 @@ class ItemBiddingForm(forms.Form):
 
 class ItemMultiBiddingForm(forms.Form):
     amount = forms.DecimalField(max_digits=15, decimal_places=2)
-    buyer_numbers = forms.CharField(label="Buyer Numbers (comma separated)")
+    buyer_numbers = forms.CharField(label="Buyer Numbers (comma or space separated)")
     quantity = forms.CharField(max_length=10, label="Quantity", required=False)
     DELETE = forms.BooleanField(label="Delete?", required=False)
 
@@ -46,7 +47,7 @@ class ItemMultiBiddingForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        buyer_numbers = [x.strip() for x in cleaned_data.get('buyer_numbers', '').split(',')]
+        buyer_numbers = multiple_buyer_number_parser(cleaned_data.get('buyer_numbers', ''))
         for num in buyer_numbers:
             if not Patron.objects.filter(buyer_num=num).exists():
                 raise forms.ValidationError("Buyer number {} is not a valid number".format(num))
