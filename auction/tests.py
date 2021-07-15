@@ -16,14 +16,14 @@ class AuctionBidEntry(TestCase):
     def test_winning_bid_time_set(self):
         p = PatronFactory()
         i = AuctionItemFactory()
-        pur = Purchase.create_auction_item_purchase(patron=p, amount='10', auction_item=i, quantity='1')
+        pur = Purchase.create_auction_item_purchase(patron=p, amount='10', auction_item=i, quantity=1)
         assert pur.transaction_time is not None
         assert i.sale_time is not None
 
     def test_is_purchased(self):
         p = PatronFactory()
         i = AuctionItemFactory()
-        pur = Purchase.create_auction_item_purchase(patron=p, amount='10', auction_item=i, quantity='1')
+        pur = Purchase.create_auction_item_purchase(patron=p, amount='10', auction_item=i, quantity=1)
         assert i.is_purchased
 
     def test_is_not_purchased(self):
@@ -94,6 +94,11 @@ class PurchaseTestCase(TestCase):
         Purchase.objects.create(patron=p, amount='10.00')
         assert p.outstanding_balance == Decimal('40.00')
 
+    def test_more_quantity_purchases(self):
+        p = PatronFactory()
+        Purchase.objects.create(patron=p, amount='10.00', quantity=4)
+        assert p.outstanding_balance == Decimal('40.00')
+
     def test_new_donation(self):
         p = PatronFactory()
         booth = BoothFactory()
@@ -111,7 +116,7 @@ class PurchaseTestCase(TestCase):
     def test_new_auction_purchase(self):
         p = PatronFactory()
         ai = AuctionItemFactory(fair_market_value=Decimal('10.00'))
-        pur = Purchase.create_auction_item_purchase(patron=p, amount='10.00', auction_item=ai, quantity='1')
+        pur = Purchase.create_auction_item_purchase(patron=p, amount='10.00', auction_item=ai, quantity=1)
         assert pur.donation_amount == Decimal('0.00')
         assert p.outstanding_balance == Decimal('10.00')
 

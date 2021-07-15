@@ -25,3 +25,6 @@ local_new:
 #	python manage.py populate_testdb && \
 #	python manage.py purchase_random_items
 
+
+tests:
+	pytest .
