@@ -22,10 +22,10 @@ Data is cleared out between years, except for patrons.  See the
 `docker compose up` to get all the environments up and running -- Actually, using a local docker instance of PG and then
 running the dev server from PyCharm is probably better.  These are already configured in the PyCharm IDE.
 
-`heroku pg:backups:create` and `heroku pg:backups:download <b00?>` 
+`heroku pg:backups:capture` and `heroku pg:backups:download <b00?>` 
 to get the production data locally
 
-`pg_restore -d ab -h 127.0.0.1 -p 5432 -U ab -v latest.dump` 
+`pg_restore -d ab -h 127.0.0.1 -p 5432 -U ab -v --no-owner latest.dump` 
 to restore
 
 `manage.py dumpdata auction.patron > patron_list.json`

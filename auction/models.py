@@ -67,7 +67,7 @@ class AuctionItem(TrackedModel):
         return False
 
     def purchase_sum(self):
-        amount = self.purchase_set.aggregate(Sum('amount'))['amount__sum']
+        amount = sum([x.amount_total for x in self.purchase_set.all()])
         return amount if amount else 0
 
     def purchaser_count(self):
@@ -146,7 +146,7 @@ class Patron(TrackedModel, models.Model):
 
     @property
     def purchases_total(self):
-        purchases = self.purchases.all().aggregate(models.Sum('amount'))['amount__sum']
+        purchases = sum([x.amount_total for x in self.purchases.all()])
         return D(purchases)
 
     @property
@@ -238,8 +238,7 @@ class Purchase(TrackedModel, models.Model):
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     booth = models.ForeignKey('Booth', blank=True, null=True, on_delete=models.SET_NULL)
-    quantity = models.CharField(max_length=50, blank=True, verbose_name="Quantity",
-                                help_text="2 dozen, 3 gallons, etc.")
+    quantity = models.SmallIntegerField(default=1)
     is_donation = models.BooleanField(default=False,
                                       help_text="True only when the full amount was a donation "
                                                 "with nothing received by the Patron")
@@ -254,6 +253,10 @@ class Purchase(TrackedModel, models.Model):
 
     def get_absolute_url(self):
         return reverse('purchase_detail', kwargs={'pk': self.pk})
+
+    @property
+    def amount_total(self):
+        return self.amount * self.quantity
 
     @property
     def donation_amount(self):
@@ -278,7 +281,7 @@ class Purchase(TrackedModel, models.Model):
     @classmethod
     def create_auction_item_purchase(cls, patron, amount, auction_item, quantity):
         desc = 'Auction Item "{}"'.format(auction_item.name)
-        desc = desc + ': Quantity: {}'.format( quantity) if quantity else desc
+        desc = desc + ' (Quantity: {} * {})'.format(quantity, USD(amount)) if quantity > 1 else desc
         p = Purchase.objects.create(patron=patron, amount=D(amount), auction_item=auction_item, description=desc,
                                     booth=auction_item.booth, fair_market_value=auction_item.fair_market_value,
                                     quantity=quantity)

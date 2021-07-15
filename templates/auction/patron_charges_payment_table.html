@@ -10,7 +10,9 @@
             <th class="col-action">Action</th>
             <th scope="col">Description</th>
 {#            <th scope="col" class="col-price">Donation</th>#}
+            <th scope="col" >Quantity</th>
             <th scope="col" class="col-price">Amount</th>
+            <th scope="col" class="col-price">Amount Total</th>
         </tr>
         </thead>
         <tbody>
@@ -21,17 +23,23 @@
                         <img class="icon-sm" src="{% static 'svg/pencil.svg' %}" alt="pencil icon" /></a>
                     <a class="btn btn-sm btn-secondary" href="{% url 'purchase_delete' pk=purchase.pk %}?next={% url 'patron_detail' pk=patron.pk %}" title="Delete">
                         <img class="icon-sm" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
+                </td>
                 <td>
                     {% if purchase.booth %}<em>{{ purchase.booth.name }}</em>: {% endif %}{{ purchase.description }}
                 </td>
-                <td class="col-price">{{ purchase.amount|money }}</td>
+                <td>
+                    {{ purchase.quantity }}
+                </td>
+                <td>
+                    {{ purchase.amount }}
+                </td>
+                <td class="col-price">{{ purchase.amount_total|money }}</td>
             </tr>
         {% endfor %}
         </tbody>
         <tfoot>
         <tr>
-            <th class="col-action"></th>
-            <th class="text-right" >Total Purchases</th>
+            <th colspan="4" class="text-right" >Total Purchases</th>
             <th class="col-price">{{ patron.purchases_total|money }}</th>
         </tr>
         </tfoot>

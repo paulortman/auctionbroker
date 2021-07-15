@@ -38,7 +38,7 @@ class ItemBiddingForm(forms.Form):
 class ItemMultiBiddingForm(forms.Form):
     amount = forms.DecimalField(max_digits=15, decimal_places=2)
     buyer_numbers = forms.CharField(label="Buyer Numbers (comma or space separated)")
-    quantity = forms.CharField(max_length=10, label="Quantity", required=False)
+    quantity = forms.IntegerField(label="Quantity", required=False, initial=1)
     DELETE = forms.BooleanField(label="Delete?", required=False)
 
     def __init__(self, *args, **kwargs):
@@ -67,7 +67,7 @@ class PaymentForm(forms.ModelForm):
 
 
 class PurchaseEditForm(forms.Form):
-    description = forms.CharField(max_length=50, required=False)
+    description = forms.CharField(max_length=100, required=False)
     amount = forms.DecimalField(max_digits=15, decimal_places=2)
 
 

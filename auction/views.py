@@ -228,7 +228,7 @@ class PurchaseUpdate(HonorNextMixin, FormView):
     def get_initial(self):
         self.object = self.get_object()
         initial = {}
-        initial['description'] = self.object.item.name
+        initial['description'] = self.object.description
         initial['amount'] = self.object.amount
         return initial
 
@@ -245,8 +245,7 @@ class PurchaseUpdate(HonorNextMixin, FormView):
         if 'amount' in form.changed_data and hasattr(self.object, 'priceditem'):
             self.object.priceditem.fair_market_value = form.cleaned_data['amount']
             self.object.priceditem.save()
-        self.object.item.name = form.cleaned_data['description']
-        self.object.item.save()
+        self.object.description = form.cleaned_data['description']
         self.object.amount = form.cleaned_data['amount']
         self.object.save()
         return super().form_valid(form)
