@@ -140,6 +140,9 @@ CHANNEL_LAYERS = {
 }
 
 
+# Needed as of Django 3.2+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # Django Debug Toolbar
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
