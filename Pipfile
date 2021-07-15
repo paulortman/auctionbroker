@@ -8,7 +8,6 @@ python_full_version = ">=3.9.*"
 
 [packages]
 "django-bootstrap4" = "*"
-channels = "*"
 dj-database-url = "*"
 django = "<4.0.0"
 django-braces = "*"
@@ -23,6 +22,7 @@ whitenoise = "*"
 gunicorn = "*"
 django-heroku = "*"
 xlsxwriter = "*"
+sentry-sdk = "*"
 
 [dev-packages]
 django-debug-toolbar = "*"
