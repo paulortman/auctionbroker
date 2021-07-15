@@ -947,21 +947,21 @@ class SalesByBooth(GroupRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         # Summarize all the booth sales
-        booth_sales = Booth.objects.annotate(Sum('purchase__amount')).order_by('category', 'name')
+        booth_sales = Booth.objects.annotate(Sum('purchase__amount_total')).order_by('category', 'name')
         booths = {}
         for b in booth_sales:
-            amount = b.purchase__amount__sum
+            amount = b.purchase__amount_total__sum
             booths[b.name] = D(amount)
 
         # Donations without a recorded booth need to be accounted for too
-        donations = Purchase.objects.filter(booth__isnull=True).aggregate(Sum('amount'))['amount__sum']
+        donations = Purchase.objects.filter(booth__isnull=True).aggregate(Sum('amount_total'))['amount_total__sum']
         booths['Generic Donations'] = D(donations)
 
         # Fees
         fees = D(Fee.objects.all().aggregate(Sum('amount'))['amount__sum'])
         booths['Fees'] = fees
 
-        total = D(Purchase.objects.all().aggregate(Sum('amount'))['amount__sum']) + fees
+        total = D(Purchase.objects.all().aggregate(Sum('amount_total'))['amount_total__sum']) + fees
         context['total_sum'] = D(total)
         context['booth_sums'] = booths
 
@@ -989,12 +989,14 @@ class AllSales(GroupRequiredMixin, View):
         worksheet.write(row, col+0, 'Last Name')
         worksheet.write(row, col+1, 'First Name')
         worksheet.write(row, col+2, 'Buyer Number')
-        worksheet.write(row, col+3, 'Amount')
-        worksheet.write(row, col+4, 'Transaction Time')
-        worksheet.write(row, col+5, 'DB Time')
-        worksheet.write(row, col+6, 'Item Number')
-        worksheet.write(row, col+7, 'Item Name')
-        worksheet.write(row, col+8, 'Booth')
+        worksheet.write(row, col+3, 'Quantity')
+        worksheet.write(row, col+4, 'Amount')
+        worksheet.write(row, col+5, 'Amount Total')
+        worksheet.write(row, col+6, 'Transaction Time')
+        worksheet.write(row, col+7, 'DB Time')
+        worksheet.write(row, col+8, 'Item Number')
+        worksheet.write(row, col+9, 'Item Name')
+        worksheet.write(row, col+10, 'Booth')
         row = row + 1
 
 
@@ -1003,20 +1005,24 @@ class AllSales(GroupRequiredMixin, View):
             worksheet.write(row, col+0, purchase.patron.last_name)
             worksheet.write(row, col+1, purchase.patron.first_name)
             worksheet.write(row, col+2, purchase.patron.buyer_num)
-            worksheet.write(row, col+3, purchase.amount, money_format)
-            worksheet.write(row, col+4, purchase.transaction_time, date_format)
-            worksheet.write(row, col+5, purchase.ctime, date_format)
-            worksheet.write(row, col+6, purchase.auction_item.item_number if purchase.auction_item else '')
-            worksheet.write(row, col+7, purchase.auction_item.name if purchase.auction_item else '')
-            worksheet.write(row, col+8, purchase.booth.name if purchase.booth else '')
+            worksheet.write(row, col+3, purchase.quantity)
+            worksheet.write(row, col+4, purchase.amount, money_format)
+            worksheet.write(row, col+5, purchase.amount_total, money_format)
+            worksheet.write(row, col+6, purchase.transaction_time, date_format)
+            worksheet.write(row, col+7, purchase.ctime, date_format)
+            worksheet.write(row, col+8, purchase.auction_item.item_number if purchase.auction_item else '')
+            worksheet.write(row, col+9, purchase.auction_item.name if purchase.auction_item else '')
+            worksheet.write(row, col+10, purchase.booth.name if purchase.booth else '')
             row = row + 1
 
         # Set colunn width
         worksheet.set_column(0, 1, 16)
         worksheet.set_column(2, 2, 4)
-        worksheet.set_column(3, 5, 14)
-        worksheet.set_column(6, 6, 4)
-        worksheet.set_column(7, 8, 30)
+        worksheet.set_column(3, 3, 4)
+        worksheet.set_column(4, 5, 10)
+        worksheet.set_column(6, 7, 14)
+        worksheet.set_column(8, 8, 5)
+        worksheet.set_column(9, 10, 30)
 
         workbook.close()
 

@@ -236,6 +236,7 @@ class Fee(TrackedModel, models.Model):
 class Purchase(TrackedModel, models.Model):
     patron = models.ForeignKey(Patron, related_name='purchases', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
+    amount_total = models.DecimalField(max_digits=15, decimal_places=2)
     transaction_time = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     booth = models.ForeignKey('Booth', blank=True, null=True, on_delete=models.SET_NULL)
     quantity = models.SmallIntegerField(default=1)
@@ -254,9 +255,9 @@ class Purchase(TrackedModel, models.Model):
     def get_absolute_url(self):
         return reverse('purchase_detail', kwargs={'pk': self.pk})
 
-    @property
-    def amount_total(self):
-        return self.amount * self.quantity
+    def save(self, *args, **kwargs):
+        self.amount_total = self.amount * self.quantity
+        super().save(*args, **kwargs)
 
     @property
     def donation_amount(self):
