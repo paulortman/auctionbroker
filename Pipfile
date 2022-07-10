@@ -4,15 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [requires]
-python_full_version = ">=3.9.*"
+python_full_version = ">=3.10.*"
 
 [packages]
 "django-bootstrap4" = "*"
 dj-database-url = "*"
-django = "<4.0.0"
+django = "<5.0.0"
 django-braces = "*"
 django-crispy-forms = "*"
-django-easy-timezones = "*"
+django-easy-timezones = {editable = true, git = "https://github.com/paulortman/django-easy-timezones"}
 django-extra-views = "*"
 factory-boy = "*"
 "psycopg2-binary" = "*"

@@ -23,7 +23,7 @@ from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView, TemplateView, FormView
 from extra_views import FormSetView
 from weasyprint import HTML, CSS
-from weasyprint.fonts import FontConfiguration
+from weasyprint.text.fonts import FontConfiguration
 
 from .models import Patron, Purchase, Booth, Payment, AuctionItem, round_scheduled_sale_time, Fee
 from auction.utils import D, USD, calc_cc_fee_amount, multiple_buyer_number_parser
