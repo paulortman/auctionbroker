@@ -16,9 +16,9 @@ local_new:
 	python manage.py collectstatic --no-input && \
 	python manage.py migrate && \
 	python manage.py create_booths && \
-	python manage.py loaddata --app auction.patron 2019_patron_dump.json && \
+	python manage.py loaddata --app auction.patron 2021_patron_list.json && \
 	python manage.py create_users && \
-	python manage.py import_auction_items "Auction" 2021_auction_items.tsv --year 2020 --month 7 --day 10 && \
+	python manage.py import_auction_items "Auction" 2022_auction_items.tsv --year 2022 --month 7 --day 9 && \
 	python manage.py reset_all_buyer_numbers
 #	python manage.py import_auction_items "Silent Auction" 2019_silent_auction_items.tsv --year 2019 --month 7 --day 13 && \
 #	python manage.py create_patrons && \

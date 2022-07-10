@@ -9,3 +9,6 @@
 /static
 .pytest_cache
 my_*
+latest.dump*
+*_patron_list.json
+*_auction_items.tsv
