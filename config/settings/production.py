@@ -8,8 +8,6 @@ DEBUG = False
 
 ALLOWED_HOSTS.append('auctionbroker.herokuapp.com')
 
-
-
 # Force SSL on Heroku: https://help.heroku.com/J2R1S4T8/can-heroku-force-an-application-to-use-ssl-tls
 SECURE_SSL_REDIRECT = True
 

@@ -27,6 +27,10 @@ local_new:
 #	python manage.py populate_testdb && \
 #	python manage.py purchase_random_items
 
+lock:
+	docker-compose exec app /bin/bash -c "pipenv --python /usr/local/bin/python lock"
+
+
 
 tests:
 	pytest .
