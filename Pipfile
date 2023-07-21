@@ -19,7 +19,6 @@ factory-boy = "*"
 weasyprint = "*"
 whitenoise = "*"
 gunicorn = "*"
-django-heroku = "*"
 xlsxwriter = "*"
 sentry-sdk = "*"
 

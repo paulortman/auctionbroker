@@ -1,3 +1,4 @@
+import dj_database_url
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -11,11 +12,13 @@ ALLOWED_HOSTS.append('auctionbroker.herokuapp.com')
 # Force SSL on Heroku: https://help.heroku.com/J2R1S4T8/can-heroku-force-an-application-to-use-ssl-tls
 SECURE_SSL_REDIRECT = True
 
-# Configure Django App for Heroku.
-import django_heroku
-
-django_heroku.settings(locals())
-
+DATABASES = {
+        "default": dj_database_url.config(
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        ),
+    }
 
 # Sentry
 sentry_sdk.init(
