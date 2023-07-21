@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [requires]
-python_full_version = ">=3.10.*"
+python_full_version = ">=3.11.*"
 
 [packages]
 "django-bootstrap4" = "*"
@@ -16,7 +16,6 @@ django-tz-detect = "*"
 django-extra-views = "*"
 factory-boy = "*"
 "psycopg2-binary" = "*"
-#uwsgi = "*"
 weasyprint = "*"
 whitenoise = "*"
 gunicorn = "*"

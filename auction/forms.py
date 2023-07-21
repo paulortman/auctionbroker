@@ -10,9 +10,17 @@ class PatronChoiceField(ModelChoiceField):
         return "{last_name}, {first_name}".format(last_name=obj.last_name, first_name=obj.first_name)
 
 
+class CustomSplitDateTimeField(forms.SplitDateTimeField):
+    def __init__(self, *args, **kwargs):
+        input_time_formats = kwargs.pop('input_time_formats', None)
+        input_time_formats = ['%I:%M %p', '%I:%M+%p', '%I:%M%p']
+        super().__init__(*args, input_time_formats=input_time_formats, **kwargs)
+        self.widget = widgets.SplitDateTimeWidget(time_format="%I:%M %p")
+        self.help_text = "Enter the scheduled date ('YYYY-MM-DD') and the time ('HH:MM PM')"
+
+
 class AuctionItemEditForm(forms.ModelForm):
-    scheduled_sale_time = forms.SplitDateTimeField(widget=widgets.SplitDateTimeWidget,
-                                                   help_text="Enter the scheduled date ('YYYY-MM-DD') and the time ('HH:MM PM')")
+    scheduled_sale_time = CustomSplitDateTimeField()
     donor = PatronChoiceField(queryset=Patron.objects.all().order_by('last_name'), required=False)
 
     class Meta:
@@ -21,8 +29,7 @@ class AuctionItemEditForm(forms.ModelForm):
 
 
 class AuctionItemCreateForm(forms.ModelForm):
-    scheduled_sale_time = forms.SplitDateTimeField(widget=widgets.SplitDateTimeWidget,
-                                                   help_text="Enter the scheduled date ('YYYY-MM-DD') and the time ('HH:MM PM')")
+    scheduled_sale_time = CustomSplitDateTimeField()
     donor = PatronChoiceField(queryset=Patron.objects.all().order_by('last_name'), required=False)
 
     class Meta:
