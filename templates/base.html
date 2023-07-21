@@ -1,7 +1,5 @@
 {% load static %}
-{% load tz %}
-
-{% localtime on %}
+{% load tz_detect %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -104,6 +102,6 @@
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
 {% block script_footer %}
 {% endblock %}
+{% tz_detect %}
 </body>
 </html>
-{% endlocaltime %}

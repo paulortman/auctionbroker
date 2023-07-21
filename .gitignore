@@ -12,3 +12,5 @@ my_*
 latest.dump*
 *_patron_list.json
 *_auction_items.tsv
+**/.DS_Store
+.bash_history

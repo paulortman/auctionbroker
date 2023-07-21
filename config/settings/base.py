@@ -32,7 +32,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = os.environ['DJANGO_ALLOWED_HOSTS'].split()
 
 
 # Application definition
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
 
     #'channels',
 
-    'easy_timezones',
+    'tz_detect',
     'bootstrap4',
     'crispy_forms',
     'auction',
@@ -61,7 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'easy_timezones.middleware.EasyTimezoneMiddleware',
+    'tz_detect.middleware.TimezoneMiddleware',
     'auction.middleware.TimezoneMiddleware',
 ]
 
@@ -120,8 +120,8 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-GEOIP_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCity.dat')
-GEOIPV6_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCityv6.dat')
+# GEOIP_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCity.dat')
+# GEOIPV6_DATABASE = os.path.join(BASE_DIR, 'GeoLiteCityv6.dat')
 TIME_INPUT_FORMATS=['%I:%M %p', '%H:%M']
 
 # Static files (CSS, JavaScript, Images)
@@ -161,3 +161,6 @@ SALE_TZ = pytz.timezone('US/Central')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
+
+MIDDLEWARE = [MIDDLEWARE[0], 'whitenoise.middleware.WhiteNoiseMiddleware', ] + MIDDLEWARE[1:]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'

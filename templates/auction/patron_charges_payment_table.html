@@ -30,8 +30,8 @@
                 <td>
                     {{ purchase.quantity }}
                 </td>
-                <td>
-                    {{ purchase.amount }}
+                <td class="col-price">
+                    {{ purchase.amount|money }}
                 </td>
                 <td class="col-price">{{ purchase.amount_total|money }}</td>
             </tr>

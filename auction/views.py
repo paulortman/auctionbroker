@@ -504,7 +504,8 @@ class PatronReceipt(PatronMixin, DetailView):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
         font_config = FontConfiguration()
-        html = HTML(string=render_to_string(self.template_name, context=context))
+        html = HTML(string=render_to_string(self.template_name, context=context),
+                    base_url=self.request.build_absolute_uri())
         css_files = ['css/bootstrap.min.css', 'css/print.css']
         css_files = ['css/print.css',]
         css_str = ""
