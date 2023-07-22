@@ -7,7 +7,7 @@ name = "pypi"
 python_full_version = ">=3.11.4"
 
 [packages]
-"django-bootstrap4" = "*"
+"crispy-bootstrap4" = "*"
 dj-database-url = "*"
 django = "<5.0.0"
 django-braces = "*"
