@@ -25,9 +25,11 @@ RUN apt-get update &&  \
 
 # Install python dependencies in /.venv
 COPY Pipfile .
-#COPY Pipfile.lock .
+COPY Pipfile.lock .
 ENV PATH="/usr/local/bin/:$PATH"
-RUN PIPENV_VENV_IN_PROJECT=1 pipenv --python /usr/local/bin/python update && pipenv --python /usr/local/bin/python install --dev --deploy
+RUN PIPENV_VENV_IN_PROJECT=1 \
+    pipenv --python /usr/local/bin/python update && \
+    pipenv --python /usr/local/bin/python install --dev --deploy
 
 
 #FROM base as runtime

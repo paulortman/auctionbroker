@@ -764,7 +764,7 @@ class CheckoutConfirm(CheckoutAuthMixin, FormView):
         context = super(CheckoutConfirm, self).get_context_data(**kwargs)
         context['patron'] = self.patron
         context['booth'] = self.booth
-        context['purchase_total'] = D(self.request.session['purchase_total'])
+        context['purchase_total'] = D(self.request.session.get('purchase_total', 0))
         return context
 
     def form_valid(self, form):
