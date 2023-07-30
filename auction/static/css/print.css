@@ -36,6 +36,10 @@ h2 {
     width: 7em;
     text-align: right;
 }
+.table .quantity {
+    width: 5em;
+    text-align: right;
+}
 .table thead th {
     border-bottom: 1px solid gray;
 }

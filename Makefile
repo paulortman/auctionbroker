@@ -40,5 +40,8 @@ up:
 build:
 	docker-compose build
 
+dump_patrons:
+	docker-compose exec app /bin/bash -c 'python manage.py dumpdata auction.patron > data/patron_list_$$(date "+%Y").json'
+
 tests:
 	pytest .

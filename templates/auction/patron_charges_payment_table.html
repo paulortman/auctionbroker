@@ -4,13 +4,13 @@
 
 {% if patron.purchases.all %}
     <h2>Purchases</h2>
-    <table class="table table-bordered table-hover">
+    <table class="table table-bordered table-hover receipt-details">
         <thead class="thead-dark">
         <tr>
             <th class="col-action">Action</th>
-            <th scope="col">Description</th>
+            <th class="desc" scope="col">Description</th>
 {#            <th scope="col" class="col-price">Donation</th>#}
-            <th scope="col" >Quantity</th>
+            <th class="quantity" scope="col" >Quantity</th>
             <th scope="col" class="col-price">Amount</th>
             <th scope="col" class="col-price">Amount Total</th>
         </tr>
@@ -24,10 +24,10 @@
                     <a class="btn btn-sm btn-secondary" href="{% url 'purchase_delete' pk=purchase.pk %}?next={% url 'patron_detail' pk=patron.pk %}" title="Delete">
                         <img class="icon-sm" src="{% static 'svg/delete.svg' %}" alt="delete icon" /></a>
                 </td>
-                <td>
+                <td class="desc">
                     {% if purchase.booth %}<em>{{ purchase.booth.name }}</em>: {% endif %}{{ purchase.description }}
                 </td>
-                <td>
+                <td class="quantity">
                     {{ purchase.quantity }}
                 </td>
                 <td class="col-price">
