@@ -2,7 +2,7 @@
 
 [https://actionbroker.herokuapp.com/](https://actionbroker.herokuapp.com/)
 
-There is a `makefile` to help with deploying the softare to Heroku.
+There is a `makefile` to help with deploying the software to Heroku.
 
 The tests are weak, but they run using pytest.
 
@@ -25,11 +25,11 @@ running the dev server from PyCharm is probably better.  These are already confi
 `heroku pg:backups:capture` and `heroku pg:backups:download <b00?>` 
 to get the production data locally
 
-`pg_restore -d ab -h 127.0.0.1 -p 5432 -U ab -v --no-owner latest.dump` 
+`docker compose exec db pg_restore -d ab -h 127.0.0.1 -p 5432 -U ab -v --no-owner /data/dump-2023.dump`
 to restore
 
 `manage.py dumpdata auction.patron > patron_list.json`
-and `manage.py loaddata patron_list.json` and `manage.py reset_all_buyer_nubmers` to dump the list of patrons (
+and `manage.py loaddata patron_list.json` and `manage.py reset_all_buyer_numbers` to dump the list of patrons (
 addresses, etc) and then reload it and remove all the buyer numbers -- see also `make local_new`
 
 
