@@ -13,3 +13,4 @@ latest.dump*
 .bash_history
 .local
 .python_history
+/data
