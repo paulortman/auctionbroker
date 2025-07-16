@@ -66,6 +66,9 @@ class AuctionItem(TrackedModel):
             return True
         return False
 
+    def __str__(self):
+        return f"{self.name} ({str(self.item_number)})"
+
     def purchase_sum(self):
         amount = sum([x.amount_total for x in self.purchase_set.all()])
         return amount if amount else 0

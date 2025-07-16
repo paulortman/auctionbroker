@@ -32,7 +32,7 @@ lock:
 	docker-compose exec app /bin/bash -c "pipenv --python /usr/local/bin/python lock"
 
 restore_db:
-	docker-compose exec app /bin/bash -c 'pg_restore -h db -p 5432 -d ab -U ab -v --no-owner data/dump-2023.dump'
+	docker-compose exec db /bin/bash -c 'pg_restore -h db -p 5432 -d ab -U ab -v --no-owner data/dump-2024.dump'
 
 up:
 	docker-compose up -d
@@ -45,3 +45,6 @@ dump_patrons:
 
 tests:
 	pytest .
+
+run COMMAND:
+    docker-compose exec app python manage.py {{COMMAND}}
