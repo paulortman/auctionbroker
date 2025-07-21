@@ -1,12 +1,5 @@
 
-# heroku deploy steps
-deploy:
-	true
-#	python manage.py collectstatic --no-input && \
-#	python manage.py migrate
-#	python manage.py create_users && \
-#	python manage.py populate_testdb && \
-#	python manage.py purchase_random_items
+# heroku deploy steps (done on the Heroku Servers)-- See Makefile
 
 # Use git to deploy code to Heroku
 heroku_deploy:
@@ -32,7 +25,7 @@ lock:
 	docker-compose exec app /bin/bash -c "pipenv --python /usr/local/bin/python lock"
 
 restore_db:
-	docker-compose exec db /bin/bash -c 'pg_restore -h db -p 5432 -d ab -U ab -v --no-owner data/dump-2024.dump'
+	docker-compose exec db /bin/bash -c 'pg_restore -h db -p 5432 -d ab -U ab -v --no-owner data/dump-2025.dump'
 
 up:
 	docker-compose up -d
@@ -41,7 +34,7 @@ build:
 	docker-compose build
 
 dump_patrons:
-	docker-compose exec app /bin/bash -c 'python manage.py dumpdata auction.patron > data/patron_list_$$(date "+%Y").json'
+	docker-compose exec app /bin/bash -c 'python manage.py dumpdata auction.patron > data/patron_list_$(date "+%Y").json'
 
 tests:
 	pytest .
