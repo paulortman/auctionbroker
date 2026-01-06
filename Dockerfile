@@ -16,7 +16,7 @@ RUN apt-get update &&  \
         libcairo2 \
         libpango-1.0-0 \
         libpangocairo-1.0-0 \
-        libgdk-pixbuf2.0-0 \
+        libgdk-pixbuf-2.0-0 \
         libffi-dev \
         shared-mime-info \
         postgresql-client \
@@ -29,7 +29,7 @@ COPY Pipfile.lock .
 ENV PATH="/usr/local/bin/:$PATH"
 RUN PIPENV_VENV_IN_PROJECT=1 \
     pipenv --python /usr/local/bin/python update && \
-    pipenv --python /usr/local/bin/python install --dev --deploy
+    pipenv --python /usr/local/bin/python install --dev
 
 
 #FROM base as runtime
