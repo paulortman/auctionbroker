@@ -259,7 +259,7 @@ class Purchase(TrackedModel, models.Model):
         return reverse('purchase_detail', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
-        self.amount_total = self.amount * self.quantity
+        self.amount_total = D(self.amount) * self.quantity
         super().save(*args, **kwargs)
 
     @property

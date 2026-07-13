@@ -11,7 +11,7 @@ local_new:
 	python manage.py collectstatic --no-input && \
 	python manage.py migrate && \
 	python manage.py create_booths && \
-	python manage.py loaddata --app auction.patron 2021_patron_list.json && \
+	python manage.py loaddata --app auction.patron data/patron_list_2025.json && \
 	python manage.py create_users && \
 	python manage.py reset_all_buyer_numbers \
 	"
@@ -25,7 +25,9 @@ lock:
 	docker-compose exec app /bin/bash -c "pipenv --python /usr/local/bin/python lock"
 
 restore_db:
-	docker-compose exec db /bin/bash -c 'pg_restore -h db -p 5432 -d ab -U ab -v --no-owner data/dump-2025.dump'
+    docker-compose down app
+    docker-compose exec db /bin/bash -c 'dropdb --if-exists ab -U ab && createdb ab -U ab && pg_restore -h db -p 5432 -d ab -U ab -v --no-owner data/dump-2025.dump'
+    docker-compose up -d app
 
 up:
 	docker-compose up -d
@@ -37,7 +39,7 @@ dump_patrons:
 	docker-compose exec app /bin/bash -c 'python manage.py dumpdata auction.patron > data/patron_list_$(date "+%Y").json'
 
 tests:
-	pytest .
+	docker compose exec app pytest
 
 run COMMAND:
     docker-compose exec app python manage.py {{COMMAND}}

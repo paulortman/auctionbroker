@@ -25,6 +25,9 @@ running the dev server from PyCharm is probably better.  These are already confi
 `heroku pg:backups:capture` and `heroku pg:backups:download <b00?>` 
 to get the production data locally
 
+`just restore_db && just run reset_all_for_new_year && just run reset_all_buyer_numbers` to restore a previous year's
+data, and reset all the fields for the current year.
+
 `docker compose exec db pg_restore -d ab -h 127.0.0.1 -p 5432 -U ab -v --no-owner /data/dump-2023.dump`
 to restore
 
