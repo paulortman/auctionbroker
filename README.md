@@ -35,6 +35,7 @@ to restore
 and `manage.py loaddata patron_list.json` and `manage.py reset_all_buyer_numbers` to dump the list of patrons (
 addresses, etc) and then reload it and remove all the buyer numbers -- see also `just local_new`
 
+`docker compose exec db pg_dump -Fc -U ab -h localhost -d ab -f data/pre-2026-db.dump` to dump the local db
 
 To push the local database to the remote heroku database: 
     `heroku pg:reset postgresql-triangular-11982`
