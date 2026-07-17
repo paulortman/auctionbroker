@@ -1,5 +1,5 @@
 
-# heroku deploy steps (done on the Heroku Servers)-- See Makefile
+# heroku deploy steps (done on the Heroku Servers)-- See ./deploy.sh
 
 # Use git to deploy code to Heroku
 heroku_deploy:

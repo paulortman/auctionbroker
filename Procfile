@@ -1,3 +1,3 @@
 web: gunicorn config.wsgi --log-file -
 
-release: make deploy
+release: /bin/bash deploy.sh
