@@ -46,6 +46,7 @@ class ItemMultiBiddingForm(forms.Form):
     amount = forms.DecimalField(max_digits=15, decimal_places=2)
     buyer_numbers = forms.CharField(label="Buyer Numbers (comma or space separated)")
     quantity = forms.IntegerField(label="Quantity", required=False, initial=1)
+    description = forms.CharField(label="Description", required=False)
     DELETE = forms.BooleanField(label="Delete?", required=False)
 
     def __init__(self, *args, **kwargs):

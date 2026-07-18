@@ -791,8 +791,9 @@ class BiddingRecorderFormHelper(FormHelper):
         self.layout = Layout(
             Row(
                 Column(PrependedText('amount', '$'), css_class="form-group col-md-2 mb-0"),
-                Column('buyer_numbers', css_class="form-group col-md-8 mb-0"),
+                Column('buyer_numbers', css_class="form-group col-md-7 mb-0"),
                 Column('quantity', css_class="form-group col-md-1 mb-0"),
+                Column('description', css_class="form-group col-md-1 mb-0"),
                 Column('DELETE', css_class="form-group col-md-1 mb-0"),
                 css_class='form-row'
             ),
@@ -845,9 +846,11 @@ class BiddingRecorder(GroupRequiredMixin, FormSetView):
                     patron = get_object_or_404(Patron, buyer_num=buyer_num)
                     amount = form.cleaned_data['amount']
                     quantity = form.cleaned_data['quantity']
+                    description = form.cleaned_data['description']
                     if not form.cleaned_data['DELETE']:  # we've already deleted it, so we just don't add it back
                         Purchase.create_auction_item_purchase(patron=patron, amount=amount,
-                                                              auction_item=item, quantity=quantity)
+                                                              auction_item=item, quantity=quantity,
+                                                              description=description)
                         msg = "{b_num} ({b_name}) purchased {i_name} ({i_num}) in the amount of {amount}".format(
                             b_num=patron.buyer_num, b_name=patron.name, i_name=item.name, i_num=item.item_number,
                             amount=USD(amount))

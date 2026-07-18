@@ -16,7 +16,11 @@
                                         {% if purchase.quantity %}
                                             {{ purchase.quantity }} for
                                         {% endif %}
-                                        {{ purchase.amount|money }}</li>
+                                        {{ purchase.amount|money }}
+                                        {% if purchase.auction_purchase_description %}
+                                            >> {{ purchase.auction_purchase_description }}
+                                        {% endif %}
+                                    </li>
                                 {% endfor %}
                             </ul>
                         </li>

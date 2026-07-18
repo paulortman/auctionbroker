@@ -263,6 +263,13 @@ class Purchase(TrackedModel, models.Model):
         super().save(*args, **kwargs)
 
     @property
+    def auction_purchase_description(self):
+        if '>>' in self.description:
+            return self.description.split('>>')[1].strip()
+        else:
+            return None
+
+    @property
     def donation_amount(self):
         if self.is_donation:
             return D(self.amount)
@@ -283,9 +290,11 @@ class Purchase(TrackedModel, models.Model):
         return p
 
     @classmethod
-    def create_auction_item_purchase(cls, patron, amount, auction_item, quantity):
+    def create_auction_item_purchase(cls, patron, amount, auction_item, quantity, description=None):
         desc = 'Auction Item "{}"'.format(auction_item.name)
         desc = desc + ' (Quantity: {} * {})'.format(quantity, USD(amount)) if quantity > 1 else desc
+        if description:
+            desc = desc + ' >> {}'.format(description)
         p = Purchase.objects.create(patron=patron, amount=D(amount), auction_item=auction_item, description=desc,
                                     booth=auction_item.booth, fair_market_value=auction_item.fair_market_value,
                                     quantity=quantity)
